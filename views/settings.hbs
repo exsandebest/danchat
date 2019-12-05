@@ -1,0 +1,48 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Настройки</title>
+    <style>
+    </style>
+</head>
+<body background="bg.jpg">
+{{> navbar}}
+<center>
+  <span class="orange" style="cursor:default">Цвет логина в чате</span><br><br>
+<input type="color" id="color" value="{{color}}" style="height: 44px"><br><br>
+<label><span class="orange">Автоматически прокручивать чат</span>
+    <br><br>
+    {{#if scroll}}
+    <input type="checkbox" id="scroll" checked/>
+        {{else}}
+        <input type="checkbox" id="scroll"/>
+        {{/if}}
+</label><br><br>
+<span class="green" id="notif"></span>
+<br><br>
+<buttons class="buttons" onclick="save()">Сохранить</buttons>
+</center>
+<script>
+function save() {
+    var colorValue = document.getElementById("color").value;
+    var scrollValue = document.getElementById("scroll").checked;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/change-settings", true);
+    xhr.onload = ()=> {
+        if (xhr.status == 200) {
+          document.getElementById("notif").setAttribute("style","opacity:0");
+          document.getElementById("notif").innerHTML = "<notificationGood>Настройки успешно сохранены</notificationGood>";
+          document.getElementById("notif").setAttribute("style", "opacity:1");
+          setTimeout(()=>{
+            document.getElementById("notif").setAttribute("style", "opacity:0");
+          },100000);
+        }
+    }
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("color=" + colorValue + "&scroll=" + scrollValue);
+}
+</script>
+{{> footer}}
+<body>
+
+</html>

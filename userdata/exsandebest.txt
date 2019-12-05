@@ -1,0 +1,18 @@
+{
+     "id": "2",
+     "login": "exsandebest",
+     "password": "123456",
+     "sex": "male",
+     "age": 16,
+     "friends": [
+          "FoxYour"
+     ],
+     "firstname": "Даниил",
+     "lastname": "Богданов",
+     "color": "#00ff40",
+     "scroll": true,
+     "outreqs": [],
+     "inreqs": [
+          "admin"
+     ]
+}

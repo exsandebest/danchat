@@ -1,0 +1,181 @@
+﻿<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Профиль</title>
+    <style>
+        .overlay {
+            transition: 0.5s;
+            background: #000;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            opacity: .5;
+        }
+        .visible {
+            transition: 0.5s;
+            background: rgba(255, 255, 255, 0.75);
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            border-radius: 20px 20px 20px 20px;
+            margin-top: -200px;
+            overflow: hidden;
+            z-index: 2000;
+            width: 500px;
+            padding: 0px;
+            margin-left: -250px;
+        }
+        .content {
+            transition: 0.5s;
+            padding: 0 1em;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            background: WhiteSmoke;
+        }
+        #notif2
+        {
+          opacity: 0;
+          transition: 1s;
+        }
+    </style>
+</head>
+<body background="bg.jpg">
+  <script >
+  function changePasword(){
+  var oldPassword = val("oldPassword");
+  var newPassword = val("newPassword");
+  var repeatNewPassword = val("repeatNewPassword");
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/user/change/password", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onload = ()=>{
+    if (xhr.responseText.split(":")[0] === "true") {
+      notif (1, "Good", xhr.responseText.split(":")[1],"",100000);
+      document.getElementById("oldPassword").innerHTML = "";
+      document.getElementById("newPassword").innerHTML = "";
+      document.getElementById("repeatNewPassword").innerHTML = "";
+    } else if (xhr.responseText.split(":")[0] === "false"){
+      notif(1,"Bad",xhr.responseText.split(":")[1].split("\n\n")[0],xhr.responseText.split(":")[1].split("\n\n")[1], 10000);
+    } else {
+      notif (1, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
+    }
+  }
+  xhr.onerror = xhr.onabort = ()=>{
+    notif (1, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
+  }
+  xhr.send(`oldPassword=${oldPassword}&newPassword=${newPassword}&repeatNewPassword=${repeatNewPassword}`);
+  }
+
+
+
+
+  function changeName(){
+  var firstname = val("firstname");
+  var lastname = val("lastname");
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST","/user/change/name",true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onload = ()=>{
+    if (xhr.responseText.split(":")[0] === "true") {
+      notif (2, "Good", xhr.responseText.split(":")[1],"",100000);
+    } else if (xhr.responseText.split(":")[0] === "false"){
+      notif(2,"Bad",xhr.responseText.split(":")[1].split("\n\n")[0],xhr.responseText.split(":")[1].split("\n\n")[1], 10000);
+    } else {
+      notif (2, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
+    }
+  }
+  xhr.onerror = xhr.onabort = ()=>{
+    notif (2, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
+  }
+  xhr.send(`firstname=${firstname}&lastname=${lastname}`);
+  }
+
+  function notif (num,type, msg1, msg2, time){
+  if (num == 1){
+    document.getElementById("notif").setAttribute("style", "opacity:0");
+    document.getElementById("notif").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><span class='orange'>" + msg2 + "</span>";
+    document.getElementById("notif").setAttribute("style", "opacity:1");
+    setTimeout(() => {
+      document.getElementById("notif").setAttribute("style", "opacity:0");
+    }, time);
+  } else {
+    document.getElementById("notif2").setAttribute("style", "opacity:0");
+    document.getElementById("notif2").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><span class='orange'>" + msg2 + "</span>";
+    document.getElementById("notif2").setAttribute("style", "opacity:1");
+    setTimeout(() => {
+      document.getElementById("notif2").setAttribute("style", "opacity:0");
+    }, time);
+  }
+  }
+
+
+  function val(id) {
+    return document.getElementById(id).value;
+  }
+  </script>
+{{> navbar}}
+<center>
+    {{#if imgStatus}}
+        <img src="{{login}}.jpg" style="border-radius:20px; width: 200px; height:200px;"/>
+        {{else}}
+        <img src="default.jpg" style="border-radius:20px; width: 250px; height:250px;"/>
+    {{/if}}
+    <br><br>
+    <span style="font: bold 25px 'Trebuchet MS'; color: {{color}}; background-color: rgba(245,255,233,0.55); border-radius: 7px 7px 7px 7px;"> {{login}} </span><br><br>
+    <br><br>
+    <span class="green">{{firstname}} {{lastname}}</span>
+    <br><br><br>
+{{#if isAdmin}}
+<buttons class="buttons" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</buttons>
+    <br><br><br><br>
+{{/if}}
+    <buttons class="buttons" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИО</buttons><br><br><br><br>
+<buttons class="buttons" onClick="getElementById('winChangePassword').removeAttribute('style');" type="button">Сменить пароль</buttons>
+<br><br><br>
+    </center>
+{{> footer}}
+<div id="winChangePassword" style="display:none;">
+    <div class="overlay" onclick="getElementById('winChangePassword').style.display='none';"></div>
+    <div class="visible">
+        <span class="orange" style="margin: 20px">Смена пароля</span>
+        <div class="content">
+            <br><br>
+            <center>
+            <input id="oldPassword" type="password" class="pole2" placeholder="Старый пароль"/><br><br>
+            <input id="newPassword" type="password" class="pole2" placeholder="Новый пароль"/><br><br>
+            <input id="repeatNewPassword" type="password" class="pole2" placeholder="Повторите новый пароль"/><br><br>
+            <span class="red" id="notif"> </span>
+            <br>
+            <buttons class="buttons" onclick="changePasword()">Сменить</buttons>
+            </center>
+        </div>
+        <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</buttons>
+    </div>
+</div>
+
+<div id="winChangeName" style="display:none;">
+    <div class="overlay" onclick="getElementById('winChangeName').style.display='none';"></div>
+    <div class="visible">
+        <span class="orange" style="margin: 20px">Смена имени и фамилии</span>
+        <div class="content">
+            <br><br>
+            <center>
+                <input id="firstname" type="text" class="pole2" placeholder="Имя" value="{{firstname}}"/><br><br>
+                <input id="lastname" type="text" class="pole2" placeholder="Фамилия" value="{{lastname}}"/><br><br>
+                <span class="red" id="notif2"> </span>
+                <br>
+                <buttons class="buttons" onclick="changeName()">Сохранить</buttons>
+            </center>
+        </div>
+        <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</buttons>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

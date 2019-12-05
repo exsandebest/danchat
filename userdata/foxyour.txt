@@ -1,0 +1,16 @@
+{
+     "id": "3",
+     "login": "FoxYour",
+     "password": "123456",
+     "sex": "female",
+     "age": 14,
+     "friends": [
+          "exsandebest"
+     ],
+     "firstname": "Софья",
+     "lastname": "Воробьева",
+     "color": "#00ffff",
+     "scroll": true,
+     "outreqs": [],
+     "inreqs": []
+}

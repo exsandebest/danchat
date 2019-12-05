@@ -1,0 +1,15 @@
+{
+     "login": "admin",
+     "password": "admin",
+     "age": "217",
+     "sex": "male",
+     "firstname": "Администратор",
+     "lastname": "",
+     "color": "F00000",
+     "scroll": true,
+     "friends": [],
+     "inreqs": [],
+     "outreqs": [
+          "exsandebest"
+      ]
+}

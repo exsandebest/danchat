@@ -1,0 +1,257 @@
+
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <style>
+    center div {
+      border: 5px outset blue;
+
+      display: inline-flex;
+      flex-wrap: wrap;
+      margin-left: 10%;
+      justify-content: space-around;
+      margin-right: 10%
+    }
+  </style>
+  <title>ADMIN PANEL</title>
+</head>
+
+<body background="bg.jpg">
+  {{> navbar}}
+  <center>
+    <div>
+      <input type="text" class="pole2" id="token" placeholder="Токен">
+      <p id="notif1"></p>
+      <input type="button" onclick="getLogin();" value="Получить логин">
+    </div>
+    <br><br>
+    <div>
+      <input type="text" class="pole2" id="login" placeholder="Логин">
+      <p id="notif2"></p>
+      <input type="button" onclick="getToken();" value="Получить токен">
+    </div>
+    <br><br>
+    <div>
+      <input type="text" class="pole2" id="loginfordelete" placeholder="Логин">
+      <p id="notif3"></p>
+      <input type="button" value="Удалить запись" onclick="deleteCouple()">
+    </div>
+    <br><br>
+    <div>
+      <input id="loginforcreate" type="text" class="pole2" placeholder="Логин"><br><br>
+      <input id="tokenforcreate" type="text" class="pole2" placeholder="Токен "><br>
+      <p id="notif4"></p>
+      <input type="button" onclick="createCouple();" value="Создать запись">
+    </div>
+  <!--  <br><br>
+    <div>
+      <input id="field" type="text" class="pole2" placeholder="Поле"><br><br>
+      <input id="value" type="text" class="pole2" placeholder="Значение"><br>
+      <p id="notif5"></p>
+      <input type="button" onclick="addField();" value="Добавить поле">
+    </div> -->
+    <br><br>
+    <div>
+      <input type="button" style="hight:80px" onclick="onlineUpdate()" value="Обновление онлайна">
+
+      <br>
+    </div>
+    <br><br>
+    <div>
+      <select id="userselector" style="font: normal 17px 'Arial'">
+    </select>
+      <br><br>
+      <input type="button" style="width:150px" onclick="makeAdmin()" value="Сделать админом">
+    </div>
+    <br><br>
+    <div style="margin-bottom: 80px; ">
+      <select id="adminselector" style="font: normal 17px 'Arial'">
+          </select>
+      <br><br>
+      <input type="button" style="width:150px" onclick="makeUser()" value="Сделать user'ом">
+    </div>
+    <br>
+    <input type="button" onclick="validate()" value="Валидировать меня">
+    <br><br><br><br>
+    <div style="margin-bottom: 80px; ">
+      <input type="text" class="pole2" id="message" placeholder="Сообщение">
+      <input type="button" style="width:120px" onclick="sendMessage()" value="Отправить всем  + ">
+    </div>
+
+  </center>
+
+  <script>
+    var gxhr = new XMLHttpRequest();
+    gxhr.open("GET", "/users/toMakeAdmin/list", true);
+    gxhr.onload = () => {
+      var users = JSON.parse(gxhr.responseText);
+      users.forEach((user) => {
+        var option = document.createElement("option");
+        option.value = user;
+        option.innerHTML = user;
+        document.getElementById("userselector").appendChild(option);
+      })
+    }
+    gxhr.send();
+
+
+
+
+    var gxhr2 = new XMLHttpRequest();
+    gxhr2.open("GET", "/users/toMakeUser/list", true);
+    gxhr2.onload = () => {
+      var admins = JSON.parse(gxhr2.responseText);
+      admins.forEach((admin) => {
+        if (admin === "") {
+          admins.splice(admins.indexOf(admin), 1);
+        } else {
+          var option = document.createElement("option");
+          option.value = admin;
+          option.innerHTML = admin;
+          document.getElementById("adminselector").appendChild(option);
+        }
+      })
+    }
+    gxhr2.send();
+
+
+    function sendMessage() {
+      var message = document.getElementById("message").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/message", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = () => {
+        alert(xhr.responseText);
+      }
+      xhr.send("message=" + message);
+
+    }
+
+
+    function getLogin() {
+      var token = document.getElementById("token").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/get/login", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = ()=>{
+        alert(xhr.responseText);
+      }
+      xhr.send("token=" + token);
+
+    }
+
+    function getToken() {
+      var login = document.getElementById("login").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/get/token", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload= ()=>{
+          alert(xhr.responseText);
+      }
+      xhr.send("login=" + login);
+
+    }
+
+
+    function createCouple() {
+      var login = document.getElementById("loginforcreate").value;
+      var token = document.getElementById("tokenforcreate").value;
+      if (login == false || token == false) {
+        document.getElementById("notif4").innerHTML = "Тупой админ :|";
+      } else {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/admin/set/couple", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = ()=>{
+          alert(xhr.responseText);
+        }
+        xhr.send("login=" + login + "&token=" + token);
+        document.getElementById("notif4").innerHTML = "";
+      }
+    }
+
+
+    function deleteCouple() {
+      var login = document.getElementById("loginfordelete").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/delete/couple", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = ()=> {
+        alert(xhr.responseText);
+      }
+      xhr.send("login=" + login);
+
+    }
+
+
+  /*  function addField() {
+      var field = document.getElementById("field").value;
+      var value = document.getElementById("value").value;
+      console.log(field);
+      if (value == false || field == false) {
+        document.getElementById("notif5").innerHTML = "Тупой админ :|";
+      } else {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/admin/add/field", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = ()=>{
+          alert(xhr.responseText);
+        }
+        xhr.send("field=" + field + "&value=" + value);
+
+      }
+    }*/
+
+
+    function validate() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/admin/validate/me", true);
+      xhr.onload = () => {
+        alert(xhr.responseText);
+      }
+      xhr.send();
+
+    }
+
+
+
+    function makeAdmin() {
+      var user = document.getElementById("userselector").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/make/admin", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = () => {
+        alert(xhr.responseText);
+        location.reload();
+      }
+      xhr.send("user=" + user);
+    }
+
+
+    function makeUser() {
+      var login = document.getElementById("adminselector").value;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/admin/make/user", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = () => {
+        alert(xhr.responseText);
+        location.reload();
+      }
+      xhr.send("login=" + login);
+    }
+
+    function onlineUpdate() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/admin/online/update", true);
+      xhr.onload = ()=>{
+          alert(xhr.responseText);
+      }
+      xhr.send();
+
+    }
+  </script>
+  {{> footer}}
+</body>
+
+</html>

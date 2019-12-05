@@ -1,0 +1,87 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Люди</title>
+    <style>
+        img {
+            float:left;
+            margin:10px;
+            border-radius: 70px;
+            width:85px;
+            height:85px;
+        }
+        div.block {
+            height:100px;
+            width:275px;
+            background:rgba(254, 254, 254, 0.6);
+            margin: 10px;
+            margin-bottom: 20px;
+            border: outset 4px #20ccff;
+            border-radius: 20px;
+        }
+        div.datablock {
+            height: 65px;
+            width: 150px;
+            float: right;
+        }
+
+
+        p#fullname {
+            font: normal 12px 'Arial';
+            cursor: default;
+        }
+
+        a#login {
+            font: bold 20px 'Trebuchet MS';
+            cursor: pointer;
+            width: auto;
+            text-decoration: none;
+        }
+        span.red {
+            float: left;
+            margin: 0px;
+            padding: 0px;
+        }
+        #list{
+            display: inline-flex;
+            flex-wrap: wrap;
+            margin-left: 5%;
+            justify-content: space-around;
+            margin-right: 5%
+        }
+    </style>
+</head>
+<body background="bg.jpg">
+{{> navbar}}
+<center>
+    <div id="list">
+
+{{#each people}}
+
+    <div class="block">
+
+    {{#if imgStatus}}
+        <img src="{{login}}.jpg">
+    {{else}}
+        <img src="default.jpg">
+    {{/if}}
+        <div class="datablock">
+          <br>
+        <a id="login" href="/user?{{login}}" style="color:{{color}}">{{login}}</a><br>
+            <p></p>
+            <span class="green" style="font: normal 15px 'Arial';" id="fullname">{{firstname}} {{lastname}}</span>
+
+           <!-- <span class="green" style="font-size: 1.1em">Возраст: </span><span class="red" style="font-size: 1.1em">{{age}}</span>
+           <span class="green" style="font-size: 1.1em ">Пол: </span><span class="red" style="font-size: 1.1em">{{sex}}</span>-->
+        </div>
+    </div>
+
+{{/each}}
+</div>
+
+</center>
+<script>
+</script>
+{{> footer}}
+</body>
+</html>

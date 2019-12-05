@@ -1,0 +1,102 @@
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  <title>Регистрация</title>
+</head>
+
+<body background="bg.jpg">
+  <h1>Регистрация</h1>
+  <style>
+  </style>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <center>
+
+    <input class='pole2' type="text" required id="login" id="login" title="Логин" placeholder="Логин"><br><br>
+    <input class='pole2' type="password" required id="password" title="Пароль" placeholder="Пароль"><br><br>
+    <input class="pole2" type="text" required id="firstname" title="Имя" placeholder="Имя" /><br><br>
+    <input class="pole2" type="text" required id="lastname" title="Фамилия" placeholder="Фалимия" /><br><br>
+    <input class="pole2" type="number" id="age" title="Возраст" placeholder="Возраст" /><br><br>
+    <span class="green" style="bottom: 0px;">Пол:</p>
+    <select id="sex" style="width:auto; font-size: 20px;">
+        <option value="male" >
+            Мужской
+        </option>
+        <option value="female">
+            Женский
+        </option>
+    </select>
+  </span>
+    <input type="text" id="submit" required value="REAL" style="display: none;" /><br><br>
+    <div id="notification"></div>
+    <buttons class="buttons" type="button" onclick="registration()">Зарегестрироваться</buttons><br><br>
+    <span class="purple">или</span><br><br>
+    <a href="/login" style="text-decoration: none;"><buttons class="buttons" type="button">Войти</buttons></a>
+  </center>
+  <script>
+    function registration() {
+      var login = encodeURI(val("login"));
+      var password = encodeURI(encrypt(val("password")));
+      var firstname = encodeURI(val("firstname"));
+      var lastname = encodeURI(val("lastname"));
+      var age = val("age");
+      var sex = val("sex");
+      var submit = val("submit");
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/registration", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = () => {
+        console.log(xhr.responseText);
+        if (xhr.responseText.split(":")[0] == "false") {
+          notif("Bad", xhr.responseText.split(":")[1].split("\n\n")[0], xhr.responseText.split(":")[1].split("\n\n")[1], 10000);
+        } else if (xhr.responseText.split(":")[0] === "true") {
+          notif("Good", "Вы успешно зарегестрированы!", "",9999999);
+          setTimeout(() => {
+            location = "/login";
+          }, 3000);
+        } else {
+          notif("Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 5000);
+        }
+      }
+      xhr.onerror = xhr.onabort = () => {
+        notif("Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 5000);
+      }
+      xhr.send(`login=${login}&password=${password}&firstname=${firstname}&lastname=${lastname}&age=${age}&sex=${sex}&submit=${submit}`);
+
+    }
+
+    function val(id) {
+      return document.getElementById(id).value;
+    }
+
+    function notif(type, msg1, msg2, time) {
+      document.getElementById("notification").setAttribute("style", "opacity:0");
+      document.getElementById("notification").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><br><span class='orange'>" + msg2 + "</span>";
+      document.getElementById("notification").setAttribute("style", "opacity:1");
+      setTimeout(() => {
+        document.getElementById("notification").setAttribute("style", "opacity:0");
+      }, time);
+    }
+
+    function encrypt(theText) {
+      var output = "";
+      var Temp = [];
+      var Temp2 = [];
+      var TextSize = theText.length;
+      for (var i = 0; i < TextSize; i++) {
+        var rnd = Math.round(Math.random() * 217) + 68;
+        Temp[i] = theText.charCodeAt(i) + rnd;
+        Temp2[i] = rnd;
+      }
+      for (i = 0; i < TextSize; i++) {
+        output += String.fromCharCode(Temp[i], Temp2[i]);
+      }
+      return output;
+    }
+  </script>
+  {{> footer}}
+</body>
+
+</html>

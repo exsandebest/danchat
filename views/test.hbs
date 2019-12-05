@@ -1,0 +1,25 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body background="bg.jpg">
+{{> navbar}}
+<center>
+<input type="button" value="Lol" onclick="go();"><br><br>
+<input type="button" value="Lol2" onclick="goo();">
+</center>
+{{> footer}}
+<script>
+  function go(){
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/admin/test/1",true);
+  xhr.send();
+  }
+  function goo(){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/admin/test/2",true);
+    xhr.send();
+  }
+</script>
+</body>
+</html>
