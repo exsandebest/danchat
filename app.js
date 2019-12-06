@@ -926,27 +926,6 @@ app.post("/", uep, (req, res) => {
   res.send(JSON.stringify(req.body, "", 5));
 })
 
-app.get("/admin/test/1", (req, res) => {
-  console.time("TEST");
-  fs.readFile("data/chat.json", "utf-8", (err, data) => {
-    var arr = JSON.parse(data);
-    var obj = {};
-    obj.id = "x";
-    obj.from = "admin";
-    obj.time = "asd";
-    obj.txt = "LOLO";
-    arr.push(obj);
-    fs.writeFile("data/chat.json", JSON.stringify(arr, "", 1), (err) => {
-      console.timeEnd("TEST");
-      res.end();
-    });
-  });
-});
-
-app.get("/admin/test/2", (req, res) => {
-  res.redirect("/");
-})
-
 
 //Функция генерации токена
 function genToken() {

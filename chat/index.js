@@ -5,7 +5,7 @@ const getter = require('../getter');
 
 exports.subscribe = function (req, res) {
   clients.push(res);
-res.on("close", function(){
+  res.on("close", function(){
   clients.splice(clients.indexOf(res),1);
 });
 };
