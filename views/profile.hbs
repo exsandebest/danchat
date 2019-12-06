@@ -1,109 +1,114 @@
 ﻿<html>
-<head>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <title>Профиль</title>
-    <style>
-        .overlay {
-            transition: 0.5s;
-            background: #000;
-            position: fixed;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 1000;
-            opacity: .5;
-        }
-        .visible {
-            transition: 0.5s;
-            background: rgba(255, 255, 255, 0.75);
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            border-radius: 20px 20px 20px 20px;
-            margin-top: -200px;
-            overflow: hidden;
-            z-index: 2000;
-            width: 500px;
-            padding: 0px;
-            margin-left: -250px;
-        }
-        .content {
-            transition: 0.5s;
-            padding: 0 1em;
-            border-top: 1px solid #ccc;
-            border-bottom: 1px solid #ccc;
-            background: WhiteSmoke;
-        }
-        #notif2
-        {
-          opacity: 0;
-          transition: 1s;
-        }
-    </style>
-</head>
-<body background="bg.jpg">
-  <script src="pages/profile.js" ></script>
-{{> navbar}}
-<center>
-    {{#if imgStatus}}
-        <img src="{{login}}.jpg" style="border-radius:20px; width: 200px; height:200px;"/>
-        {{else}}
-        <img src="default.jpg" style="border-radius:20px; width: 250px; height:250px;"/>
-    {{/if}}
-    <br><br>
-    <span style="font: bold 25px 'Trebuchet MS'; color: {{color}}; background-color: rgba(245,255,233,0.55); border-radius: 7px 7px 7px 7px;"> {{login}} </span><br><br>
-    <br><br>
-    <span class="green">{{firstname}} {{lastname}}</span>
-    <br><br><br>
-{{#if isAdmin}}
-<buttons class="buttons" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</buttons>
-    <br><br><br><br>
-{{/if}}
-    <buttons class="buttons" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИО</buttons><br><br><br><br>
-<buttons class="buttons" onClick="getElementById('winChangePassword').removeAttribute('style');" type="button">Сменить пароль</buttons>
-<br><br><br>
-    </center>
-{{> footer}}
-<div id="winChangePassword" style="display:none;">
-    <div class="overlay" onclick="getElementById('winChangePassword').style.display='none';"></div>
-    <div class="visible">
-        <span class="orange" style="margin: 20px">Смена пароля</span>
-        <div class="content">
-            <br><br>
-            <center>
-            <input id="oldPassword" type="password" class="pole2" placeholder="Старый пароль"/><br><br>
-            <input id="newPassword" type="password" class="pole2" placeholder="Новый пароль"/><br><br>
-            <input id="repeatNewPassword" type="password" class="pole2" placeholder="Повторите новый пароль"/><br><br>
-            <span class="red" id="notif"> </span>
-            <br>
-            <buttons class="buttons" onclick="changePasword()">Сменить</buttons>
-            </center>
-        </div>
-        <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</buttons>
-    </div>
-</div>
 
-<div id="winChangeName" style="display:none;">
-    <div class="overlay" onclick="getElementById('winChangeName').style.display='none';"></div>
-    <div class="visible">
-        <span class="orange" style="margin: 20px">Смена имени и фамилии</span>
-        <div class="content">
+<head>
+   <link rel="stylesheet" type="text/css" href="style.css">
+   <title>Профиль</title>
+   <style>
+      .overlay {
+         transition: 0.5s;
+         background: #000;
+         position: fixed;
+         left: 0;
+         right: 0;
+         top: 0;
+         bottom: 0;
+         z-index: 1000;
+         opacity: .5;
+      }
+
+      .visible {
+         transition: 0.5s;
+         background: rgba(255, 255, 255, 0.75);
+         position: fixed;
+         left: 50%;
+         top: 50%;
+         border-radius: 20px 20px 20px 20px;
+         margin-top: -200px;
+         overflow: hidden;
+         z-index: 2000;
+         width: 500px;
+         padding: 0px;
+         margin-left: -250px;
+      }
+
+      .content {
+         transition: 0.5s;
+         padding: 0 1em;
+         border-top: 1px solid #ccc;
+         border-bottom: 1px solid #ccc;
+         background: WhiteSmoke;
+      }
+
+      #notif2 {
+         opacity: 0;
+         transition: 1s;
+      }
+   </style>
+</head>
+
+<body background="bg.jpg">
+   <script src="pages/profile.js"></script>
+   {{> navbar}}
+   <center>
+      {{#if imgStatus}}
+         <img src="{{login}}.jpg" style="border-radius:20px; width: 200px; height:200px;" />
+      {{else}}
+         <img src="default.jpg" style="border-radius:20px; width: 250px; height:250px;" />
+      {{/if}}
+      <br><br>
+      <span style="font: bold 25px 'Trebuchet MS'; color: {{color}}; background-color: rgba(245,255,233,0.55); border-radius: 7px 7px 7px 7px;"> {{login}} </span><br><br>
+      <br><br>
+      <span class="green">{{firstname}} {{lastname}}</span>
+      <br><br><br>
+      {{#if isAdmin}}
+         <buttons class="buttons" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</buttons>
+         <br><br><br><br>
+      {{/if}}
+      <buttons class="buttons" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИО</buttons><br><br><br><br>
+      <buttons class="buttons" onClick="getElementById('winChangePassword').removeAttribute('style');" type="button">Сменить пароль</buttons>
+      <br><br><br>
+   </center>
+   {{> footer}}
+   <div id="winChangePassword" style="display:none;">
+      <div class="overlay" onclick="getElementById('winChangePassword').style.display='none';"></div>
+      <div class="visible">
+         <span class="orange" style="margin: 20px">Смена пароля</span>
+         <div class="content">
             <br><br>
             <center>
-                <input id="firstname" type="text" class="pole2" placeholder="Имя" value="{{firstname}}"/><br><br>
-                <input id="lastname" type="text" class="pole2" placeholder="Фамилия" value="{{lastname}}"/><br><br>
-                <span class="red" id="notif2"> </span>
-                <br>
-                <buttons class="buttons" onclick="changeName()">Сохранить</buttons>
+               <input id="oldPassword" type="password" class="pole2" placeholder="Старый пароль" /><br><br>
+               <input id="newPassword" type="password" class="pole2" placeholder="Новый пароль" /><br><br>
+               <input id="repeatNewPassword" type="password" class="pole2" placeholder="Повторите новый пароль" /><br><br>
+               <span class="red" id="notif"> </span>
+               <br>
+               <buttons class="buttons" onclick="changePasword()">Сменить</buttons>
             </center>
-        </div>
-        <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</buttons>
-    </div>
-</div>
+         </div>
+         <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</buttons>
+      </div>
+   </div>
+
+   <div id="winChangeName" style="display:none;">
+      <div class="overlay" onclick="getElementById('winChangeName').style.display='none';"></div>
+      <div class="visible">
+         <span class="orange" style="margin: 20px">Смена имени и фамилии</span>
+         <div class="content">
+            <br><br>
+            <center>
+               <input id="firstname" type="text" class="pole2" placeholder="Имя" value="{{firstname}}" /><br><br>
+               <input id="lastname" type="text" class="pole2" placeholder="Фамилия" value="{{lastname}}" /><br><br>
+               <span class="red" id="notif2"> </span>
+               <br>
+               <buttons class="buttons" onclick="changeName()">Сохранить</buttons>
+            </center>
+         </div>
+         <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</buttons>
+      </div>
+   </div>
 
 
 
 
 </body>
+
 </html>

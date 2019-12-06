@@ -1,88 +1,87 @@
-
 <html>
 
 <head>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <style>
-    center div {
-      border: 5px outset blue;
+   <link rel="stylesheet" type="text/css" href="style.css">
+   <style>
+      center div {
+         border: 5px outset blue;
 
-      display: inline-flex;
-      flex-wrap: wrap;
-      margin-left: 10%;
-      justify-content: space-around;
-      margin-right: 10%
-    }
-  </style>
-  <title>ADMIN PANEL</title>
+         display: inline-flex;
+         flex-wrap: wrap;
+         margin-left: 10%;
+         justify-content: space-around;
+         margin-right: 10%
+      }
+   </style>
+   <title>ADMIN PANEL</title>
 </head>
 
 <body background="bg.jpg">
-  {{> navbar}}
-  <center>
-    <div>
-      <input type="text" class="pole2" id="token" placeholder="Токен">
-      <p id="notif1"></p>
-      <input type="button" onclick="getLogin();" value="Получить логин">
-    </div>
-    <br><br>
-    <div>
-      <input type="text" class="pole2" id="login" placeholder="Логин">
-      <p id="notif2"></p>
-      <input type="button" onclick="getToken();" value="Получить токен">
-    </div>
-    <br><br>
-    <div>
-      <input type="text" class="pole2" id="loginfordelete" placeholder="Логин">
-      <p id="notif3"></p>
-      <input type="button" value="Удалить запись" onclick="deleteCouple()">
-    </div>
-    <br><br>
-    <div>
-      <input id="loginforcreate" type="text" class="pole2" placeholder="Логин"><br><br>
-      <input id="tokenforcreate" type="text" class="pole2" placeholder="Токен "><br>
-      <p id="notif4"></p>
-      <input type="button" onclick="createCouple();" value="Создать запись">
-    </div>
-  <!--  <br><br>
+   {{> navbar}}
+   <center>
+      <div>
+         <input type="text" class="pole2" id="token" placeholder="Токен">
+         <p id="notif1"></p>
+         <input type="button" onclick="getLogin();" value="Получить логин">
+      </div>
+      <br><br>
+      <div>
+         <input type="text" class="pole2" id="login" placeholder="Логин">
+         <p id="notif2"></p>
+         <input type="button" onclick="getToken();" value="Получить токен">
+      </div>
+      <br><br>
+      <div>
+         <input type="text" class="pole2" id="loginfordelete" placeholder="Логин">
+         <p id="notif3"></p>
+         <input type="button" value="Удалить запись" onclick="deleteCouple()">
+      </div>
+      <br><br>
+      <div>
+         <input id="loginforcreate" type="text" class="pole2" placeholder="Логин"><br><br>
+         <input id="tokenforcreate" type="text" class="pole2" placeholder="Токен "><br>
+         <p id="notif4"></p>
+         <input type="button" onclick="createCouple();" value="Создать запись">
+      </div>
+      <!--  <br><br>
     <div>
       <input id="field" type="text" class="pole2" placeholder="Поле"><br><br>
       <input id="value" type="text" class="pole2" placeholder="Значение"><br>
       <p id="notif5"></p>
       <input type="button" onclick="addField();" value="Добавить поле">
     </div> -->
-    <br><br>
-    <div>
-      <input type="button" style="hight:80px" onclick="onlineUpdate()" value="Обновление онлайна">
+      <br><br>
+      <div>
+         <input type="button" style="hight:80px" onclick="onlineUpdate()" value="Обновление онлайна">
 
+         <br>
+      </div>
+      <br><br>
+      <div>
+         <select id="userselector" style="font: normal 17px 'Arial'">
+         </select>
+         <br><br>
+         <input type="button" style="width:150px" onclick="makeAdmin()" value="Сделать админом">
+      </div>
+      <br><br>
+      <div style="margin-bottom: 80px; ">
+         <select id="adminselector" style="font: normal 17px 'Arial'">
+         </select>
+         <br><br>
+         <input type="button" style="width:150px" onclick="makeUser()" value="Сделать user'ом">
+      </div>
       <br>
-    </div>
-    <br><br>
-    <div>
-      <select id="userselector" style="font: normal 17px 'Arial'">
-    </select>
-      <br><br>
-      <input type="button" style="width:150px" onclick="makeAdmin()" value="Сделать админом">
-    </div>
-    <br><br>
-    <div style="margin-bottom: 80px; ">
-      <select id="adminselector" style="font: normal 17px 'Arial'">
-          </select>
-      <br><br>
-      <input type="button" style="width:150px" onclick="makeUser()" value="Сделать user'ом">
-    </div>
-    <br>
-    <input type="button" onclick="validate()" value="Валидировать меня">
-    <br><br><br><br>
-    <div style="margin-bottom: 80px; ">
-      <input type="text" class="pole2" id="message" placeholder="Сообщение">
-      <input type="button" style="width:120px" onclick="sendMessage()" value="Отправить всем  + ">
-    </div>
+      <input type="button" onclick="validate()" value="Валидировать меня">
+      <br><br><br><br>
+      <div style="margin-bottom: 80px; ">
+         <input type="text" class="pole2" id="message" placeholder="Сообщение">
+         <input type="button" style="width:120px" onclick="sendMessage()" value="Отправить всем  + ">
+      </div>
 
-  </center>
+   </center>
 
-  <script src="pages/adminpanel.js"></script>
-  {{> footer}}
+   <script src="pages/adminpanel.js"></script>
+   {{> footer}}
 </body>
 
 </html>

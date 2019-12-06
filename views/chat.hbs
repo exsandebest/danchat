@@ -2,67 +2,71 @@
 <meta charset="utf-8">
 
 <head>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <title id="t">
-    Чат
-  </title>
+   <link rel="stylesheet" type="text/css" href="style.css">
+   <title id="t">
+      Чат
+   </title>
 </head>
 <style>
-  .messageTime {
+   .messageTime {
       float: right;
       color: rgba(248, 249, 255, 1);
-  }
-    .specImg{
-        width: 25px;
-        height: 25px;
-        border-radius: 7px;
-    }
-    notif {
+   }
+
+   .specImg {
+      width: 25px;
+      height: 25px;
+      border-radius: 7px;
+   }
+
+   notif {
       transition: 1s;
       opacity: 0;
-    }
-    .msg {
+   }
+
+   .msg {
       bottom: 0;
       cursor: default;
-    }
+   }
 </style>
 
-<body background="bg.jpg" onload = "onload();">
-  <nav>
-    <ul>
-      <li><a class="navbar" href="/">Чат</a></li>
-      <li><a class="navbar" href="/friends">Друзья</a></li>
-        <li><a class="navbar" href="/people">Люди</a></li>
-      <li style="float:right;" class="active"><a class="navbar" style="cursor:pointer" id="prof">{{login}}</a>
-        <ul>
-          <li><a class="navbar" name="var" href="/profile"> Профиль</a></li>
-          <li><a class="navbar" name="var" href="/settings"> Настройки</a></li>
-          <li><a class="navbar" name="var" href="/logout"> Выйти</a></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
-  <center>
-    <div onclick="getMsg(false);" style="background-color: rgba(71, 226, 73, 0.89); bottom: 0; width: 45%; height: 30px; border-radius: 25px 25px 0px 0px">
-    </div>
-    <div style="position:relative;word-break: break-all; width: 55%; height: 35%; font-size: 17px; white-space: pre-wrap; text-align:left; border-radius: 30px; padding: 1.5% " id="chat"></div><br>
-    <div style="width:779px; display:inline-block">
-    <textarea style="min-height:50px; width:60%; border-radius: 15px; background-color:rgba(254, 254, 254, 0.8); resize:none; font: normal 15px 'arial'" placeholder="Напишите сообщение..." onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
-    <br><br>
-    <br>
-    <buttons class="buttons" onclick="sendMessage()">Отправить</buttons>
-  </div>
-  <br><br><br>
-  </center>
-  {{#if scroll}}
-      <input type="checkbox" id="scroll" style="display:none;" checked/>
-  {{else}}
-  <input type="checkbox" id="scroll" style="display:none;" />
-  {{/if}}
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="pages/chat.js"></script>
-  <span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>
-{{> footer}}
+<body background="bg.jpg" onload="onload();">
+   <nav>
+      <ul>
+         <li><a class="navbar" href="/">Чат</a></li>
+         <li><a class="navbar" href="/friends">Друзья</a></li>
+         <li><a class="navbar" href="/people">Люди</a></li>
+         <li style="float:right;" class="active"><a class="navbar" style="cursor:pointer" id="prof">{{login}}</a>
+            <ul>
+               <li><a class="navbar" name="var" href="/profile"> Профиль</a></li>
+               <li><a class="navbar" name="var" href="/settings"> Настройки</a></li>
+               <li><a class="navbar" name="var" href="/logout"> Выйти</a></li>
+            </ul>
+         </li>
+      </ul>
+   </nav>
+   <center>
+      <div onclick="getMsg(false);" style="background-color: rgba(71, 226, 73, 0.89); bottom: 0; width: 45%; height: 30px; border-radius: 25px 25px 0px 0px">
+      </div>
+      <div style="position:relative;word-break: break-all; width: 55%; height: 35%; font-size: 17px; white-space: pre-wrap; text-align:left; border-radius: 30px; padding: 1.5% " id="chat"></div><br>
+      <div style="width:779px; display:inline-block">
+         <textarea style="min-height:50px; width:60%; border-radius: 15px; background-color:rgba(254, 254, 254, 0.8); resize:none; font: normal 15px 'arial'" placeholder="Напишите сообщение..."
+            onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
+         <br><br>
+         <br>
+         <buttons class="buttons" onclick="sendMessage()">Отправить</buttons>
+      </div>
+      <br><br><br>
+   </center>
+   {{#if scroll}}
+      <input type="checkbox" id="scroll" style="display:none;" checked />
+   {{else}}
+      <input type="checkbox" id="scroll" style="display:none;" />
+   {{/if}}
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="pages/chat.js"></script>
+   <span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>
+   {{> footer}}
 </body>
 
 </html>

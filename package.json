@@ -1,38 +1,38 @@
 {
-  "name": "danchat",
-  "version": "0.0.1",
-  "dependencies": {
-    "body-parser": "*",
-    "cookie-parser": "*",
-    "express": "*",
-    "hbs": "*",
-    "md5": "^2.2.1",
-    "nodemon": "*",
-    "socket.io": "*"
-  },
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "demon": "nodemon app.js"
-  },
-  "description": "Chat, friends, communication with Node.js",
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/exsandebest/danchat.git"
-  },
-  "keywords": [
-    "chat",
-    "friends",
-    "communication",
-    "node.js",
-    "js",
-    "long-polling"
-  ],
-  "author": "Daniil Bogdanov",
-  "license": "MIT License",
-  "bugs": {
-    "url": "https://github.com/exsandebest/danchat/issues"
-  },
-  "homepage": "https://github.com/exsandebest/danchat#readme"
+   "name": "danchat",
+   "version": "0.0.1",
+   "dependencies": {
+      "body-parser": "*",
+      "cookie-parser": "*",
+      "express": "*",
+      "hbs": "*",
+      "md5": "^2.2.1",
+      "nodemon": "*",
+      "socket.io": "*"
+   },
+   "main": "app.js",
+   "scripts": {
+      "start": "node app.js",
+      "demon": "nodemon app.js"
+   },
+   "description": "Chat, friends, communication with Node.js",
+   "devDependencies": {},
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/exsandebest/danchat.git"
+   },
+   "keywords": [
+      "chat",
+      "friends",
+      "communication",
+      "node.js",
+      "js",
+      "long-polling"
+   ],
+   "author": "Daniil Bogdanov",
+   "license": "MIT License",
+   "bugs": {
+      "url": "https://github.com/exsandebest/danchat/issues"
+   },
+   "homepage": "https://github.com/exsandebest/danchat#readme"
 }
