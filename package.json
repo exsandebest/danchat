@@ -29,7 +29,7 @@
     "long-polling"
   ],
   "author": "Daniil Bogdanov",
-  "license": "ISC",
+  "license": "MIT License",
   "bugs": {
     "url": "https://github.com/exsandebest/danchat/issues"
   },
