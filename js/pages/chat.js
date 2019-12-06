@@ -54,6 +54,9 @@ function sendMessage() {
 function complex(r,str,ou){
   maxid = r.id;
   addToChat(str);
+  if (!ou){
+      document.getElementById(`msg${r.id}`).innerText = r.text;
+  }
   subscribe();
   if (login != r.from){
     if (r.type){
@@ -75,7 +78,7 @@ function subscribe() {
     xhr.onload = ()=> {
         var r = JSON.parse(xhr.responseText);
         if (r.type === undefined){
-          var str =  `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.from}"><strong style="color: ${r.color};">${r.from}</strong></a>: ${r.text}<span class="messageTime">${r.time}</span></span><br>`;
+          var str =  `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.from}"><strong style="color: ${r.color};">${r.from}</strong></a>:<msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
           complex(r,str, false);
         } else if (r.type === "enter"){
             var str =  `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.from}"><strong style="color: ${r.color};">${r.from}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${r.time}</span></span><br>`;
@@ -129,7 +132,8 @@ var chat = document.getElementById("chat");
 minId = msgObj.minId;
 msgObj.msg.forEach((m)=>{
   if (m.type === undefined){
-  chat.innerHTML =  `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.from}"><strong style="color: ${m.color};">${m.from}</strong></a>: ${m.text}<span class="messageTime">${m.time}</span></span><br>`+chat.innerHTML;
+  chat.innerHTML =  `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.from}"><strong style="color: ${m.color};">${m.from}</strong></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>`+chat.innerHTML;
+  document.getElementById(`msg${m.id}`).innerText = m.text;
 } else if (m.type === "enter"){
   chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.from}"><strong style="color: ${m.color};">${m.from}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
 } else if (m.type === "exit"){
