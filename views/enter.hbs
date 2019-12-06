@@ -38,51 +38,7 @@
       <span class="purple">или</span><br><br>
       <a href="/registration" style="text-decoration: none;"><buttons class="buttons" type="button">Зарегистрироваться</buttons></a>
 </center>
-<script >
-sessionStorage.clear();
-function enter() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/enter", true);
-        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-        xhr.onload = ()=>{
-            if (xhr.responseText === "token"){
-              location = "/";
-
-            } else if (xhr.responseText.split(":")[0] === "false"){
-                notif(xhr.responseText.split(":")[1]);
-            } else  {
-            notif("Проблемы с сервером<br>Приносим извинения");
-            }
-        }
-        xhr.send(`login=${document.getElementById("login").value.replace(/\s/,"")}&password=${encrypt(document.getElementById("password").value.replace(/\s/,""))}`);
-}
-
-function notif (msg){
-  document.getElementById("notification").setAttribute("style", "opacity:0");
-    document.getElementById("notification").innerHTML = `<notificationBad>${msg}</notificationBad>`;
-    document.getElementById("notification").setAttribute("style", "opacity:1");
-    setTimeout(()=>{
-      document.getElementById("notification").setAttribute("style", "opacity:0");
-    }, 5000);
-
-}
-
-function encrypt(theText) {
-  var output = "";
-  var Temp = [];
-  var Temp2 = [];
-  var TextSize = theText.length;
-  for (var i = 0; i < TextSize; i++) {
-    var rnd = Math.round(Math.random() * 217) + 68;
-    Temp[i] = theText.charCodeAt(i) + rnd;
-    Temp2[i] = rnd;
-  }
-  for (i = 0; i < TextSize; i++) {
-    output += String.fromCharCode(Temp[i], Temp2[i]);
-  }
-  return output;
-}
-
+<script src="pages/enter.js" >
 
 </script>
 {{> footer}}
