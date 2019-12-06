@@ -119,6 +119,7 @@ function getObj(user,time){
   obj.time = time;
   obj.color = user.color;
   obj.id = getter.GUID();
+  obj.login = user.login;
   return obj;
 }
 
