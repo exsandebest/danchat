@@ -1,5 +1,6 @@
 console.time("Module => user-module");
 const fs = require('fs');
+const md5 = require("md5");
 const crypt = require('../crypt');
 var logins = [];
 
@@ -29,10 +30,10 @@ fs.readFile("data/userlist.json", "utf-8", (err, data)=>{
 
 exports.passwordValidate = (res, password, oldPassword, newPassword, repeatNewPassword)=>{
   if (oldPassword && newPassword && repeatNewPassword){
-  if (oldPassword === password){
+  if (md5(oldPassword) === password){
     if (regPassword.test(newPassword)){
       if (newPassword === repeatNewPassword){
-        if (password !== newPassword){
+        if (password !== md5(newPassword)){
           return true;
         } else {
           badAns(res,"Пароль не может быть изменен на старый\n\n");
@@ -82,7 +83,7 @@ exports.registrationValidate = (req, res)=>{
     if (logins.indexOf(data.login) == -1){
     if (data.submit === "REAL"){
     if (regLogin.test(data.login)){
-    if (regPassword.test(crypt.unEnc(data.password))){
+    if (regPassword.test(data.password)){
         if (regName.test(data.firstname) && data.firstname !== undefined){
             if (regName.test(data.lastname) && data.lastname !== undefined){
                 if (regAge.test(data.age) && data.age>0 && data.age<218){

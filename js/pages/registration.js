@@ -1,6 +1,6 @@
 function registration() {
   var login = encodeURI(val("login"));
-  var password = encodeURI(encrypt(val("password")));
+  var password = encodeURI(val("password"));
   var firstname = encodeURI(val("firstname"));
   var lastname = encodeURI(val("lastname"));
   var age = val("age");
@@ -40,20 +40,4 @@ function notif(type, msg1, msg2, time) {
   setTimeout(() => {
     document.getElementById("notification").setAttribute("style", "opacity:0");
   }, time);
-}
-
-function encrypt(theText) {
-  var output = "";
-  var Temp = [];
-  var Temp2 = [];
-  var TextSize = theText.length;
-  for (var i = 0; i < TextSize; i++) {
-    var rnd = Math.round(Math.random() * 217) + 68;
-    Temp[i] = theText.charCodeAt(i) + rnd;
-    Temp2[i] = rnd;
-  }
-  for (i = 0; i < TextSize; i++) {
-    output += String.fromCharCode(Temp[i], Temp2[i]);
-  }
-  return output;
 }

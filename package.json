@@ -6,6 +6,7 @@
     "cookie-parser": "*",
     "express": "*",
     "hbs": "*",
+    "md5": "^2.2.1",
     "nodemon": "*",
     "socket.io": "*"
   },

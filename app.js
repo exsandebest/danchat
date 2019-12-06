@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const chat = require('./chat');
 const wwt = require('./work-with-token');
 const hbs = require("hbs");
+const md5 = require("md5");
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -58,12 +59,12 @@ app.get("/login", (req, res) => {
 //Вход
 app.post("/enter", uep, (req, res) => {
   var Rlogin = req.body.login;
-  var Rpassword = crypt.unEnc(req.body.password);
+  var Rpassword = req.body.password;
   if (Rlogin && Rpassword) {
     if (fs.existsSync(`userdata/${Rlogin}.json`)) {
       fs.readFile(`userdata/${Rlogin}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
-        if ((Rlogin === user.login) && (Rpassword === user.password)) {
+        if ((Rlogin === user.login) && (md5(Rpassword) === user.password)) {
           var token = genToken();
           fs.readFile("data/tokens.json", "utf-8", (err, data2) => {
             if (data2 == false) data2 = "[]";
@@ -267,7 +268,7 @@ app.post("/registration", uep, (req, res) => {
   if (validate) {
     var user = {};
     user.login = req.body.login;
-    user.password = crypt.unEnc(req.body.password);
+    user.password = md5(req.body.password);
     user.age = req.body.age;
     user.sex = req.body.sex;
     user.firstname = req.body.firstname;
@@ -843,7 +844,7 @@ app.post("/user/change/password", uep, (req, res) => {
     fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       if (usMod.passwordValidate(res, user.password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
-        user.password = req.body.newPassword;
+        user.password = md5(req.body.newPassword);
         fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) {
             console.log(err);

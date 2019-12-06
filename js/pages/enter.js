@@ -13,7 +13,7 @@ function enter() {
             notif("Проблемы с сервером<br>Приносим извинения");
             }
         }
-        xhr.send(`login=${document.getElementById("login").value.replace(/\s/,"")}&password=${encrypt(document.getElementById("password").value.replace(/\s/,""))}`);
+        xhr.send(`login=${document.getElementById("login").value.replace(/\s/,"")}&password=${document.getElementById("password").value.replace(/\s/,"")}`);
 }
 
 function notif (msg){
@@ -24,20 +24,4 @@ function notif (msg){
       document.getElementById("notification").setAttribute("style", "opacity:0");
     }, 5000);
 
-}
-
-function encrypt(theText) {
-  var output = "";
-  var Temp = [];
-  var Temp2 = [];
-  var TextSize = theText.length;
-  for (var i = 0; i < TextSize; i++) {
-    var rnd = Math.round(Math.random() * 217) + 68;
-    Temp[i] = theText.charCodeAt(i) + rnd;
-    Temp2[i] = rnd;
-  }
-  for (i = 0; i < TextSize; i++) {
-    output += String.fromCharCode(Temp[i], Temp2[i]);
-  }
-  return output;
 }
