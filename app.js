@@ -12,7 +12,6 @@ const http = require('http').Server(app);
 const usMod = require('./user-module');
 const io = require('socket.io')(http);
 const pars = require('body-parser');
-const crypt = require('./crypt');
 const getter = require('./getter');
 const uep = pars.urlencoded({
   extended: false

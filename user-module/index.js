@@ -1,7 +1,6 @@
 console.time("Module => user-module");
 const fs = require('fs');
 const md5 = require("md5");
-const crypt = require('../crypt');
 var logins = [];
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
