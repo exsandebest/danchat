@@ -466,15 +466,14 @@ app.post("/admin/make/admin", uep, (req, res) => {
 })
 
 setInterval(() => {
-  console.log("Clear");
+  //console.log("Clearing");
   usersOnline = [];
   io.emit("CheckConnection", "SERVER!");
   setTimeout(() => {
-    console.log(usersOnline);
+    //console.log(usersOnline);
     wwt.clear(usersOnline);
-    usersOnline = [];
-  }, 2000);
-}, 300000)
+  }, 10000);
+}, 300000);
 
 app.get("/admin/online/update", (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);

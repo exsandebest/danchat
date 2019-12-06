@@ -3,6 +3,7 @@ var logins = [];
 var tokens = [];
 const fs = require("fs");
 const wwt = require("../work-with-token");
+const chat = require("../chat");
 start();
 
 function start(){
@@ -110,15 +111,15 @@ exports.validate = function (req, res) {
 exports.clear = (arr)=>{
 fs.readFile("data/tokens.json","utf-8",(err,data)=>{
   var tkns = JSON.parse(data);
-  tkns.forEach((elem,i)=>{
-    for (key in elem){
-      if (arr.indexOf(key) == -1){
-        tkns.splice(i,1);
+  tkns.forEach((token,i)=>{
+    for (login in token){
+      if (arr.indexOf(login) == -1){
+        wwt.userLogout(wwt.getTokenFromLogin(login),login);
+        fs.readFile(`userdata/${login}.json`, "utf-8", (err, data2)=>{
+          chat.addnewmessage("exit",JSON.parse(data2));
+        })
       }
     }
-  });
-  fs.writeFile("data/tokens.json",JSON.stringify(tkns,"",5),(err)=>{
-    if (err) throw err;
   });
 });
 }
