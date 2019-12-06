@@ -28,7 +28,7 @@ switch (action) {
   case "message":
   var obj = getObj(user,time);
   obj.text = user.message;
-  fs.readFile("data/chat.txt","utf-8",(err,data)=>{
+  fs.readFile("data/chat.json","utf-8",(err,data)=>{
     if (data == false) data = "[]";
     var chat = JSON.parse(data);
     chat.push({
@@ -37,8 +37,8 @@ switch (action) {
       id: obj.id,
       text: user.message
     });
-    fs.writeFile("data/chat.txt",JSON.stringify(chat,"",2),(err)=>{
-      fs.writeFileSync("data/GUID.txt",obj.id+1);
+    fs.writeFile("data/chat.json",JSON.stringify(chat,"",2),(err)=>{
+      fs.writeFileSync("data/GUID.id",obj.id+1);
     });
   });
       clients.forEach((res) => {
@@ -53,7 +53,7 @@ switch (action) {
     var obj = getObj(user,time);
     obj.type = "enter";
 
-    fs.readFile("data/chat.txt","utf-8",(err,data)=>{
+    fs.readFile("data/chat.json","utf-8",(err,data)=>{
       if (data == false) data = "[]";
       var chat = JSON.parse(data);
       chat.push({
@@ -62,8 +62,8 @@ switch (action) {
         id: obj.id,
         type: "enter"
       });
-      fs.writeFile("data/chat.txt",JSON.stringify(chat,"",2),(err)=>{
-        fs.writeFileSync("data/GUID.txt",obj.id+1);
+      fs.writeFile("data/chat.json",JSON.stringify(chat,"",2),(err)=>{
+        fs.writeFileSync("data/GUID.id",obj.id+1);
       });
     });
 
@@ -80,7 +80,7 @@ switch (action) {
     var obj = getObj(user,time);
     obj.type = "exit";
 
-    fs.readFile("data/chat.txt","utf-8",(err,data)=>{
+    fs.readFile("data/chat.json","utf-8",(err,data)=>{
       if (data == false) data = "[]";
       var chat = JSON.parse(data);
       chat.push({
@@ -89,8 +89,8 @@ switch (action) {
         id: obj.id,
         type: "exit"
       });
-      fs.writeFile("data/chat.txt",JSON.stringify(chat,"",2),(err)=>{
-        fs.writeFileSync("data/GUID.txt",obj.id+1);
+      fs.writeFile("data/chat.json",JSON.stringify(chat,"",2),(err)=>{
+        fs.writeFileSync("data/GUID.id",obj.id+1);
       });
     });
 

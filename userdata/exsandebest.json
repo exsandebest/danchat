@@ -1,9 +1,9 @@
 {
-     "id": "2",
+     "id": 2,
      "login": "exsandebest",
      "password": "123456",
      "sex": "male",
-     "age": 16,
+     "age": 17,
      "friends": [
           "FoxYour"
      ],

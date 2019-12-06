@@ -40,7 +40,7 @@ app.get("/login", (req, res) => {
   var login = wwt.getLoginFromToken(token);
   if (token && login) {
     wwt.userLogout(token, login);
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       chat.addnewmessage("exit", JSON.parse(data));
       res.clearCookie("token", {
         path: "/"
@@ -60,18 +60,18 @@ app.post("/enter", uep, (req, res) => {
   var Rlogin = req.body.login;
   var Rpassword = crypt.unEnc(req.body.password);
   if (Rlogin && Rpassword) {
-    if (fs.existsSync(`userdata/${Rlogin}.txt`)) {
-      fs.readFile(`userdata/${Rlogin}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync(`userdata/${Rlogin}.json`)) {
+      fs.readFile(`userdata/${Rlogin}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
         if ((Rlogin === user.login) && (Rpassword === user.password)) {
           var token = genToken();
-          fs.readFile("data/tokens.txt", "utf-8", (err, data2) => {
+          fs.readFile("data/tokens.json", "utf-8", (err, data2) => {
             if (data2 == false) data2 = "[]";
             var tokens = JSON.parse(data2);
             var obj = {};
             obj[user.login] = token;
             tokens.push(obj);
-            fs.writeFile("data/tokens.txt", JSON.stringify(tokens, "", 2), (err) => {
+            fs.writeFile("data/tokens.json", JSON.stringify(tokens, "", 2), (err) => {
               chat.addnewmessage("enter", user);
               res.cookie("token", token, {
                 httpOnly: true
@@ -99,7 +99,7 @@ app.post("/enter", uep, (req, res) => {
 app.get("/", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       res.render("chat.hbs", {
         scroll: JSON.parse(data).scroll,
         login: login
@@ -124,7 +124,7 @@ app.get("/subscribe", (req, res) => {
 app.post("/addnewmessage", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       user.message = req.body.message;
       chat.addnewmessage("message", user);
@@ -137,7 +137,7 @@ app.post("/addnewmessage", uep, (req, res) => {
 app.post("/get/message", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile("data/chat.txt", "utf-8", (err, data) => {
+    fs.readFile("data/chat.json", "utf-8", (err, data) => {
       var msgs = JSON.parse(data);
       var obj = {};
       obj.maxId = Number(req.body.id);
@@ -164,7 +164,7 @@ app.post("/get/message", uep, (req, res) => {
 app.get("/settings", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       if (err) throw err;
       var user = JSON.parse(data);
       res.render("settings.hbs", {
@@ -194,11 +194,11 @@ app.get("/friends", (req, res) => {
 app.get("/profile", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       getUserData = true;
       var imgStatus = fs.existsSync("userimages/" + user.login + ".jpg");
-      var isAdmin = (JSON.parse(fs.readFileSync("data/adminlist.txt", "utf-8")).indexOf(login) !== -1);
+      var isAdmin = (JSON.parse(fs.readFileSync("data/adminlist.json", "utf-8")).indexOf(login) !== -1);
       res.render("profile.hbs", {
         login: login,
         isAdmin: isAdmin,
@@ -213,7 +213,7 @@ app.get("/profile", (req, res) => {
 
 // Счетчик людей онлайн
 app.get("/onlineCounter", (req, res) => {
-  fs.readFile("data/tokens.txt", "utf-8", (err, data) => {
+  fs.readFile("data/tokens.json", "utf-8", (err, data) => {
     var tokens = JSON.parse(data);
     var people = [];
     tokens.forEach((elem) => {
@@ -229,13 +229,13 @@ app.get("/onlineCounter", (req, res) => {
 app.get("/people", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile("data/userlist.txt", "utf-8", (err, data) => {
+    fs.readFile("data/userlist.json", "utf-8", (err, data) => {
       if (!data) data = "[]";
       var users = JSON.parse(data);
       var people = [];
       users.forEach((username) => {
-        if (fs.existsSync(`userdata/${username}.txt`)) {
-          fs.readFile(`userdata/${username}.txt`, "utf-8", (err, data) => {
+        if (fs.existsSync(`userdata/${username}.json`)) {
+          fs.readFile(`userdata/${username}.json`, "utf-8", (err, data) => {
             var user = JSON.parse(data);
             var obj_user = {};
             obj_user.login = user.login;
@@ -277,13 +277,13 @@ app.post("/registration", uep, (req, res) => {
     user.friends = [];
     user.inreqs = [];
     user.outreqs = [];
-    fs.writeFile(`userdata/${user.login}.txt`, JSON.stringify(user, "", 5), (err) => {
+    fs.writeFile(`userdata/${user.login}.json`, JSON.stringify(user, "", 5), (err) => {
       if (err) throw err;
-      fs.readFile("data/userlist.txt", "utf-8", (err, data) => {
+      fs.readFile("data/userlist.json", "utf-8", (err, data) => {
         if (!data) data = "[]";
         var arr = JSON.parse(data);
         arr.push(user.login);
-        fs.writeFile("data/userlist.txt", JSON.stringify(arr, "", 5), (err) => {
+        fs.writeFile("data/userlist.json", JSON.stringify(arr, "", 5), (err) => {
           if (err) throw err;
           res.send("true:true");
         });
@@ -307,13 +307,13 @@ app.get("/user", (req, res) => {
         login: login
       });
     }
-    if (fs.existsSync(`userdata/${userlogin}.txt`) === false) {
+    if (fs.existsSync(`userdata/${userlogin}.json`) === false) {
       res.render("404.hbs", {
         message: "This user does not exist",
         login: login
       });
     } else {
-      var user = JSON.parse(fs.readFileSync(`userdata/${login}.txt`, "utf-8"));
+      var user = JSON.parse(fs.readFileSync(`userdata/${login}.json`, "utf-8"));
       var userstatus = "";
       if (user.inreqs.indexOf(userlogin) != -1) {
         userstatus = "subscriber";
@@ -327,13 +327,13 @@ app.get("/user", (req, res) => {
         userstatus = "default";
       }
       var imgStatus = fs.existsSync("userimages/" + userlogin + ".jpg");
-      fs.readFile(`userdata/${userlogin}.txt`, (err, data) => {
+      fs.readFile(`userdata/${userlogin}.json`, (err, data) => {
         if (err) throw err;
         var user = JSON.parse(data);
         var friends = [];
         for (var i = 0; i < 6; i++) {
-          if (fs.existsSync("userdata/" + user.friends[i] + ".txt")) {
-            fs.readFile("userdata/" + user.friends[i] + ".txt", "utf-8", (err, data) => {
+          if (fs.existsSync("userdata/" + user.friends[i] + ".json")) {
+            fs.readFile("userdata/" + user.friends[i] + ".json", "utf-8", (err, data) => {
               var user = JSON.parse(data);
               var obj = {}
               obj.login = user.login;
@@ -390,7 +390,7 @@ app.post("/admin/get/token", uep, (req, res) => {
   }
 })
 
-//Установить новую пару (соответствие) токен=логин в tokens.txt
+//Установить новую пару (соответствие) токен=логин в tokens.json
 app.post("/admin/set/couple", uep, (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
@@ -399,7 +399,7 @@ app.post("/admin/set/couple", uep, (req, res) => {
   }
 })
 
-//Удалить пару (соответствие) в tokens.txt
+//Удалить пару (соответствие) в tokens.json
 app.post("/admin/delete/couple", uep, (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
@@ -420,9 +420,9 @@ app.get("/admin/validate/me", (req, res) => {
 app.get("/users/toMakeAdmin/list", (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
-    fs.readFile("data/userlist.txt", "utf-8", (err, data) => {
+    fs.readFile("data/userlist.json", "utf-8", (err, data) => {
       var users = JSON.parse(data);
-      fs.readFile("data/adminlist.txt", "utf-8", (err, data2) => {
+      fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
         var admins = JSON.parse(data2);
         admins.forEach((elem) => {
           if (users.indexOf(elem) !== -1) {
@@ -439,7 +439,7 @@ app.get("/users/toMakeAdmin/list", (req, res) => {
 app.get("/users/toMakeUser/list", (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
-    fs.readFile("data/adminlist.txt", "utf-8", (err, data) => {
+    fs.readFile("data/adminlist.json", "utf-8", (err, data) => {
       if (!data) data = "[]";
       res.send(data);
     })
@@ -449,13 +449,13 @@ app.get("/users/toMakeUser/list", (req, res) => {
 app.post("/admin/make/admin", uep, (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
-    if (fs.existsSync("userdata/" + req.body.user + ".txt")) {
-      fs.readFile("data/adminlist.txt", "utf-8", (err, data2) => {
+    if (fs.existsSync("userdata/" + req.body.user + ".json")) {
+      fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
         if (err) throw err;
         if (!data2) data2 = "[]";
         var arr = JSON.parse(data2);
         arr.push(req.body.user);
-        fs.writeFile("data/adminlist.txt", JSON.stringify(arr, "", 5), (err) => {
+        fs.writeFile("data/adminlist.json", JSON.stringify(arr, "", 5), (err) => {
           if (err) throw err;
           res.send("True");
         });
@@ -499,13 +499,13 @@ io.on("connection", (socket) => {
 app.post("/admin/make/user", uep, (req, res) => {
   var adminLogin = wwt.validateAdmin(req, res);
   if (adminLogin) {
-    if (fs.existsSync("userdata/" + req.body.login + ".txt")) {
-      fs.readFile("data/adminlist.txt", "utf-8", (err, data2) => {
+    if (fs.existsSync("userdata/" + req.body.login + ".json")) {
+      fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
         if (err) throw err;
         if (!data2) data2 = "[]";
         var arr = JSON.parse(data2);
         arr.splice(arr.indexOf(req.body.login), 1);
-        fs.writeFile("data/adminlist.txt", JSON.stringify(arr, "", 5), (err) => {
+        fs.writeFile("data/adminlist.json", JSON.stringify(arr, "", 5), (err) => {
           if (err) throw err;
           res.send("true");
         });
@@ -588,12 +588,12 @@ app.get("/user/get/outreqs/data", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
     var friendsData = [];
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       for (var i = 0; i < user.outreqs.length; i++) {
         var friendLogin = user.outreqs[i];
-        if (fs.existsSync("userdata/" + friendLogin + ".txt")) {
-          var result = fs.readFileSync("userdata/" + friendLogin + ".txt", "utf-8");
+        if (fs.existsSync("userdata/" + friendLogin + ".json")) {
+          var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
           var friend = JSON.parse(result);
           var friendData = {}
           friendData.login = friend.login;
@@ -619,12 +619,12 @@ app.get("/user/get/inreqs/data", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
     var friendsData = [];
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       for (var i = 0; i < user.inreqs.length; i++) {
         var friendLogin = user.inreqs[i];
-        if (fs.existsSync("userdata/" + friendLogin + ".txt")) {
-          var result = fs.readFileSync("userdata/" + friendLogin + ".txt", "utf-8");
+        if (fs.existsSync("userdata/" + friendLogin + ".json")) {
+          var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
           var friend = JSON.parse(result);
           var friendData = {}
           friendData.login = friend.login;
@@ -648,8 +648,8 @@ app.get("/user/get/inreqs/data", (req, res) => {
 app.get("/get/inreqs/count", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    if (fs.existsSync(`userdata/${login}.txt`)) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync(`userdata/${login}.json`)) {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
         res.end(String(user.inreqs.length));
       });
@@ -663,8 +663,8 @@ app.get("/get/inreqs/count", (req, res) => {
 app.get("/get/outreqs/count", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    if (fs.existsSync(`userdata/${login}.txt`)) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync(`userdata/${login}.json`)) {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
         res.end(String(user.outreqs.length));
       });
@@ -681,18 +681,18 @@ app.get("/get/outreqs/count", (req, res) => {
 app.post("/user/add/friend", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       if (err) throw err;
       var user = JSON.parse(data);
       user.outreqs.push(req.body.friend);
-      fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, '', 5), (err) => {
+      fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, '', 5), (err) => {
         if (err) throw err;
-        if (fs.existsSync("userdata/" + req.body.friend + ".txt")) {
-          fs.readFile("userdata/" + req.body.friend + ".txt", "utf-8", (err, result) => {
+        if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
+          fs.readFile("userdata/" + req.body.friend + ".json", "utf-8", (err, result) => {
             if (err) throw err;
             var friend = JSON.parse(result);
             friend.inreqs.push(login);
-            fs.writeFile("userdata/" + req.body.friend + ".txt", JSON.stringify(friend, "", 5), (err) => {
+            fs.writeFile("userdata/" + req.body.friend + ".json", JSON.stringify(friend, "", 5), (err) => {
               if (err) throw err;
               res.end("true")
             })
@@ -708,17 +708,17 @@ app.post("/user/add/friend", uep, (req, res) => {
 app.post("/user/cancel/outcomingrequest", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    if (fs.existsSync("userdata/" + req.body.user + ".txt")) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync("userdata/" + req.body.user + ".json")) {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         if (err) throw err;
         var user = JSON.parse(data);
         user.outreqs.splice(user.outreqs.indexOf(req.body.user), 1);
-        fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, "", 5), (err) => {
+        fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) throw err;
-          fs.readFile("userdata/" + req.body.user + ".txt", "utf-8", (err, result) => {
+          fs.readFile("userdata/" + req.body.user + ".json", "utf-8", (err, result) => {
             user = JSON.parse(result);
             user.inreqs.splice(user.inreqs.indexOf(login), 1);
-            fs.writeFile("userdata/" + req.body.user + ".txt", JSON.stringify(user, "", 5), (err) => {
+            fs.writeFile("userdata/" + req.body.user + ".json", JSON.stringify(user, "", 5), (err) => {
               if (err) throw err;
               res.end("true");
             })
@@ -734,20 +734,20 @@ app.post("/user/cancel/outcomingrequest", uep, (req, res) => {
 app.post("/user/accept/incomingrequest", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    if (fs.existsSync("userdata/" + req.body.user + ".txt")) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync("userdata/" + req.body.user + ".json")) {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
         var tempUser = user.inreqs[user.inreqs.indexOf(req.body.user)];
         user.inreqs.splice(user.inreqs.indexOf(req.body.user), 1);
         user.friends.push(tempUser);
-        fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, "", 5), (err) => {
+        fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) throw err;
-          fs.readFile("userdata/" + req.body.user + ".txt", "utf-8", (err, result) => {
+          fs.readFile("userdata/" + req.body.user + ".json", "utf-8", (err, result) => {
             user = JSON.parse(result);
             tempUser = user.outreqs[user.outreqs.indexOf(login)];
             user.outreqs.splice(user.outreqs.indexOf(login), 1);
             user.friends.push(tempUser);
-            fs.writeFile("userdata/" + req.body.user + ".txt", JSON.stringify(user, "", 5), (err) => {
+            fs.writeFile("userdata/" + req.body.user + ".json", JSON.stringify(user, "", 5), (err) => {
               if (err) throw err;
               res.end("true");
             })
@@ -763,12 +763,12 @@ app.get("/user/get/friends/data", (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
     var friendsData = [];
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       for (var i = 0; i < user.friends.length; i++) {
         var friendLogin = user.friends[i];
-        if (fs.existsSync("userdata/" + friendLogin + ".txt")) {
-          var result = fs.readFileSync("userdata/" + friendLogin + ".txt", "utf-8");
+        if (fs.existsSync("userdata/" + friendLogin + ".json")) {
+          var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
           var friend = JSON.parse(result);
           var friendData = {}
           friendData.login = friend.login;
@@ -792,20 +792,20 @@ app.get("/user/get/friends/data", (req, res) => {
 app.post("/user/delete/friend", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    if (fs.existsSync("userdata/" + req.body.friend + ".txt")) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         var user = JSON.parse(data);
         var tempUser = user.friends[user.friends.indexOf(req.body.friend)];
         user.friends.splice(user.friends.indexOf(req.body.friend), 1);
         user.inreqs.push(tempUser);
-        fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, "", 5), (err) => {
+        fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) throw err;
-          fs.readFile("userdata/" + req.body.friend + ".txt", "utf-8", (err, result) => {
+          fs.readFile("userdata/" + req.body.friend + ".json", "utf-8", (err, result) => {
             user = JSON.parse(result);
             tempUser = user.friends[user.friends.indexOf(login)];
             user.friends.splice(user.friends.indexOf(login), 1);
             user.outreqs.push(tempUser);
-            fs.writeFile("userdata/" + req.body.friend + ".txt", JSON.stringify(user, "", 5), (err) => {
+            fs.writeFile("userdata/" + req.body.friend + ".json", JSON.stringify(user, "", 5), (err) => {
               if (err) throw err;
               res.end("true");
             });
@@ -825,7 +825,7 @@ app.get("/get/:login", (req, res) => {
   var login = wwt.getLoginFromToken(token);
   if (login && token && (loginFromReq == login) && getUserData) {
     getUserData = false;
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       delete user.password;
       res.end(JSON.stringify(user, "", 5));
@@ -840,11 +840,11 @@ app.get("/get/:login", (req, res) => {
 app.post("/user/change/password", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       if (usMod.passwordValidate(res, user.password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
         user.password = req.body.newPassword;
-        fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, "", 5), (err) => {
+        fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) {
             console.log(err);
             return res.sendStatus(500);
@@ -863,7 +863,7 @@ app.post("/user/change/name", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
     if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
-      fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
         if (err) {
           console.log(err);
           res.sendStatus(500);
@@ -871,7 +871,7 @@ app.post("/user/change/name", uep, (req, res) => {
         var user = JSON.parse(data);
         user.firstname = req.body.firstname;
         user.lastname = req.body.lastname;
-        fs.writeFile(`userdata/${login}.txt`, JSON.stringify(user, "", 5), (err) => {
+        fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
           if (err) throw err;
           res.send("true:Данные успешно сохранены!\n\n");
         })
@@ -886,12 +886,12 @@ app.post("/user/change/name", uep, (req, res) => {
 app.post("/change-settings", uep, (req, res) => {
   var login = wwt.validate(req, res);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       if (req.body.scroll === "true") user.scroll = true;
       if (req.body.scroll === "false") user.scroll = false;
       user.color = req.body.color;
-      fs.writeFile("userdata/" + user.login + ".txt", JSON.stringify(user, "", 5), (err) => {
+      fs.writeFile("userdata/" + user.login + ".json", JSON.stringify(user, "", 5), (err) => {
         if (err) throw err;
         res.end();
       });
@@ -907,8 +907,8 @@ app.post("/change-settings", uep, (req, res) => {
 app.get("/logout", (req, res) => {
   var token = getCookie(req, "token");
   var login = wwt.getLoginFromToken(token);
-  if (login && token && fs.existsSync(`userdata/${login}.txt`)) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+  if (login && token && fs.existsSync(`userdata/${login}.json`)) {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       wwt.userLogout(token, login);
       chat.addnewmessage("exit", JSON.parse(data));
       res.clearCookie("token");
@@ -929,7 +929,7 @@ app.post("/", uep, (req, res) => {
 
 app.get("/admin/test/1", (req, res) => {
   console.time("TEST");
-  fs.readFile("data/chat.txt", "utf-8", (err, data) => {
+  fs.readFile("data/chat.json", "utf-8", (err, data) => {
     var arr = JSON.parse(data);
     var obj = {};
     obj.id = "x";
@@ -937,7 +937,7 @@ app.get("/admin/test/1", (req, res) => {
     obj.time = "asd";
     obj.txt = "LOLO";
     arr.push(obj);
-    fs.writeFile("data/chat.txt", JSON.stringify(arr, "", 1), (err) => {
+    fs.writeFile("data/chat.json", JSON.stringify(arr, "", 1), (err) => {
       console.timeEnd("TEST");
       res.end();
     });

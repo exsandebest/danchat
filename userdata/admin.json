@@ -1,7 +1,8 @@
 {
+     "id": 1,
      "login": "admin",
      "password": "admin",
-     "age": "217",
+     "age": 127,
      "sex": "male",
      "firstname": "Администратор",
      "lastname": "",

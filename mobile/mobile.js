@@ -3,19 +3,19 @@ app.get("/mobile/check/connection", (req, res) => {
 });
 
 app.post("/mobile/enter", uep, (req, res) => {
-  var auth = fs.existsSync("userdata/" + req.body.login + ".txt");
+  var auth = fs.existsSync("userdata/" + req.body.login + ".json");
   if (auth === false) {
     res.end("false");
   } else {
     console.log(req.body.login + " is entering...");
-    fs.readFile("userdata/" + req.body.login + ".txt", "utf-8", (err, data)=> {
+    fs.readFile("userdata/" + req.body.login + ".json", "utf-8", (err, data)=> {
       if (err != null) {
         res.end("false");
       } else {
         var user = JSON.parse(data);
         if (req.body.login == user.login && req.body.password == user.password) {
           var token = genToken();
-          fs.appendFileSync("data/tokens.txt", ";" + token + "=" + user.login);
+          fs.appendFileSync("data/tokens.json", ";" + token + "=" + user.login);
           res.send("true:" + user.login + ":" + token);
           chat.addnewmessage("enter", user);
           console.log(user.login + " entered. IP: " + req.ip);
@@ -30,7 +30,7 @@ app.post("/mobile/enter", uep, (req, res) => {
 app.post("/mobile/addnewmessage", uep, (req, res) => {
   var login = wwt.getLoginFromToken(req.body.token);
   if (login) {
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       user.message = req.body.message || "";
       chat.addnewmessage("message", user);
@@ -59,7 +59,7 @@ app.post("/mobile/logout", uep, (req, res) => {
     res.end("false");
   } else {
     wwt.userLogout(token, login);
-    fs.readFile(`userdata/${login}.txt`, "utf-8", (err, data) => {
+    fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
       var user = JSON.parse(data);
       chat.addnewmessage("exit", user);
       }, (err, resp, body) => {})

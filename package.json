@@ -11,7 +11,7 @@
   },
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "description": "Chat, friends, communication with Node.js",
   "devDependencies": {},

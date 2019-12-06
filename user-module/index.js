@@ -12,15 +12,15 @@ const regSex2 = /female/;
 
 update();
 
-fs.watch("data/userlist.txt", (event, filename)=>{
+fs.watch("data/userlist.json", (event, filename)=>{
   update();
 });
 
 
 
 function update(){
-fs.readFile("data/userlist.txt", "utf-8", (err, data)=>{
-  logins = data.replace("\r\n","").split(";");
+fs.readFile("data/userlist.json", "utf-8", (err, data)=>{
+  logins = JSON.parse(data);
 });
 }
 

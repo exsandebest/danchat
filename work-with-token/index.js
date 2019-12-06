@@ -9,7 +9,7 @@ function start(){
   try{
   logins = [];
   tokens = [];
-  var data = fs.readFileSync("data/tokens.txt", "utf-8");
+  var data = fs.readFileSync("data/tokens.json", "utf-8");
   data = data.replace(/\r/g, "");
   data = data.replace(/\n/g, "");
 if (data == false) data = "[]";
@@ -25,11 +25,11 @@ if (data == false) data = "[]";
   }
 }
 
-fs.watch("data/tokens.txt", (event) => {
+fs.watch("data/tokens.json", (event) => {
   if (event === "change") {
     logins = [];
     tokens = [];
-    var data = fs.readFileSync("data/tokens.txt", "utf-8");
+    var data = fs.readFileSync("data/tokens.json", "utf-8");
     data = data.replace(/\r/g, "");
     data = data.replace(/\n/g, "");
     if (data == false) data = "[]";
@@ -56,7 +56,7 @@ return tokens[logins.indexOf(login)];
 
 
 exports.userLogout = (token, login)=>{
-  fs.readFile("data/tokens.txt","utf-8",(err,data)=>{
+  fs.readFile("data/tokens.json","utf-8",(err,data)=>{
     if (data == false) data = "[]";
     var arr = JSON.parse(data);
     arr.forEach((elem,i)=>{
@@ -64,7 +64,7 @@ exports.userLogout = (token, login)=>{
         arr.splice(i,1);
       }
     })
-    fs.writeFile("data/tokens.txt", JSON.stringify(arr,"",2),(err)=>{
+    fs.writeFile("data/tokens.json", JSON.stringify(arr,"",2),(err)=>{
       if (err) throw err;
     })
   })
@@ -73,13 +73,13 @@ exports.userLogout = (token, login)=>{
 
 
 exports.setCouple =  (login, token) => {
-  fs.readFile("data/tokens.txt", "utf-8", (err, data)=>{
+  fs.readFile("data/tokens.json", "utf-8", (err, data)=>{
     if (err) throw err;
     var arr = JSON.parse(data);
     var obj = {};
     obj[login]=token;
     arr.push(obj);
-    fs.writeFile("data/tokens.txt",JSON.stringify(arr,"",5), (err)=>{
+    fs.writeFile("data/tokens.json",JSON.stringify(arr,"",5), (err)=>{
       if (err) throw err;
     })
   })
@@ -93,7 +93,7 @@ exports.validate = function (req, res) {
   if (token){
     var login = wwt.getLoginFromToken(token);
     if (login){
-      if(fs.existsSync(`userdata/${login}.txt`)){
+      if(fs.existsSync(`userdata/${login}.json`)){
         return login;
       }
     } else {
@@ -108,7 +108,7 @@ exports.validate = function (req, res) {
 };
 
 exports.clear = (arr)=>{
-fs.readFile("data/tokens.txt","utf-8",(err,data)=>{
+fs.readFile("data/tokens.json","utf-8",(err,data)=>{
   var tkns = JSON.parse(data);
   tkns.forEach((elem,i)=>{
     for (key in elem){
@@ -117,7 +117,7 @@ fs.readFile("data/tokens.txt","utf-8",(err,data)=>{
       }
     }
   });
-  fs.writeFile("data/tokens.txt",JSON.stringify(tkns,"",5),(err)=>{
+  fs.writeFile("data/tokens.json",JSON.stringify(tkns,"",5),(err)=>{
     if (err) throw err;
   });
 });
@@ -141,7 +141,7 @@ function getCookie(req,name) {
 exports.validateAdmin = (req,res)=>{
     var token = getCookie(req,"token");
     var login = wwt.getLoginFromToken(token);
-    if (fs.existsSync(`userdata/${login}.txt`) && login && token && (JSON.parse(fs.readFileSync("data/adminlist.txt","utf-8")).indexOf(login) !== -1)){
+    if (fs.existsSync(`userdata/${login}.json`) && login && token && (JSON.parse(fs.readFileSync("data/adminlist.json","utf-8")).indexOf(login) !== -1)){
           return login;
         } else {
           res.clearCookie("token",{path:"/"});
