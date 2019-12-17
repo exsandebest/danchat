@@ -17,8 +17,7 @@ const uep = pars.urlencoded({
    extended: false
 });
 
-const port = 80;
-const ip = "192.168.43.47";
+const port = process.env.PORT || 80;
 
 
 hbs.registerPartials(__dirname + "/views/partials");
@@ -957,7 +956,7 @@ function rn(str) {
 
 
 //Слушать порт
-http.listen(port, ip, (err) => {
+http.listen(port/*, ip*/, (err) => {
    console.timeEnd("Loading");
    console.log("Started ::: " + ip + ":" + port);
 });
