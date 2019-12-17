@@ -13,7 +13,8 @@
    "main": "app.js",
    "scripts": {
       "start": "node app.js",
-      "demon": "nodemon app.js"
+      "demon": "nodemon app.js",
+      "build": "node app.js"
    },
    "description": "Chat, friends, communication with Node.js",
    "devDependencies": {},
