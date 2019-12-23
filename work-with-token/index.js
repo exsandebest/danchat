@@ -110,6 +110,12 @@ exports.validate = function(req, res) {
    }
 };
 
+exports.test = (id)=>{
+   sql.query(`select login from users where id = ${id}`, (err, result)=>{
+      console.log(result);
+   })
+}
+
 exports.clear = (arr) => {
    fs.readFile("data/tokens.json", "utf-8", (err, data) => {
       var tkns = JSON.parse(data);
