@@ -13,12 +13,48 @@ const usMod = require('./user-module');
 const io = require('socket.io')(http);
 const pars = require('body-parser');
 const getter = require('./getter');
-const uep = pars.urlencoded({
+const mysql = require("mysql2");
+const parserURLEncoded = pars.urlencoded({
    extended: false
 });
+const parserJSON = pars.json();
 
+
+console.time("Config");
 var config = JSON.parse(fs.readFileSync("config/main.json","utf-8"));
 var dbconfig = JSON.parse(fs.readFileSync("config/database.json", "utf-8"));
+console.timeEnd("Config");
+
+console.time("Database");
+var sql = mysql.createPool({
+   host: dbconfig.host,
+   user: dbconfig.user,
+   database: dbconfig.name,
+   password: dbconfig.password
+})
+
+sql.query(`create table if not exists users
+   (id int(11) NOT NULL auto_increment primary key,
+   login varchar(255) NOT NULL,
+   password varchar(512) NOT NULL,
+   age int(4) default NULL,
+   sex bool default NULL,
+   firstname varchar(255) NOT NULL,
+   lastname varchar(255) default NULL,
+   color varchar(8) default "F00000",
+   scroll bool default 1)
+   DEFAULT CHARSET=utf8;`, (err, result)=>{
+      if (err) console.error(err);
+      sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname)
+       values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов");`, (err, result)=>{
+         if (err) console.error(err);
+      })
+   })
+console.timeEnd("Database");
+
+
+
+
 
 
 hbs.registerPartials(__dirname + "/views/partials");
@@ -56,7 +92,7 @@ app.get("/login", (req, res) => {
 })
 
 //Вход
-app.post("/enter", uep, (req, res) => {
+app.post("/enter", parserURLEncoded, (req, res) => {
    var Rlogin = req.body.login;
    var Rpassword = req.body.password;
    if (Rlogin && Rpassword) {
@@ -121,7 +157,7 @@ app.get("/subscribe", (req, res) => {
 });
 
 //Новое сообщение
-app.post("/addnewmessage", uep, (req, res) => {
+app.post("/addnewmessage", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
@@ -134,7 +170,7 @@ app.post("/addnewmessage", uep, (req, res) => {
 });
 
 
-app.post("/get/message", uep, (req, res) => {
+app.post("/get/message", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile("data/chat.json", "utf-8", (err, data) => {
@@ -226,7 +262,7 @@ app.get("/onlineCounter", (req, res) => {
 });
 
 //Страница Люди
-app.get("/people", uep, (req, res) => {
+app.get("/people", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile("data/userlist.json", "utf-8", (err, data) => {
@@ -262,7 +298,7 @@ app.get("/registration", (req, res) => {
 });
 
 //Процесс регистрации
-app.post("/registration", uep, (req, res) => {
+app.post("/registration", parserURLEncoded, (req, res) => {
    var validate = usMod.registrationValidate(req, res);
    if (validate) {
       var user = {};
@@ -375,7 +411,7 @@ app.get("/get/GUID", (req, res) => {
 Команды админа
 */
 //Получить логин из токена
-app.post("/admin/get/login", uep, (req, res) => {
+app.post("/admin/get/login", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       res.end(wwt.getLoginFromToken(req.body.token));
@@ -383,7 +419,7 @@ app.post("/admin/get/login", uep, (req, res) => {
 })
 
 //Получить токен из логина
-app.post("/admin/get/token", uep, (req, res) => {
+app.post("/admin/get/token", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       res.end(wwt.getTokenFromLogin(req.body.login));
@@ -391,7 +427,7 @@ app.post("/admin/get/token", uep, (req, res) => {
 })
 
 //Установить новую пару (соответствие) токен=логин в tokens.json
-app.post("/admin/set/couple", uep, (req, res) => {
+app.post("/admin/set/couple", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       wwt.setCouple(req.body.login, req.body.token);
@@ -400,7 +436,7 @@ app.post("/admin/set/couple", uep, (req, res) => {
 })
 
 //Удалить пару (соответствие) в tokens.json
-app.post("/admin/delete/couple", uep, (req, res) => {
+app.post("/admin/delete/couple", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       wwt.userLogout(wwt.getTokenFromLogin(req.body.login), req.body.login);
@@ -446,7 +482,7 @@ app.get("/users/toMakeUser/list", (req, res) => {
    }
 });
 
-app.post("/admin/make/admin", uep, (req, res) => {
+app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       if (fs.existsSync("userdata/" + req.body.user + ".json")) {
@@ -495,7 +531,7 @@ io.on("connection", (socket) => {
    });
 });
 
-app.post("/admin/make/user", uep, (req, res) => {
+app.post("/admin/make/user", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       if (fs.existsSync("userdata/" + req.body.login + ".json")) {
@@ -512,7 +548,7 @@ app.post("/admin/make/user", uep, (req, res) => {
       }
    }
 })
-app.post("/admin/message", uep, (req, res) => {
+app.post("/admin/message", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       io.emit("MESSAGE", adminLogin + ": " + req.body.message);
@@ -677,7 +713,7 @@ app.get("/get/outreqs/count", (req, res) => {
 
 
 //Подать заявку на добавление в друзья
-app.post("/user/add/friend", uep, (req, res) => {
+app.post("/user/add/friend", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
@@ -704,7 +740,7 @@ app.post("/user/add/friend", uep, (req, res) => {
 
 
 //Отвенить заявку
-app.post("/user/cancel/outcomingrequest", uep, (req, res) => {
+app.post("/user/cancel/outcomingrequest", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       if (fs.existsSync("userdata/" + req.body.user + ".json")) {
@@ -730,7 +766,7 @@ app.post("/user/cancel/outcomingrequest", uep, (req, res) => {
 
 
 //Принять заявку на добавление в друзья
-app.post("/user/accept/incomingrequest", uep, (req, res) => {
+app.post("/user/accept/incomingrequest", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       if (fs.existsSync("userdata/" + req.body.user + ".json")) {
@@ -788,7 +824,7 @@ app.get("/user/get/friends/data", (req, res) => {
 });
 
 //Удалить из друзей
-app.post("/user/delete/friend", uep, (req, res) => {
+app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
@@ -836,7 +872,7 @@ app.get("/get/:login", (req, res) => {
 });
 
 
-app.post("/user/change/password", uep, (req, res) => {
+app.post("/user/change/password", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
@@ -858,7 +894,7 @@ app.post("/user/change/password", uep, (req, res) => {
 
 
 
-app.post("/user/change/name", uep, (req, res) => {
+app.post("/user/change/name", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
@@ -882,7 +918,7 @@ app.post("/user/change/name", uep, (req, res) => {
 });
 
 //Сохранить изменения в настройках
-app.post("/change-settings", uep, (req, res) => {
+app.post("/change-settings", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
@@ -922,7 +958,7 @@ app.get("/logout", (req, res) => {
 })
 
 
-app.post("/", uep, (req, res) => {
+app.post("/", parserURLEncoded, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 
@@ -952,8 +988,21 @@ function rn(str) {
    return str.replace("\r", "").replace("\n", "");
 };
 
+app.get("/console/sql", (req, res) => {
+   fs.readFile("secret/consoleSql.html", "utf-8", (err, data) => {
+      if (err) console.error(err);
+      res.send(data);
+   })
+})
 
-
+app.post("/console/sql/query", parserURLEncoded, (req, res) => {
+   console.log(req.body.q);
+   sql.query(req.body.q, (err, result, fields) => {
+      if (err) console.error(err);
+      console.log(result);
+      res.send(JSON.stringify(result,"",5));
+   })
+})
 
 
 //Слушать порт
