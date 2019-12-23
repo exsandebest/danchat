@@ -17,7 +17,8 @@ const uep = pars.urlencoded({
    extended: false
 });
 
-const port = process.env.PORT || 80;
+var config = JSON.parse(fs.readFileSync("config/main.json","utf-8"));
+var dbconfig = JSON.parse(fs.readFileSync("config/database.json", "utf-8"));
 
 
 hbs.registerPartials(__dirname + "/views/partials");
@@ -956,7 +957,7 @@ function rn(str) {
 
 
 //Слушать порт
-http.listen(port/*, ip*/, (err) => {
+http.listen(config.port, config.ip, (err) => {
    console.timeEnd("Loading");
-   console.log("Started ::: "/* + ip + ":"*/ + port);
+   console.log(`Started on : ${config.ip}:${config.port}`);
 });
