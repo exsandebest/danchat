@@ -270,7 +270,7 @@ app.get("/registration", (req, res) => {
    res.render("registration.hbs", {});
 });
 
-//Процесс регистрации
+//Процесс
 app.post("/registration", parserURLEncoded, (req, res) => {
    var validate = usMod.registrationValidate(req, res);
    if (validate) {
@@ -935,10 +935,6 @@ app.post("/", parserURLEncoded, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 
-app.get("/t/:id", (req, res)=>{
-   wwt.test(parseInt(req.params.id));
-   res.end();
-})
 
 
 //Функция генерации токена
