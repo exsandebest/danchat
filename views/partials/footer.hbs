@@ -1,5 +1,8 @@
 ﻿<footer>
    <div style="background-color: rgba(70, 230, 72, 0.49); margin-top: 30px; position: fixed; bottom: 0; width: 100%; height: 30px; left:0; border-radius: 25px 25px 0px 0px">
-      <p style="margin-left: 25px; margin-top: 8px; color:rgba(70, 230, 72, 1); font-weight:bold">© Даниил Богданов 2017-2019</p>
+      <p style="margin-left: 25px; margin-top: 8px; color:rgba(70, 230, 72, 1); font-weight:bold">© Даниил Богданов 2017-<span id = "currentYear"></span></p>
    </div>
+   <script type="text/javascript">
+      document.getElementById("currentYear").innerText = (new Date()).getFullYear();
+   </script>
 </footer>
