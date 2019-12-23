@@ -21,7 +21,7 @@ const parserJSON = pars.json();
 
 
 console.time("Config");
-var config = JSON.parse(fs.readFileSync("config/main.json","utf-8"));
+var config = JSON.parse(fs.readFileSync("config/main.json", "utf-8"));
 var dbconfig = JSON.parse(fs.readFileSync("config/database.json", "utf-8"));
 console.timeEnd("Config");
 
@@ -43,14 +43,30 @@ sql.query(`create table if not exists users
    lastname varchar(255) default NULL,
    color varchar(8) default "F00000",
    scroll bool default 1)
-   DEFAULT CHARSET=utf8;`, (err, result)=>{
+   DEFAULT CHARSET=utf8;`, (err, result) => {
+   if (err) console.error(err);
+   sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname)
+   values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов");`, (err, result) => {
       if (err) console.error(err);
-      sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname)
-       values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов");`, (err, result)=>{
+      sql.query(`create table if not exists friends
+         (id_1 int(11) not null, id_2 int(11) not null)
+         DEFAULT CHARSET=utf8;`, (err) => {
          if (err) console.error(err);
+         sql.query(`create table if not exists friends_requests
+            (from_id int(11) not null, to_id int(11) not null)
+            DEFAULT CHARSET=utf8;`, (err) => {
+            if (err) console.error(err);
+            sql.query(`create table if not exists tokens
+               (token varchar(255) not null, id int(11) not null)
+               DEFAULT CHARSET=utf8;`, (err)=>{
+               if (err) console.error(err);
+               console.timeEnd("Database");
+            })
+         })
       })
    })
-console.timeEnd("Database");
+})
+
 
 
 
@@ -1000,7 +1016,7 @@ app.post("/console/sql/query", parserURLEncoded, (req, res) => {
    sql.query(req.body.q, (err, result, fields) => {
       if (err) console.error(err);
       console.log(result);
-      res.send(JSON.stringify(result,"",5));
+      res.send(JSON.stringify(result, "", 5));
    })
 })
 
