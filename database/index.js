@@ -13,7 +13,7 @@ var sql = mysql.createPool({
 
 sql.query(`create table if not exists users
    (id int(11) NOT NULL auto_increment primary key,
-   login varchar(255) NOT NULL,
+   login varchar(255) unique NOT NULL,
    password varchar(512) NOT NULL,
    age int(4) default NULL,
    sex bool default NULL,
@@ -35,7 +35,8 @@ sql.query(`create table if not exists users
             DEFAULT CHARSET=utf8;`, (err) => {
             if (err) console.error(err);
             sql.query(`create table if not exists tokens
-               (token varchar(255) not null, id int(11) not null)
+               (token varchar(255) not null, id int(11) not null,
+               time datetime default null)
                DEFAULT CHARSET=utf8;`, (err)=>{
                if (err) console.error(err);
                console.timeEnd("Module => database");

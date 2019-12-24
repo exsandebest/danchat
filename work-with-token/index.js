@@ -88,28 +88,59 @@ exports.setCouple = (login, token) => {
 };
 
 
-
-
-exports.validate = function(req, res) {
-   var token = getCookie(req, "token");
-   if (token) {
-      var login = wwt.getLoginFromToken(token);
-      if (login) {
-         if (fs.existsSync(`userdata/${login}.json`)) {
-            return login;
-         }
+exports.validate = (req, res)=>{
+   var p = new Promise((resolve, reject)=>{
+      var token = getCookie(req, "token");
+      if (token) {
+         sql.query(`select id from tokens where token = '${token}'`, (err, result)=>{
+            if (err){
+               console.error(err);
+               reject("db");
+            }
+            if (result === undefined || result.length === 0){
+               res.clearCookie("token");
+               res.redirect("/login");
+               resolve(false);
+            } else {
+               resolve(result[0].id);
+            }
+         })
       } else {
-         res.clearCookie("token", {
-            path: "/"
-         });
+         res.clearCookie("token");
          res.redirect("/login");
-         res.end();
+         resolve(false);
       }
-   } else {
-      res.redirect("/login");
-      res.end();
-   }
-};
+   });
+   return p;
+}
+
+// exports.validate = function(req, res) {
+//    var token = getCookie(req, "token");
+//    if (token) {
+//       var id = wwt.getLoginFromToken(token);
+//       if (login) {
+//          if (fs.existsSync(`userdata/${login}.json`)) {
+//             return login;
+//          }
+//       } else {
+//          res.clearCookie("token", {
+//             path: "/"
+//          });
+//          res.redirect("/login");
+//          res.end();
+//       }
+//    } else {
+//       res.redirect("/login");
+//       res.end();
+//    }
+// };
+
+
+exports.test = (token)=>{
+   sql.query(`select id from tokens where token = ${token}`, (err, result)=>{
+      return result;
+   })
+}
 
 exports.clear = (arr) => {
    fs.readFile("data/tokens.json", "utf-8", (err, data) => {

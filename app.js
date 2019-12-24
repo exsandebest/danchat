@@ -14,7 +14,6 @@ const usMod = require('./user-module');
 const io = require('socket.io')(http);
 const pars = require('body-parser');
 const getter = require('./getter');
-const mysql = require("mysql2");
 const parserURLEncoded = pars.urlencoded({
    extended: false
 });
@@ -45,7 +44,11 @@ var usersOnline = [];
 
 //Страница входа
 app.get("/login", (req, res) => {
-   var token = getCookie(req, "token");
+   res.clearCookie("token", {
+      path: "/"
+   });
+   res.render("enter.hbs", {});
+   /*var token = getCookie(req, "token");
    var login = wwt.getLoginFromToken(token);
    if (token && login) {
       wwt.userLogout(token, login);
@@ -61,44 +64,34 @@ app.get("/login", (req, res) => {
          path: "/"
       })
       res.render("enter.hbs", {});
-   }
+   }*/
 })
 
 //Вход
 app.post("/enter", parserURLEncoded, (req, res) => {
    var Rlogin = req.body.login;
    var Rpassword = req.body.password;
-   if (Rlogin && Rpassword) {
-      if (fs.existsSync(`userdata/${Rlogin}.json`)) {
-         fs.readFile(`userdata/${Rlogin}.json`, "utf-8", (err, data) => {
-            var user = JSON.parse(data);
-            if ((Rlogin === user.login) && (md5(Rpassword) === user.password)) {
-               var token = genToken();
-               fs.readFile("data/tokens.json", "utf-8", (err, data2) => {
-                  if (data2 == false) data2 = "[]";
-                  var tokens = JSON.parse(data2);
-                  var obj = {};
-                  obj[user.login] = token;
-                  tokens.push(obj);
-                  fs.writeFile("data/tokens.json", JSON.stringify(tokens, "", 2), (err) => {
-                     chat.addnewmessage("enter", user);
-                     res.cookie("token", token, {
-                        httpOnly: true
-                     });
-                     res.end("token");
-                  })
-               })
-            } else {
-               res.end("false:Неверный логин или пароль");
-            }
-         })
-      } else {
-         res.end("false:Неверный логин или пароль");
-      }
-   } else {
+   if (!Rlogin || !Rpassword) {
       res.end("false:Заполните все поля");
+      return;
    }
+   sql.query(`select * from users where login= '${Rlogin}' and password = '${md5(Rpassword)}'`, (err, data) => {
+      if (err) console.error(err);
+      if (data === undefined || data.length === 0) {
+         res.end("false:Неверный логин или пароль");
+         return;
+      }
+      var user = data[0];
+      var token = genToken();
+      sql.query(`insert into tokens (id, token) values (${user.id}, '${token}')`, (err) => {
+         if (err) console.error(err);
+         chat.addnewmessage("enter", user);
+         res.cookie("token", token);
+         res.end("token");
+      })
+   })
 })
+
 
 
 
@@ -106,15 +99,18 @@ app.post("/enter", parserURLEncoded, (req, res) => {
 
 //Страница чата
 app.get("/", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         res.render("chat.hbs", {
-            scroll: JSON.parse(data).scroll,
-            login: login
-         });
-      });
-   }
+   wwt.validate(req, res).then((resolve) => {
+      if (resolve) {
+         sql.query(`select scroll, login from users where id = ${resolve}`, (err, result) => {
+            res.render("chat.hbs", {
+               scroll: result[0].scroll,
+               login: result[0].login
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
@@ -131,15 +127,19 @@ app.get("/subscribe", (req, res) => {
 
 //Новое сообщение
 app.post("/addnewmessage", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         user.message = req.body.message;
-         chat.addnewmessage("message", user);
-         res.end();
-      })
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select * from users where id = ${id}`, (err, result) => {
+            if (err) console.error(err);
+            var user = result[0];
+            user.message = req.body.message;
+            chat.addnewmessage("message", user);
+            res.end();
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 
@@ -157,13 +157,13 @@ app.post("/get/message", parserURLEncoded, (req, res) => {
                msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
                obj.msg.unshift(msgs[i - 1]);
             }
-            res.send(JSON.stringify(obj, "", 5));
+            res.end(JSON.stringify(obj, "", 5));
          } else {
             for (var i = 1; i < obj.maxId; i++) {
                msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
                obj.msg.unshift(msgs[i - 1]);
             }
-            res.send(JSON.stringify(obj, "", 5));
+            res.end(JSON.stringify(obj, "", 5));
          }
       });
    }
