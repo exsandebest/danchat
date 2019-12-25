@@ -1,29 +1,13 @@
 console.time("Module => user-module");
 const fs = require('fs');
 const md5 = require("md5");
-var logins = [];
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
 const regName = /^[a-zA-ZА-Яа-яЁё]{2,24}$/;
 const regAge = /^[0-9]{1,3}$/;
-const regSex1 = /male/;
-const regSex2 = /female/;
-
-update();
-
-fs.watch("data/userlist.json", (event, filename) => {
-   update();
-});
-
-
-
-function update() {
-   fs.readFile("data/userlist.json", "utf-8", (err, data) => {
-      logins = JSON.parse(data);
-   });
-}
-
+const regSex1 = /[01]/;
+const regSex2 = /[01]/;
 
 
 

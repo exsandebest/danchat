@@ -235,6 +235,15 @@ app.get("/onlineCounter", (req, res) => {
 
 //Страница Люди
 app.get("/people", parserURLEncoded, (req, res) => {
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login, firstname, lastname, color, imgStatus from users`)
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+
+
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile("data/userlist.json", "utf-8", (err, data) => {

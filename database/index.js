@@ -21,7 +21,8 @@ sql.query(`create table if not exists users
    lastname varchar(255) default NULL,
    color varchar(8) default "F00000",
    scroll bool default 1,
-   admin bool default 0)
+   admin bool default 0,
+   imgStatus bool default 0)
    DEFAULT CHARSET=utf8;`, (err, result) => {
    if (err) console.error(err);
    sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname, admin)
