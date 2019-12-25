@@ -115,12 +115,20 @@ app.get("/subscribe", (req, res) => {
 app.post("/addnewmessage", parserURLEncoded, (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select * from users where id = ${id}`, (err, result) => {
+         sql.query(`select login, color from users where id = ${id}`, (err, result) => {
             if (err) console.error(err);
-            var user = result[0];
-            user.message = req.body.message;
-            chat.addnewmessage("message", user);
-            res.end();
+            sql.query(`select max(id) from users`, (err, data)=>{
+               var msg = {};
+               msg.user_id = id;
+               msg.from = result[0].login;
+               msg.color = result[0].color;
+               msg.time = new Date().toTimeString().substring(0,5);
+               msg.id = data[0]["max(id)"] + 1;
+               msg.type = "message";
+               msg.text = req.body.message;
+               chat.addnewmessage(msg);
+               res.end();
+            })
          })
       }
    }, (err) => {

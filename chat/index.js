@@ -1,7 +1,8 @@
 console.time("Module => chat");
-var clients = [];
 const fs = require("fs");
 const getter = require('../getter');
+var clients = [];
+
 
 exports.subscribe = function(req, res) {
    clients.push(res);
@@ -11,19 +12,7 @@ exports.subscribe = function(req, res) {
 };
 
 exports.addnewmessage = function(action, user) {
-   var time;
-   var date = new Date();
-   var hours = date.getHours();
-   if (String(hours).length == 1) {
-      hours = "0" + String(hours);
-   }
-   var mins = date.getMinutes();
-   if (String(mins).length == 1) {
-      mins = "0" + String(mins);
-   }
-
-   time = hours + ":" + mins;
-
+   var time = new Date().toTimeString().substring(0,5);
    switch (action) {
       case "message":
          var obj = getObj(user, time);

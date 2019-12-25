@@ -49,6 +49,7 @@ sql.query(`create table if not exists users
                   if (err) console.error(err);
                   sql.query(`create table if not exists chathistory
                      (id int(11) auto_increment primary key,
+                     login varchar(255),
                      text text) DEFAULT CHARSET=utf8;`, (err) =>{
                         if (err) console.error(err);
                         console.timeEnd("Module => database");
