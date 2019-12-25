@@ -174,17 +174,42 @@ function getCookie(req, name) {
 
 
 exports.validateAdmin = (req, res) => {
-   var token = getCookie(req, "token");
-   var login = wwt.getLoginFromToken(token);
-   if (fs.existsSync(`userdata/${login}.json`) && login && token && (JSON.parse(fs.readFileSync("data/adminlist.json", "utf-8")).indexOf(login) !== -1)) {
-      return login;
-   } else {
-      res.clearCookie("token", {
-         path: "/"
-      });
-      res.redirect("/login");
-   }
+   var p = new Promise((resolve, reject)=>{
+      var token = getCookie(req, "token");
+      if (token) {
+         sql.query(`select id from tokens where token = '${token}'`, (err, result)=>{
+            if (err){
+               console.error(err);
+               reject("db");
+            }
+            if (result === undefined || result.length === 0){
+               res.clearCookie("token");
+               res.redirect("/login");
+               resolve(false);
+            } else {
+               sql.query(`select admin from users where id = ${result[0].id}`, (err, data)=>{
+                  if (err){
+                     console.error(err);
+                     reject("db");
+                  }
+                  if (result === undefined || result.length === 0){
+                     res.clearCookie("token");
+                     res.redirect("/login");
+                     resolve(false);
+                  } else {
+                     resolve(result[0].id);
+                  }
+               })
 
+            }
+         })
+      } else {
+         res.clearCookie("token");
+         res.redirect("/login");
+         resolve(false);
+      }
+   });
+   return p;
 }
 
 

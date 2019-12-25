@@ -2,7 +2,7 @@ function save() {
    var colorValue = document.getElementById("color").value;
    var scrollValue = document.getElementById("scroll").checked;
    var xhr = new XMLHttpRequest();
-   xhr.open("POST", "/change-settings", true);
+   xhr.open("POST", "/user/change/settings", true);
    xhr.onload = () => {
       if (xhr.status == 200) {
          document.getElementById("notif").setAttribute("style", "opacity:0");

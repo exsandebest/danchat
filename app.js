@@ -39,7 +39,6 @@ app.use(express.static(__dirname + "/sounds"));
 app.use(cookieParser());
 app.set("view engine", "hbs");
 
-var getUserData = false;
 var usersOnline = [];
 
 //Страница входа
@@ -48,23 +47,6 @@ app.get("/login", (req, res) => {
       path: "/"
    });
    res.render("enter.hbs", {});
-   /*var token = getCookie(req, "token");
-   var login = wwt.getLoginFromToken(token);
-   if (token && login) {
-      wwt.userLogout(token, login);
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         chat.addnewmessage("exit", JSON.parse(data));
-         res.clearCookie("token", {
-            path: "/"
-         })
-         res.render("enter.hbs", {});
-      })
-   } else {
-      res.clearCookie("token", {
-         path: "/"
-      })
-      res.render("enter.hbs", {});
-   }*/
 })
 
 //Вход
@@ -104,7 +86,7 @@ app.post("/enter", parserURLEncoded, (req, res) => {
 app.get("/", (req, res) => {
    wwt.validate(req, res).then((resolve) => {
       if (resolve) {
-         sql.query(`select scroll, login from users where id = ${resolve}`, (err, result) => {
+         sql.query(`select scroll, login from users where id = ${sql.escape(resolve)}`, (err, result) => {
             res.render("chat.hbs", {
                scroll: result[0].scroll,
                login: result[0].login
@@ -204,7 +186,7 @@ app.get("/settings", (req, res) => {
 app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+         sql.query(`select login from users where id = ${id}`, (err, data) => {
             if (err) console.error(err);
             res.render("friends.hbs", {
                login: data[0].login
@@ -219,34 +201,22 @@ app.get("/friends", (req, res) => {
 
 //Профиль
 app.get("/profile", (req, res) => {
-
    wwt.validate(req, res).then((id) => {
-   if (id) {
-      getUserData = true;
-      slq.query(`select login, admin, color, firstname, lastname from users where id = ${id}`, (err, data)=>{
-         res.render("profile.hbs")
-      })
-   }
-}, (err) => {
-   res.end("DB ERROR");
-});
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         getUserData = true;
-         var imgStatus = fs.existsSync("userimages/" + user.login + ".jpg");
-         var isAdmin = (JSON.parse(fs.readFileSync("data/adminlist.json", "utf-8")).indexOf(login) !== -1);
-         res.render("profile.hbs", {
-            login: login,
-            isAdmin: isAdmin,
-            imgStatus: imgStatus,
-            color: user.color,
-            firstname: user.firstname,
-            lastname: user.lastname
-         });
-      })
-   }
+      if (id) {
+         sql.query(`select login, admin, color, firstname, lastname from users where id = ${id}`, (err, data) => {
+            res.render("profile.hbs", {
+               login: data[0].login,
+               isAdmin: data[0].admin,
+               imgStatus: false,
+               color: data[0].color,
+               firstname: data[0].firstname,
+               lastname: data[0].lastname
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 // Счетчик людей онлайн
@@ -604,7 +574,7 @@ app.post("/user/upload/photo/profile", (req, res) => {
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+         sql.query(`select login from users where id = ${id}`, (err, data) => {
             if (err) console.error(err);
             res.render("incoming.hbs", {
                login: data[0].login
@@ -620,7 +590,7 @@ app.get("/incoming", (req, res) => {
 app.get("/outcoming", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+         sql.query(`select login from users where id = ${id}`, (err, data) => {
             if (err) console.error(err);
             res.render("outcoming.hbs", {
                login: data[0].login
@@ -697,9 +667,9 @@ app.get("/user/get/inreqs/data", (req, res) => {
 app.get("/get/inreqs/count", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select * from friends_requests where to_id = ${id}`, (err, data)=>{
+         sql.query(`select * from friends_requests where to_id = ${id}`, (err, data) => {
             if (err) console.error(err);
-            res.end(String((data===undefined?0:data.length)));
+            res.end(String((data === undefined ? 0 : data.length)));
          })
       }
    }, (err) => {
@@ -711,9 +681,9 @@ app.get("/get/inreqs/count", (req, res) => {
 app.get("/get/outreqs/count", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
-         sql.query(`select * from friends_requests where from_id = ${id}`, (err, data)=>{
+         sql.query(`select * from friends_requests where from_id = ${id}`, (err, data) => {
             if (err) console.error(err);
-            res.end(String((data===undefined?0:data.length)));
+            res.end(String((data === undefined ? 0 : data.length)));
          })
       }
    }, (err) => {
@@ -864,85 +834,56 @@ app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
 })
 
 
-
-//Получить данные о пользователе для странице профиля
-app.get("/get/:login", (req, res) => {
-   var loginFromReq = req.params["login"];
-   var token = getCookie(req, "token");
-   var login = wwt.getLoginFromToken(token);
-   if (login && token && (loginFromReq == login) && getUserData) {
-      getUserData = false;
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         delete user.password;
-         res.end(JSON.stringify(user, "", 5));
-      })
-   } else {
-      res.clearCookie("token");
-      res.redirect("/login");
-   }
-});
-
-
 app.post("/user/change/password", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         if (usMod.passwordValidate(res, user.password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
-            user.password = md5(req.body.newPassword);
-            fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
-               if (err) {
-                  console.log(err);
-                  return res.sendStatus(500);
-               }
-               res.send("true:Пароль успешно изменён!");
-            });
-         }
-      });
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select password from users where id = ${id}`, (err, data) => {
+            if (err) console.error(err);
+            if (usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
+               sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${id}`, (err) => {
+                  if (err) console.error(err);
+                  res.send("true:Пароль успешно изменён!");
+               })
+            }
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 
 
 
 app.post("/user/change/name", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            if (err) {
-               console.log(err);
-               res.sendStatus(500);
-            }
-            var user = JSON.parse(data);
-            user.firstname = req.body.firstname;
-            user.lastname = req.body.lastname;
-            fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
-               if (err) throw err;
-               res.send("true:Данные успешно сохранены!\n\n");
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
+            sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${id}`, (err) => {
+               if (err) console.error(err);
+               res.send("true:Данные успешно сохранены\n\n");
             })
-         })
-      } else {
-         res.end();
+         }
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 //Сохранить изменения в настройках
-app.post("/change-settings", parserURLEncoded, (req, res) => {
+app.post("/user/change/settings", parserURLEncoded, (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
          var scroll = true;
          if (req.body.scroll === "true") {
             scroll = true;
-         } else if (req.body.scroll === "false"){
+         } else if (req.body.scroll === "false") {
             scroll = false;
          } else {
             res.end("Incorrect values");
             return;
          }
-         sql.query(`update users set scroll = ${(scroll?1:0)}, color = '${req.body.color}' where id = ${id}`, (err, data)=>{
+         sql.query(`update users set scroll = ${(scroll?1:0)}, color = '${req.body.color}' where id = ${id}`, (err, data) => {
             if (err) console.error(err);
             res.end("OK");
          })

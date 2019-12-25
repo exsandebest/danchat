@@ -63,3 +63,7 @@ sql.query(`create table if not exists users
 exports.query = (a,b)=>{
    sql.query(a,b);
 }
+
+exports.escape = (s)=>{
+   return sql.escape(s);
+}
