@@ -273,29 +273,10 @@ app.get("/registration", (req, res) => {
 app.post("/registration", parserURLEncoded, (req, res) => {
    var validate = usMod.registrationValidate(req, res);
    if (validate) {
-      var user = {};
-      user.login = req.body.login;
-      user.password = md5(req.body.password);
-      user.age = req.body.age;
-      user.sex = req.body.sex;
-      user.firstname = req.body.firstname;
-      user.lastname = req.body.lastname;
-      user.color = "F00000";
-      user.scroll = true;
-      user.friends = [];
-      user.inreqs = [];
-      user.outreqs = [];
-      fs.writeFile(`userdata/${user.login}.json`, JSON.stringify(user, "", 5), (err) => {
-         if (err) throw err;
-         fs.readFile("data/userlist.json", "utf-8", (err, data) => {
-            if (!data) data = "[]";
-            var arr = JSON.parse(data);
-            arr.push(user.login);
-            fs.writeFile("data/userlist.json", JSON.stringify(arr, "", 5), (err) => {
-               if (err) throw err;
-               res.send("true:true");
-            });
-         });
+      sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
+      ${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err)=>{
+         if (err) console.error(err);
+         res.send("true:true");
       })
    } else {
       res.end();
@@ -373,7 +354,9 @@ app.get("/user", (req, res) => {
 
 
 app.get("/get/GUID", (req, res) => {
-   res.end(String(getter.GUID()));
+   sql.query(`select max(id) from chat`, (err, data)=>{
+      res.end(String(data[0]["max(id)"]))
+   })
 });
 
 
@@ -520,21 +503,30 @@ app.post("/admin/make/user", parserURLEncoded, (req, res) => {
       }
    }
 })
+
 app.post("/admin/message", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      io.emit("MESSAGE", adminLogin + ": " + req.body.message);
-   }
+   wwt.validateAdmin(req, res).then((id) => {
+      if (id) {
+         io.emit("MESSAGE", req.body.message);
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 //Административная панель
 app.get("/adminpanel", (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      res.render("adminpanel.hbs", {
-         login: adminLogin
-      });
-   }
+   wwt.validateAdmin(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login from users where id = ${id}`, (err, data) => {
+            res.render("adminpanel.hbs", {
+               login: data[0].login
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
@@ -939,7 +931,7 @@ function getCookie(req, name) {
       ));
       return matches ? decodeURIComponent(matches[1]) : false;
    } catch (e) {
-      console.log(e)
+      console.error(e)
       return false;
    }
 }
