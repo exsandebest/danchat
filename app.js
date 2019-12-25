@@ -57,7 +57,7 @@ app.post("/enter", parserURLEncoded, (req, res) => {
       res.end("false:Заполните все поля");
       return;
    }
-   sql.query(`select login, color from users where login= '${Rlogin}' and password = '${md5(Rpassword)}'`, (err, data) => {
+   sql.query(`select login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
       if (err) console.error(err);
       if (data === undefined || data.length === 0) {
          res.end("false:Неверный логин или пароль");
@@ -65,20 +65,20 @@ app.post("/enter", parserURLEncoded, (req, res) => {
       }
       var user = data[0];
       var token = genToken();
-      sql.query(`insert into tokens (id, token) values (${user.id}, '${token}')`, (err) => {
+      sql.query(`insert into tokens (id, token) values (${user.id}, ${sql.escape(token)})`, (err) => {
          if (err) console.error(err);
-            sql.query(`select max(id) from users`, (err, result)=>{
-               var msg = {};
-               msg.user_id = id;
-               msg.from = user.login;
-               msg.color = user.color;
-               msg.time = new Date().toTimeString().substring(0,5);
-               msg.id = result[0]["max(id)"] + 1;
-               msg.type = "enter";
-               msg.text = req.body.message;
-               chat.addnewmessage(msg);
-               res.end();
-            })
+         sql.query(`select max(id) from users`, (err, result) => {
+            var msg = {};
+            msg.user_id = id;
+            msg.from = user.login;
+            msg.color = user.color;
+            msg.time = new Date().toTimeString().substring(0, 5);
+            msg.id = result[0]["max(id)"] + 1;
+            msg.type = "enter";
+            msg.text = req.body.message;
+            chat.addnewmessage(msg);
+            res.end();
+         })
 
          res.cookie("token", token, {
             path: "/",
@@ -129,12 +129,12 @@ app.post("/addnewmessage", parserURLEncoded, (req, res) => {
       if (id) {
          sql.query(`select login, color from users where id = ${id}`, (err, result) => {
             if (err) console.error(err);
-            sql.query(`select max(id) from users`, (err, data)=>{
+            sql.query(`select max(id) from users`, (err, data) => {
                var msg = {};
                msg.user_id = id;
                msg.from = result[0].login;
                msg.color = result[0].color;
-               msg.time = new Date().toTimeString().substring(0,5);
+               msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
                msg.type = "message";
                msg.text = req.body.message;
@@ -303,7 +303,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
    var validate = usMod.registrationValidate(req, res);
    if (validate) {
       sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-      ${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err)=>{
+      ${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
          if (err) console.error(err);
          res.send("true:true");
       })
@@ -383,7 +383,7 @@ app.get("/user", (req, res) => {
 
 
 app.get("/get/GUID", (req, res) => {
-   sql.query(`select max(id) from chat`, (err, data)=>{
+   sql.query(`select max(id) from chat`, (err, data) => {
       res.end(String(data[0]["max(id)"]))
    })
 });
@@ -484,15 +484,15 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
    }
 })
 
-setInterval(() => {
-   //console.log("Clearing");
-   usersOnline = [];
-   io.emit("CheckConnection", "SERVER!");
-   setTimeout(() => {
-      //console.log(usersOnline);
-      wwt.clear(usersOnline);
-   }, 10000);
-}, 300000);
+// setInterval(() => {
+//    //console.log("Clearing");
+//    usersOnline = [];
+//    io.emit("CheckConnection", "SERVER!");
+//    setTimeout(() => {
+//       //console.log(usersOnline);
+//       wwt.clear(usersOnline);
+//    }, 10000);
+// }, 300000);
 
 app.get("/admin/online/update", (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
@@ -904,7 +904,7 @@ app.post("/user/change/settings", parserURLEncoded, (req, res) => {
             res.end("Incorrect values");
             return;
          }
-         sql.query(`update users set scroll = ${(scroll?1:0)}, color = '${req.body.color}' where id = ${id}`, (err, data) => {
+         sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)} where id = ${id}`, (err, data) => {
             if (err) console.error(err);
             res.end("OK");
          })
@@ -920,21 +920,29 @@ app.post("/user/change/settings", parserURLEncoded, (req, res) => {
 
 //Выход
 app.get("/logout", (req, res) => {
-   var token = getCookie(req, "token");
-   var login = wwt.getLoginFromToken(token);
-   if (login && token && fs.existsSync(`userdata/${login}.json`)) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         wwt.userLogout(token, login);
-         chat.addnewmessage("exit", JSON.parse(data));
-         res.clearCookie("token");
-         res.redirect("/login");
-      })
-   } else {
-      res.clearCookie("token", {
-         path: "/"
-      });
-      res.redirect("/login");
-   }
+   wwt.validateAdmin(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login, color from users where id = ${id}`, (err, result) => {
+            if (err) console.error(err);
+            sql.query(`select max(id) from users`, (err, data) => {
+               var msg = {};
+               msg.user_id = id;
+               msg.from = result[0].login;
+               msg.color = result[0].color;
+               msg.time = new Date().toTimeString().substring(0, 5);
+               msg.id = data[0]["max(id)"] + 1;
+               msg.type = "exit";
+               msg.text = req.body.message;
+               chat.addnewmessage(msg);
+               res.clearCookie("token");
+               res.redirect("/login");
+               res.end();
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
