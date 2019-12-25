@@ -39,7 +39,19 @@ sql.query(`create table if not exists users
                time datetime default null)
                DEFAULT CHARSET=utf8;`, (err)=>{
                if (err) console.error(err);
-               console.timeEnd("Module => database");
+               sql.query(`create table if not exists chat
+               (id int(11) auto_increment primary key,
+               text text, user_id int(11), type varchar(255),
+               time datetime)
+               DEFAULT CHARSET=utf8;`, (err)=>{
+                  if (err) console.error(err);
+                  sql.query(`create table if not exists chathistory
+                     (id int(11) auto_increment primary key,
+                     text text) DEFAULT CHARSET=utf8;`, (err) =>{
+                        if (err) console.error(err);
+                        console.timeEnd("Module => database");
+                  })
+               })
             })
          })
       })

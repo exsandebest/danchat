@@ -86,7 +86,10 @@ app.post("/enter", parserURLEncoded, (req, res) => {
       sql.query(`insert into tokens (id, token) values (${user.id}, '${token}')`, (err) => {
          if (err) console.error(err);
          chat.addnewmessage("enter", user);
-         res.cookie("token", token);
+         res.cookie("token", token, {
+            path: "/",
+            httpOnly: true
+         });
          res.end("token");
       })
    })
@@ -117,12 +120,17 @@ app.get("/", (req, res) => {
 
 //Подписка на сообщения
 app.get("/subscribe", (req, res) => {
-   var login = wwt.getLoginFromToken(getCookie(req, "token"));
-   if (login) {
-      chat.subscribe(req, res);
-   } else {
-      res.redirect("/login");
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         chat.subscribe(req, res);
+      } else {
+         res.clearCookie("token");
+         res.redirect("/login");
+         res.end();
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 //Новое сообщение
@@ -141,6 +149,9 @@ app.post("/addnewmessage", parserURLEncoded, (req, res) => {
       res.end("DB ERROR");
    });
 });
+
+
+
 
 
 app.post("/get/message", parserURLEncoded, (req, res) => {
@@ -171,18 +182,20 @@ app.post("/get/message", parserURLEncoded, (req, res) => {
 
 //Настройки
 app.get("/settings", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         if (err) throw err;
-         var user = JSON.parse(data);
-         res.render("settings.hbs", {
-            scroll: user.scroll,
-            color: user.color,
-            login: login
-         });
-      })
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login, scroll, color from users where id = ${id}`, (err, data) => {
+            if (err) console.error(err);
+            res.render("settings.hbs", {
+               scroll: data[0].scroll,
+               color: data[0].color,
+               login: data[0].login
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
