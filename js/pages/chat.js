@@ -60,11 +60,7 @@ function complex(r, str, ou) {
    }
    subscribe();
    if (login != r.from) {
-      if (r.type) {
          audio[r.type].play();
-      } else {
-         audio["message"].play();
-      }
    }
    if (ou) {
       usersOnline(false);
@@ -78,7 +74,7 @@ function subscribe() {
    //Когда сообщение получено
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
-      if (r.type === undefined) {
+      if (r.type === "message") {
          var str = `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.from}"><strong style="color: ${r.color};">${r.from}</strong></a>:<msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
          complex(r, str, false);
       } else if (r.type === "enter") {

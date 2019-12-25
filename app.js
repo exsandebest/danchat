@@ -57,7 +57,7 @@ app.post("/enter", parserURLEncoded, (req, res) => {
       res.end("false:Заполните все поля");
       return;
    }
-   sql.query(`select * from users where login= '${Rlogin}' and password = '${md5(Rpassword)}'`, (err, data) => {
+   sql.query(`select login, color from users where login= '${Rlogin}' and password = '${md5(Rpassword)}'`, (err, data) => {
       if (err) console.error(err);
       if (data === undefined || data.length === 0) {
          res.end("false:Неверный логин или пароль");
@@ -67,7 +67,19 @@ app.post("/enter", parserURLEncoded, (req, res) => {
       var token = genToken();
       sql.query(`insert into tokens (id, token) values (${user.id}, '${token}')`, (err) => {
          if (err) console.error(err);
-         chat.addnewmessage("enter", user);
+            sql.query(`select max(id) from users`, (err, result)=>{
+               var msg = {};
+               msg.user_id = id;
+               msg.from = user.login;
+               msg.color = user.color;
+               msg.time = new Date().toTimeString().substring(0,5);
+               msg.id = result[0]["max(id)"] + 1;
+               msg.type = "enter";
+               msg.text = req.body.message;
+               chat.addnewmessage(msg);
+               res.end();
+            })
+
          res.cookie("token", token, {
             path: "/",
             httpOnly: true
