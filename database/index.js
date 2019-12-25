@@ -20,11 +20,12 @@ sql.query(`create table if not exists users
    firstname varchar(255) NOT NULL,
    lastname varchar(255) default NULL,
    color varchar(8) default "F00000",
-   scroll bool default 1)
+   scroll bool default 1,
+   admin bool default 0)
    DEFAULT CHARSET=utf8;`, (err, result) => {
    if (err) console.error(err);
-   sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname)
-   values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов");`, (err, result) => {
+   sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname, admin)
+   values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов", 1);`, (err, result) => {
       if (err) console.error(err);
       sql.query(`create table if not exists friends
          (id_1 int(11) not null, id_2 int(11) not null)

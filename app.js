@@ -123,10 +123,6 @@ app.get("/subscribe", (req, res) => {
    wwt.validate(req, res).then((id) => {
       if (id) {
          chat.subscribe(req, res);
-      } else {
-         res.clearCookie("token");
-         res.redirect("/login");
-         res.end();
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -155,29 +151,32 @@ app.post("/addnewmessage", parserURLEncoded, (req, res) => {
 
 
 app.post("/get/message", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile("data/chat.json", "utf-8", (err, data) => {
-         var msgs = JSON.parse(data);
-         var obj = {};
-         obj.maxId = Number(req.body.id);
-         obj.msg = [];
-         if (obj.maxId - 20 >= 1) {
-            obj.minId = obj.maxId - 20;
-            for (var i = obj.minId; i < obj.maxId; i++) {
-               msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
-               obj.msg.unshift(msgs[i - 1]);
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         fs.readFile("data/chat.json", "utf-8", (err, data) => {
+            var msgs = JSON.parse(data);
+            var obj = {};
+            obj.maxId = Number(req.body.id);
+            obj.msg = [];
+            if (obj.maxId - 20 >= 1) {
+               obj.minId = obj.maxId - 20;
+               for (var i = obj.minId; i < obj.maxId; i++) {
+                  msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
+                  obj.msg.unshift(msgs[i - 1]);
+               }
+               res.end(JSON.stringify(obj, "", 5));
+            } else {
+               for (var i = 1; i < obj.maxId; i++) {
+                  msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
+                  obj.msg.unshift(msgs[i - 1]);
+               }
+               res.end(JSON.stringify(obj, "", 5));
             }
-            res.end(JSON.stringify(obj, "", 5));
-         } else {
-            for (var i = 1; i < obj.maxId; i++) {
-               msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
-               obj.msg.unshift(msgs[i - 1]);
-            }
-            res.end(JSON.stringify(obj, "", 5));
-         }
-      });
-   }
+         });
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 //Настройки
@@ -203,17 +202,34 @@ app.get("/settings", (req, res) => {
 
 //Друзья
 app.get("/friends", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      res.render("friends.hbs", {
-         login: login
-      });
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.render("friends.hbs", {
+               login: data[0].login
+            });
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
 //Профиль
 app.get("/profile", (req, res) => {
+
+   wwt.validate(req, res).then((id) => {
+   if (id) {
+      getUserData = true;
+      slq.query(`select login, admin, color, firstname, lastname from users where id = ${id}`, (err, data)=>{
+         res.render("profile.hbs")
+      })
+   }
+}, (err) => {
+   res.end("DB ERROR");
+});
    var login = wwt.validate(req, res);
    if (login) {
       fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
@@ -586,22 +602,34 @@ app.post("/user/upload/photo/profile", (req, res) => {
 
 
 app.get("/incoming", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      res.render("incoming.hbs", {
-         login: login
-      });
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.render("incoming.hbs", {
+               login: data[0].login
+            });
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 
 app.get("/outcoming", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      res.render("outcoming.hbs", {
-         login: login
-      });
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select login from users where id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.render("outcoming.hbs", {
+               login: data[0].login
+            });
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 });
 
 
@@ -667,32 +695,30 @@ app.get("/user/get/inreqs/data", (req, res) => {
 
 
 app.get("/get/inreqs/count", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (fs.existsSync(`userdata/${login}.json`)) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            var user = JSON.parse(data);
-            res.end(String(user.inreqs.length));
-         });
-      } else {
-         res.redirect("/login");
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select * from friends_requests where to_id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.end(String((data===undefined?0:data.length)));
+         })
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
 app.get("/get/outreqs/count", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (fs.existsSync(`userdata/${login}.json`)) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            var user = JSON.parse(data);
-            res.end(String(user.outreqs.length));
-         });
-      } else {
-         res.redirect("/login");
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         sql.query(`select * from friends_requests where from_id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.end(String((data===undefined?0:data.length)));
+         })
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
@@ -905,19 +931,25 @@ app.post("/user/change/name", parserURLEncoded, (req, res) => {
 
 //Сохранить изменения в настройках
 app.post("/change-settings", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         if (req.body.scroll === "true") user.scroll = true;
-         if (req.body.scroll === "false") user.scroll = false;
-         user.color = req.body.color;
-         fs.writeFile("userdata/" + user.login + ".json", JSON.stringify(user, "", 5), (err) => {
-            if (err) throw err;
-            res.end();
-         });
-      })
-   }
+   wwt.validate(req, res).then((id) => {
+      if (id) {
+         var scroll = true;
+         if (req.body.scroll === "true") {
+            scroll = true;
+         } else if (req.body.scroll === "false"){
+            scroll = false;
+         } else {
+            res.end("Incorrect values");
+            return;
+         }
+         sql.query(`update users set scroll = ${(scroll?1:0)}, color = '${req.body.color}' where id = ${id}`, (err, data)=>{
+            if (err) console.error(err);
+            res.end("OK");
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
