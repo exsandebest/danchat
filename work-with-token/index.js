@@ -86,11 +86,4 @@ function getCookie(req, name) {
 
 
 
-
-
-
-
-
-
-
 console.timeEnd("Module => work-with-token");

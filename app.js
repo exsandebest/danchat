@@ -39,7 +39,6 @@ app.use(express.static(__dirname + "/sounds"));
 app.use(cookieParser());
 app.set("view engine", "hbs");
 
-var usersOnline = [];
 
 //Страница входа
 app.get("/login", (req, res) => {
@@ -241,16 +240,7 @@ app.get("/profile", (req, res) => {
 
 // Счетчик людей онлайн
 app.get("/onlineCounter", (req, res) => {
-   fs.readFile("data/tokens.json", "utf-8", (err, data) => {
-      var tokens = JSON.parse(data);
-      var people = [];
-      tokens.forEach((elem) => {
-         for (key in elem) {
-            people.push(key);
-         }
-      })
-      res.send(JSON.stringify(people, "", 5));
-   })
+   res.end(); // FIXME: kek;
 });
 
 //Страница Люди
@@ -394,50 +384,8 @@ app.get("/get/GUID", (req, res) => {
 /*
 Команды админа
 */
-//Получить логин из токена
-app.post("/admin/get/login", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      res.end(wwt.getLoginFromToken(req.body.token));
-   }
-})
 
-//Получить токен из логина
-app.post("/admin/get/token", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      res.end(wwt.getTokenFromLogin(req.body.login));
-   }
-})
-
-//Установить новую пару (соответствие) токен=логин в tokens.json
-app.post("/admin/set/couple", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      wwt.setCouple(req.body.login, req.body.token);
-      res.end("true");
-   }
-})
-
-//Удалить пару (соответствие) в tokens.json
-app.post("/admin/delete/couple", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      wwt.userLogout(wwt.getTokenFromLogin(req.body.login), req.body.login);
-      res.end("true");
-   }
-})
-
-
-//Валидировать пользователя административной панели
-app.get("/admin/validate/me", (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      res.end(wwt.validate(req, res))
-   }
-})
-
-app.get("/users/toMakeAdmin/list", (req, res) => {
+app.get("/admin/toMakeAdmin/list", (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       fs.readFile("data/userlist.json", "utf-8", (err, data) => {
@@ -456,7 +404,7 @@ app.get("/users/toMakeAdmin/list", (req, res) => {
 });
 
 
-app.get("/users/toMakeUser/list", (req, res) => {
+app.get("/admin/toMakeUser/list", (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       fs.readFile("data/adminlist.json", "utf-8", (err, data) => {
@@ -484,36 +432,6 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
    }
 })
 
-// setInterval(() => {
-//    //console.log("Clearing");
-//    usersOnline = [];
-//    io.emit("CheckConnection", "SERVER!");
-//    setTimeout(() => {
-//       //console.log(usersOnline);
-//       wwt.clear(usersOnline);
-//    }, 10000);
-// }, 300000);
-
-app.get("/admin/online/update", (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      usersOnline = [];
-      io.emit("CheckConnection", "SERVER!");
-      setTimeout(() => {
-         console.log(usersOnline);
-         wwt.clear(usersOnline);
-         usersOnline = [];
-         res.send("OK");
-      }, 2000);
-   }
-
-})
-
-io.on("connection", (socket) => {
-   socket.on("CheckConnectionAnswer", (answer) => {
-      usersOnline.push(answer);
-   });
-});
 
 app.post("/admin/make/user", parserURLEncoded, (req, res) => {
    var adminLogin = wwt.validateAdmin(req, res);
@@ -581,16 +499,6 @@ app.get("/app/get/function/:function", (req, res) => {
 app.get("/tt", (req, res) => {
    res.render("test.hbs", {});
 });
-
-app.get("/ddos", (req, res) => {
-   res.render("ddos.hbs", {});
-});
-
-
-app.post("/user/upload/photo/profile", (req, res) => {
-   console.log(req.files);
-});
-
 
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((id) => {

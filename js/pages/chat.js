@@ -35,9 +35,6 @@ var socket = io();
 socket.on("MESSAGE", function(serverData) {
    alert(serverData);
 });
-socket.on("CheckConnection", (data) => {
-   socket.emit("CheckConnectionAnswer", login);
-})
 
 function sendMessage() {
    var msg = document.getElementById("message").value;

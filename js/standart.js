@@ -25,10 +25,6 @@ var socket = io();
 socket.on("MESSAGE", function(serverData) {
    alert(serverData);
 });
-socket.on("CheckConnection", (data) => {
-   socket.emit("CheckConnectionAnswer", document.getElementById("prof").innerHTML);
-})
-
 
 //Подписка на сообщение
 function subscribe() {
@@ -37,7 +33,7 @@ function subscribe() {
    //Когда сообщение получено
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
-      if (r.type === undefined) {
+      if (r.type === "message") {
          audio.message.play();
          updateCounter();
          subscribe();
