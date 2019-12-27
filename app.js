@@ -154,17 +154,17 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
 app.post("/get/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((id) => {
         if (id) {
-            var portion = 50;
+            var portion = 5;
             var msgId = parseInt(req.body.id);
             if (msgId === -1) {
-                sql.query(`select login, color, id, time, type, text from chat where id >= ((select max(id) from chat)-${portion}) limit ${portion}`, (err, data) => {
+                sql.query(`select login, color, id, time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
                     if (err) console.error(err);
                     res.send(JSON.stringify(data));
                 })
             } else {
                 var msgStart = msgId - portion;
                 var msgEnd = msgId - 1;
-                sql.query(`select * from chat where id between ${msgStart} and ${msgEnd}`, (err, data) => {
+                sql.query(`select * from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                     if (err) console.error(err);
                     res.send(JSON.stringify(data));
                 })

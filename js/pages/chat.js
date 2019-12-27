@@ -97,21 +97,19 @@ function getMsg() {
 
 
 function parsMsg(msgObj) {
+   if (msgObj.length === 0) return;
    var chat = document.getElementById("chat");
-   minId = msgObj[0].id;
+   minId = msgObj[msgObj.length-1].id;
    msgObj.forEach((m) => {
       if (m.type === "message") {
-         chat.innerHTML += `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>`;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
          document.getElementById(`msg${m.id}`).innerText = m.text;
       } else if (m.type === "enter") {
-         chat.innerHTML += `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${m.time}</span></span><br>`;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
       } else if (m.type === "exit") {
-         chat.innerHTML += `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> покинул(а) в чат</strong><span class="messageTime">${m.time}</span></span><br>`;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> покинул(а) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
       }
    })
-   if (document.getElementById("scroll").checked) {
-      document.getElementById("chat").scrollTop = 99999999999999999999;
-   }
 }
 
 
