@@ -21,7 +21,14 @@ exports.validate = (req, res)=>{
                res.redirect("/login");
                resolve(false);
             } else {
-               resolve(result[0].id);
+               sql.query(`select login from users where id = ${result[0].id}`, (err, data)=>{
+                  if (err) console.error(err);
+                  let obj = {
+                     id : result[0].id,
+                     login : data[0].login
+                  }
+                  resolve(obj);
+               })
             }
          })
       } else {
@@ -48,7 +55,7 @@ exports.validateAdmin = (req, res) => {
                res.redirect("/login");
                resolve(false);
             } else {
-               sql.query(`select admin from users where id = ${result[0].id}`, (err, data)=>{
+               sql.query(`select login, admin from users where id = ${result[0].id}`, (err, data)=>{
                   if (err){
                      console.error(err);
                      reject("db");
@@ -58,7 +65,11 @@ exports.validateAdmin = (req, res) => {
                      res.redirect("/login");
                      resolve(false);
                   } else {
-                     resolve(result[0].id);
+                     let obj = {
+                        id : result[0].id,
+                        login : data[0].login
+                     }
+                     resolve(obj);
                   }
                })
 

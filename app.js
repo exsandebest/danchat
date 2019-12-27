@@ -56,7 +56,7 @@ app.post("/enter", parserURLEncoded, (req, res) => {
         res.end("false:Заполните все поля");
         return;
     }
-    sql.query(`select login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
+    sql.query(`select id, login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
         if (err) console.error(err);
         if (data === undefined || data.length === 0) {
             res.end("false:Неверный логин или пароль");
@@ -68,8 +68,8 @@ app.post("/enter", parserURLEncoded, (req, res) => {
             if (err) console.error(err);
             sql.query(`select max(id) from users`, (err, result) => {
                 var msg = {};
-                msg.user_id = id;
-                msg.from = user.login;
+                msg.user_id = user.id;
+                msg.login = user.login;
                 msg.color = user.color;
                 msg.time = new Date().toTimeString().substring(0, 5);
                 msg.id = result[0]["max(id)"] + 1;
@@ -124,14 +124,14 @@ app.get("/subscribe", (req, res) => {
 
 //Новое сообщение
 app.post("/addnewmessage", parserJSON, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login, color from users where id = ${id}`, (err, result) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select color from users where id = ${u.id}`, (err, result) => {
                 if (err) console.error(err);
                 sql.query(`select max(id) from chat`, (err, data) => {
                     var msg = {};
-                    msg.user_id = id;
-                    msg.login = result[0].login;
+                    msg.user_id = u.id;
+                    msg.login = u.login;
                     msg.color = result[0].color;
                     msg.time = new Date().toTimeString().substring(0, 5);
                     msg.id = data[0]["max(id)"] + 1;
@@ -152,8 +152,8 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
 
 
 app.post("/get/message", parserJSON, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
             var portion = 5;
             var msgId = parseInt(req.body.id);
             if (msgId === -1) {
@@ -177,14 +177,14 @@ app.post("/get/message", parserJSON, (req, res) => {
 
 
 app.get("/settings", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login, scroll, color from users where id = ${id}`, (err, data) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select scroll, color from users where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.render("settings.hbs", {
                     scroll: data[0].scroll,
                     color: data[0].color,
-                    login: data[0].login
+                    login: u.login
                 })
             })
         }
@@ -198,14 +198,11 @@ app.get("/settings", (req, res) => {
 
 //Друзья
 app.get("/friends", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login from users where id = ${id}`, (err, data) => {
-                if (err) console.error(err);
-                res.render("friends.hbs", {
-                    login: data[0].login
-                });
-            })
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            res.render("friends.hbs", {
+                login: u.login
+            });
         }
     }, (err) => {
         res.end("DB ERROR");
@@ -216,11 +213,11 @@ app.get("/friends", (req, res) => {
 
 
 app.get("/profile", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login, admin, color, firstname, lastname, imgStatus from users where id = ${id}`, (err, data) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select admin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
                 res.render("profile.hbs", {
-                    login: data[0].login,
+                    login: u.login,
                     isAdmin: data[0].admin,
                     imgStatus: data[0].imgStatus,
                     color: data[0].color,
@@ -244,19 +241,17 @@ app.get("/onlineCounter", (req, res) => {
 
 //Страница Люди
 app.get("/people", parserURLEncoded, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login from users where id = ${id}`, (err, result) => {
-                sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
-                    if (err) console.error(err);
-                    var people = [];
-                    data.forEach((elem) => {
-                        people.push(elem);
-                    })
-                    res.render("people.hbs", {
-                        login: result[0].login,
-                        people: people
-                    })
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
+                if (err) console.error(err);
+                var people = [];
+                data.forEach((elem) => {
+                    people.push(elem);
+                })
+                res.render("people.hbs", {
+                    login: u.login,
+                    people: people
                 })
             })
         }
@@ -275,7 +270,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
     var validate = usMod.registrationValidate(req, res);
     if (validate) {
         sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
+        ${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
             if (err) console.error(err);
             res.send("true:true");
         })
@@ -286,7 +281,27 @@ ${sql.escape(praseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${
 
 
 //Профиль пользователя
-app.get("/user", (req, res) => {
+app.get("/u/:userLogin", (req, res) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            var userLogin = req.params.userLogin;
+            sql.query(`select id, login, color, age, sex from users where login = ${sql.escape(userLogin)}`, (err, data) => {
+                if (err) console.error(err);
+                if (data === undefined || data.length === 0) {
+                    res.render("404.hbs", {
+                        message: "This user does not exit",
+                        login: u.login
+                    })
+                    return;
+                }
+            })
+        }
+    }, (err) => {
+        res.end("DB ERROR");
+    });
+
+
+
     var login = wwt.validate(req, res);
     if (login) {
         try {
@@ -434,8 +449,8 @@ app.post("/admin/make/user", parserURLEncoded, (req, res) => {
 })
 
 app.post("/admin/message", parserURLEncoded, (req, res) => {
-    wwt.validateAdmin(req, res).then((id) => {
-        if (id) {
+    wwt.validateAdmin(req, res).then((u) => {
+        if (u) {
             io.emit("MESSAGE", req.body.message);
         }
     }, (err) => {
@@ -445,12 +460,10 @@ app.post("/admin/message", parserURLEncoded, (req, res) => {
 
 //Административная панель
 app.get("/adminpanel", (req, res) => {
-    wwt.validateAdmin(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login from users where id = ${id}`, (err, data) => {
-                res.render("adminpanel.hbs", {
-                    login: data[0].login
-                })
+    wwt.validateAdmin(req, res).then((u) => {
+        if (u) {
+            res.render("adminpanel.hbs", {
+                login: u.login
             })
         }
     }, (err) => {
@@ -483,14 +496,11 @@ app.get("/tt", (req, res) => {
 });
 
 app.get("/incoming", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login from users where id = ${id}`, (err, data) => {
-                if (err) console.error(err);
-                res.render("incoming.hbs", {
-                    login: data[0].login
-                });
-            })
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            res.render("incoming.hbs", {
+                login: u.login
+            });
         }
     }, (err) => {
         res.end("DB ERROR");
@@ -499,14 +509,11 @@ app.get("/incoming", (req, res) => {
 
 
 app.get("/outcoming", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login from users where id = ${id}`, (err, data) => {
-                if (err) console.error(err);
-                res.render("outcoming.hbs", {
-                    login: data[0].login
-                });
-            })
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            res.render("outcoming.hbs", {
+                login: u.login
+            });
         }
     }, (err) => {
         res.end("DB ERROR");
@@ -576,9 +583,9 @@ app.get("/user/get/inreqs/data", (req, res) => {
 
 
 app.get("/get/inreqs/count", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select * from friends_requests where to_id = ${id}`, (err, data) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select * from friends_requests where to_id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.end(String((data === undefined ? 0 : data.length)));
             })
@@ -590,9 +597,9 @@ app.get("/get/inreqs/count", (req, res) => {
 
 
 app.get("/get/outreqs/count", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select * from friends_requests where from_id = ${id}`, (err, data) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select * from friends_requests where from_id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.end(String((data === undefined ? 0 : data.length)));
             })
@@ -746,12 +753,12 @@ app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
 
 
 app.post("/user/change/password", parserURLEncoded, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
-            sql.query(`select password from users where id = ${id}`, (err, data) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select password from users where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 if (usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
-                    sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${id}`, (err) => {
+                    sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${u.id}`, (err) => {
                         if (err) console.error(err);
                         res.send("true:Пароль успешно изменён!");
                     })
@@ -767,10 +774,10 @@ app.post("/user/change/password", parserURLEncoded, (req, res) => {
 
 
 app.post("/user/change/name", parserURLEncoded, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
             if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
-                sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${id}`, (err) => {
+                sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${u.id}`, (err) => {
                     if (err) console.error(err);
                     res.send("true:Данные успешно сохранены\n\n");
                 })
@@ -783,8 +790,8 @@ app.post("/user/change/name", parserURLEncoded, (req, res) => {
 
 //Сохранить изменения в настройках
 app.post("/user/change/settings", parserURLEncoded, (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
             var scroll = true;
             if (req.body.scroll === "true") {
                 scroll = true;
@@ -794,7 +801,7 @@ app.post("/user/change/settings", parserURLEncoded, (req, res) => {
                 res.end("Incorrect values");
                 return;
             }
-            sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)} where id = ${id}`, (err, data) => {
+            sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)} where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.end("OK");
             })
@@ -810,19 +817,18 @@ app.post("/user/change/settings", parserURLEncoded, (req, res) => {
 
 //Выход
 app.get("/logout", (req, res) => {
-    wwt.validateAdmin(req, res).then((id) => {
-        if (id) {
-            sql.query(`select login, color from users where id = ${id}`, (err, result) => {
+    wwt.validateAdmin(req, res).then((u) => {
+        if (u) {
+            sql.query(`select color from users where id = ${u.id}`, (err, result) => {
                 if (err) console.error(err);
                 sql.query(`select max(id) from users`, (err, data) => {
                     var msg = {};
-                    msg.user_id = id;
-                    msg.from = result[0].login;
+                    msg.user_id = i.id;
+                    msg.login = u.login;
                     msg.color = result[0].color;
                     msg.time = new Date().toTimeString().substring(0, 5);
                     msg.id = data[0]["max(id)"] + 1;
                     msg.type = "exit";
-                    msg.text = req.body.message;
                     chat.addnewmessage(msg);
                     res.clearCookie("token");
                     res.redirect("/login");

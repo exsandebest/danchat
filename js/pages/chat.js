@@ -84,7 +84,7 @@ function getMsg() {
       xhr.open("POST", "/get/message", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onload = () => {
-         console.log(xhr.responseText);
+
          parsMsg(JSON.parse(xhr.responseText));
       }
       xhr.onerror = xhr.onabort = ()=>{
