@@ -23,14 +23,14 @@
       transition: 1s;
       opacity: 0;
    }
-   
+
    .msg {
       bottom: 0;
       cursor: default;
    }
 </style>
 
-<body background="bg.jpg" onload="onload();">
+<body background="bg.jpg" onload="getMsg();">
    <nav>
       <ul>
          <li><a class="navbar" href="/">Чат</a></li>
@@ -46,7 +46,7 @@
       </ul>
    </nav>
    <center>
-      <div onclick="getMsg(false);" style="background-color: rgba(71, 226, 73, 0.89); bottom: 0; width: 45%; height: 30px; border-radius: 25px 25px 0px 0px">
+      <div onclick="getMsg();" style="background-color: rgba(71, 226, 73, 0.89); bottom: 0; width: 45%; height: 30px; border-radius: 25px 25px 0px 0px">
       </div>
       <div style="position:relative;word-break: break-all; width: 55%; height: 35%; font-size: 17px; white-space: pre-wrap; text-align:left; border-radius: 30px; padding: 1.5% " id="chat"></div><br>
       <div style="width:779px; display:inline-block">
@@ -65,7 +65,7 @@
    {{/if}}
    <script src="/socket.io/socket.io.js"></script>
    <script src="pages/chat.js"></script>
-   <span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>
+   <!--<span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>-->
    {{> footer}}
 </body>
 

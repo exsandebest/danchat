@@ -43,8 +43,12 @@ sql.query(`create table if not exists users
                if (err) console.error(err);
                sql.query(`create table if not exists chat
                (id int(11) auto_increment primary key,
-               text text, user_id int(11), type varchar(255),
-               time datetime)
+               text text,
+               user_id int(11) NOT NULL,
+               type varchar(255) NOT NULL,
+               login varchar(255) NOT NULL,
+               color varchar(8) NOT NULL,
+               time datetime NOT NULL)
                DEFAULT CHARSET=utf8;`, (err)=>{
                   if (err) console.error(err);
                   sql.query(`create table if not exists chathistory

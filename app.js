@@ -123,15 +123,15 @@ app.get("/subscribe", (req, res) => {
 });
 
 //Новое сообщение
-app.post("/addnewmessage", parserURLEncoded, (req, res) => {
+app.post("/addnewmessage", parserJSON, (req, res) => {
     wwt.validate(req, res).then((id) => {
         if (id) {
             sql.query(`select login, color from users where id = ${id}`, (err, result) => {
                 if (err) console.error(err);
-                sql.query(`select max(id) from users`, (err, data) => {
+                sql.query(`select max(id) from chat`, (err, data) => {
                     var msg = {};
                     msg.user_id = id;
-                    msg.from = result[0].login;
+                    msg.login = result[0].login;
                     msg.color = result[0].color;
                     msg.time = new Date().toTimeString().substring(0, 5);
                     msg.id = data[0]["max(id)"] + 1;
@@ -151,36 +151,31 @@ app.post("/addnewmessage", parserURLEncoded, (req, res) => {
 
 
 
-app.post("/get/message", parserURLEncoded, (req, res) => {
+app.post("/get/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((id) => {
         if (id) {
-            fs.readFile("data/chat.json", "utf-8", (err, data) => {
-                var msgs = JSON.parse(data);
-                var obj = {};
-                obj.maxId = Number(req.body.id);
-                obj.msg = [];
-                if (obj.maxId - 20 >= 1) {
-                    obj.minId = obj.maxId - 20;
-                    for (var i = obj.minId; i < obj.maxId; i++) {
-                        msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
-                        obj.msg.unshift(msgs[i - 1]);
-                    }
-                    res.end(JSON.stringify(obj, "", 5));
-                } else {
-                    for (var i = 1; i < obj.maxId; i++) {
-                        msgs[i - 1].color = getter.colorOfUser(msgs[i - 1].from);
-                        obj.msg.unshift(msgs[i - 1]);
-                    }
-                    res.end(JSON.stringify(obj, "", 5));
-                }
-            });
+            var portion = 50;
+            var msgId = parseInt(req.body.id);
+            if (msgId === -1) {
+                sql.query(`select login, color, id, time, type, text from chat where id >= ((select max(id) from chat)-${portion}) limit ${portion}`, (err, data) => {
+                    if (err) console.error(err);
+                    res.send(JSON.stringify(data));
+                })
+            } else {
+                var msgStart = msgId - portion;
+                var msgEnd = msgId - 1;
+                sql.query(`select * from chat where id between ${msgStart} and ${msgEnd}`, (err, data) => {
+                    if (err) console.error(err);
+                    res.send(JSON.stringify(data));
+                })
+            }
         }
     }, (err) => {
         res.end("DB ERROR");
     });
-});
+})
 
-//Настройки
+
 app.get("/settings", (req, res) => {
     wwt.validate(req, res).then((id) => {
         if (id) {
@@ -218,15 +213,16 @@ app.get("/friends", (req, res) => {
 })
 
 
-//Профиль
+
+
 app.get("/profile", (req, res) => {
     wwt.validate(req, res).then((id) => {
         if (id) {
-            sql.query(`select login, admin, color, firstname, lastname from users where id = ${id}`, (err, data) => {
+            sql.query(`select login, admin, color, firstname, lastname, imgStatus from users where id = ${id}`, (err, data) => {
                 res.render("profile.hbs", {
                     login: data[0].login,
                     isAdmin: data[0].admin,
-                    imgStatus: false,
+                    imgStatus: data[0].imgStatus,
                     color: data[0].color,
                     firstname: data[0].firstname,
                     lastname: data[0].lastname
@@ -237,6 +233,9 @@ app.get("/profile", (req, res) => {
         res.end("DB ERROR");
     });
 })
+
+
+
 
 // Счетчик людей онлайн
 app.get("/onlineCounter", (req, res) => {
@@ -251,12 +250,12 @@ app.get("/people", parserURLEncoded, (req, res) => {
                 sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
                     if (err) console.error(err);
                     var people = [];
-                    data.forEach((elem)=>{
-                      people.push(elem);
+                    data.forEach((elem) => {
+                        people.push(elem);
                     })
                     res.render("people.hbs", {
-                      login : result[0].login,
-                      people : people
+                        login: result[0].login,
+                        people: people
                     })
                 })
             })
