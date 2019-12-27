@@ -24,7 +24,7 @@ function onload() {
 
          dataBlock.id = "datablock";
          dataBlock.innerHTML = `<br><a id="login"
-      href="/user?${user.login}"
+      href="/u/${user.login}"
       style="color:${user.color};">
       ${user.login}</a>
       <p id="fullname">${user.firstname} ${user.lastname}<p>`;

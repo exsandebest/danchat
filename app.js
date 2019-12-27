@@ -281,7 +281,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 
 //Профиль пользователя
-app.get("/:userLogin", (req, res) => {
+app.get("/u/:userLogin", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
             var userLogin = req.params.userLogin;

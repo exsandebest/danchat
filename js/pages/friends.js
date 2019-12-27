@@ -23,7 +23,7 @@ function onload() {
          block.appendChild(img);
          dataBlock.id = "datablock";
          dataBlock.innerHTML = `<br><a id="login"
-      href="/user?${friend.login}"
+      href="/u/${friend.login}"
       style="color:${friend.color};">
       ${friend.login}</a>
       <p id="fullname">${friend.firstname} ${friend.lastname}<p>`;

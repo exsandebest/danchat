@@ -55,13 +55,13 @@ function subscribe() {
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
       if (r.type === "message") {
-         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a>:<msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
+         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/u/${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a>:<msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
          complex(r, str);
       } else if (r.type === "enter") {
-         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${r.time}</span></span><br>`;
+         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/u/${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${r.time}</span></span><br>`;
          complex(r, str);
       } else if (r.type === "exit") {
-         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/user?${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a><strong> покинул(а) чат</strong><span class="messageTime">${r.time}</span></span><br>`;
+         var str = `<span class="msg" idx="${r.id}"><a class="login" href="/u/${r.login}"><strong style="color: ${r.color};">${r.login}</strong></a><strong> покинул(а) чат</strong><span class="messageTime">${r.time}</span></span><br>`;
          complex(r, str);
       }
    }
@@ -102,12 +102,12 @@ function parsMsg(msgObj) {
    minId = msgObj[msgObj.length-1].id;
    msgObj.forEach((m) => {
       if (m.type === "message") {
-         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/u/${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
          document.getElementById(`msg${m.id}`).innerText = m.text;
       } else if (m.type === "enter") {
-         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/u/${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> вошел(ла) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
       } else if (m.type === "exit") {
-         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/user?${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> покинул(а) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
+         chat.innerHTML = `<span class="msg" idx="${m.id}"><a class="login" href="/u/${m.login}"><strong style="color: ${m.color};">${m.login}</strong></a><strong> покинул(а) в чат</strong><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
       }
    })
 }
