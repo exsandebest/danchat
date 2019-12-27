@@ -154,7 +154,7 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
 app.post("/get/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var portion = 5;
+            var portion = 50;
             var msgId = parseInt(req.body.id);
             if (msgId === -1) {
                 sql.query(`select login, color, id, time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
@@ -281,91 +281,47 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 
 //Профиль пользователя
-app.get("/u/:userLogin", (req, res) => {
+app.get("/:userLogin", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
             var userLogin = req.params.userLogin;
-            sql.query(`select id, login, color, age, sex from users where login = ${sql.escape(userLogin)}`, (err, data) => {
+            sql.query(`select id, login, firstname, lastname, color, age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
                 if (err) console.error(err);
                 if (data === undefined || data.length === 0) {
                     res.render("404.hbs", {
-                        message: "This user does not exit",
+                        message: "This user does not exist",
                         login: u.login
                     })
                     return;
+                } else {
+                   res.render("user.hbs", {
+                       userStatus: "friend",
+                       imgStatus: data[0].imgStatus,
+                       userLogin: data[0].login,
+                       firstname: data[0].firstname,
+                       lastname: data[0].lastname,
+                       color: data[0].color,
+                       age: data[0].age,
+                       login: u.login,
+                       sex: (data[0].sex?"Мужской":"Женский")
+                   });
                 }
             })
         }
     }, (err) => {
         res.end("DB ERROR");
     });
-
-
-
-    var login = wwt.validate(req, res);
-    if (login) {
-        try {
-            var userlogin = decodeURI(req.url.split("?")[1]);
-        } catch (e) {
-            res.render("404.hbs", {
-                message: "This user does not exist",
-                login: login
-            });
-        }
-        if (fs.existsSync(`userdata/${userlogin}.json`) === false) {
-            res.render("404.hbs", {
-                message: "This user does not exist",
-                login: login
-            });
-        } else {
-            var user = JSON.parse(fs.readFileSync(`userdata/${login}.json`, "utf-8"));
-            var userstatus = "";
-            if (user.inreqs.indexOf(userlogin) != -1) {
-                userstatus = "subscriber";
-            } else if (user.outreqs.indexOf(userlogin) != -1) {
-                userstatus = "request sent";
-            } else if (user.friends.indexOf(userlogin) != -1) {
-                userstatus = "friend";
-            } else if (userlogin == login) {
-                userstatus = "self";
-            } else {
-                userstatus = "default";
-            }
-            var imgStatus = fs.existsSync("userimages/" + userlogin + ".jpg");
-            fs.readFile(`userdata/${userlogin}.json`, (err, data) => {
-                if (err) throw err;
-                var user = JSON.parse(data);
-                var friends = [];
-                for (var i = 0; i < 6; i++) {
-                    if (fs.existsSync("userdata/" + user.friends[i] + ".json")) {
-                        fs.readFile("userdata/" + user.friends[i] + ".json", "utf-8", (err, data) => {
-                            var user = JSON.parse(data);
-                            var obj = {}
-                            obj.login = user.login;
-                            obj.firstname = user.firstname;
-                            obj.lastname = user.lastname;
-                            obj.imgStatus = fs.existsSync("userimages/" + user.login + ".jpg");
-                            friends.push(obj);
-                        });
-                    }
-                }
-                if (user.sex === "male") user.sex = "Мужской";
-                if (user.sex === "female") user.sex = "Женский";
-                res.render("user.hbs", {
-                    userstatus: userstatus,
-                    imgStatus: imgStatus,
-                    userlogin: user.login,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    color: user.color,
-                    age: user.age,
-                    login: login,
-                    sex: user.sex,
-                    friends: friends
-                });
-            })
-        }
-    }
+    // if (user.inreqs.indexOf(userlogin) != -1) {
+    //    userstatus = "subscriber";
+    // } else if (user.outreqs.indexOf(userlogin) != -1) {
+    //    userstatus = "request sent";
+    // } else if (user.friends.indexOf(userlogin) != -1) {
+    //    userstatus = "friend";
+    // } else if (userlogin == login) {
+    //    userstatus = "self";
+    // } else {
+    //    userstatus = "default";
+    // }
 })
 
 

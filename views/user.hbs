@@ -47,11 +47,11 @@
       <br><br>
       <buttons class="buttons" id="button" style="display:none"></buttons>
       <br><br>
-      <span style="font: bold 25px 'Trebuchet MS'; color: {{color}}; background-color: rgba(245,255,233,0.55); border-radius: 7px;"> {{userlogin}} </span><br><br>
+      <span style="font: bold 25px 'Trebuchet MS'; color: {{color}}; background-color: rgba(245,255,233,0.55); border-radius: 7px;"> {{userLogin}} </span><br><br>
       <span class="green">{{firstname}} {{lastname}}</span><br><br>
       <span class="green">Возраст: </span><span class="red">{{age}}</span><br><br>
       <span class="green">Пол: </span><span class="red">{{sex}}</span><br><br>
-      <span class="green">Друзья:</span><br><br>
+      <!--<span class="green">Друзья:</span><br><br>
       <div id="friends">
          {{#each friends}}
             <a class="friendLink" href="/user?{{login}}">
@@ -65,10 +65,10 @@
          {{else}}
             <span style="margin: 10px" class="red">Друзей нет</span>
          {{/each}}
-      </div>
+      </div>-->
    </center>
-   <input value="{{userlogin}}" id="userlogin" style="display: none;" />
-   <input value="{{userstatus}}" id="userstatus" style="display: none;" />
+   <input value="{{userLogin}}" id="userlogin" style="display: none;" />
+   <input value="{{userStatus}}" id="userstatus" style="display: none;" />
    <script src="pages/user.js"></script>
    {{> footer}}
 </body>
