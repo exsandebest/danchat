@@ -95,12 +95,12 @@ app.post("/enter", parserURLEncoded, (req, res) => {
 
 //Страница чата
 app.get("/", (req, res) => {
-    wwt.validate(req, res).then((resolve) => {
-        if (resolve) {
-            sql.query(`select scroll, login from users where id = ${sql.escape(resolve)}`, (err, result) => {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
+            sql.query(`select scroll from users where id = ${u.id}`, (err, result) => {
                 res.render("chat.hbs", {
                     scroll: result[0].scroll,
-                    login: result[0].login
+                    login: u.login
                 })
             })
         }
@@ -113,8 +113,8 @@ app.get("/", (req, res) => {
 
 //Подписка на сообщения
 app.get("/subscribe", (req, res) => {
-    wwt.validate(req, res).then((id) => {
-        if (id) {
+    wwt.validate(req, res).then((u) => {
+        if (u) {
             chat.subscribe(req, res);
         }
     }, (err) => {
@@ -823,7 +823,7 @@ app.get("/logout", (req, res) => {
                 if (err) console.error(err);
                 sql.query(`select max(id) from users`, (err, data) => {
                     var msg = {};
-                    msg.user_id = i.id;
+                    msg.user_id = u.id;
                     msg.login = u.login;
                     msg.color = result[0].color;
                     msg.time = new Date().toTimeString().substring(0, 5);
