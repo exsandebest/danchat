@@ -1,6 +1,7 @@
 console.time("Module => user-module");
 const fs = require('fs');
 const md5 = require("md5");
+const sql = require("../database");
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
@@ -63,45 +64,49 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname - Имя; ln - lastna
 exports.registrationValidate = (req, res) => {
    var data = req.body;
    if (data.age && data.firstname && data.lastname && data.login && data.sex && data.password) {
-      if (logins.indexOf(data.login) == -1) {
-         if (data.submit === "REAL") {
-            if (regLogin.test(data.login)) {
-               if (regPassword.test(data.password)) {
-                  if (regName.test(data.firstname) && data.firstname !== undefined) {
-                     if (regName.test(data.lastname) && data.lastname !== undefined) {
-                        if (regAge.test(data.age) && data.age > 0 && data.age < 218) {
-                           if (regSex1.test(data.sex) || regSex2.test(data.sex)) {
-                              return true;
-                           } else {
-                              badAns(res, "Некорректный пол.\n\nХз как так вообще получилось");
-                              return false;
-                           }
+      if (data.submit === "REAL") {
+         if (regLogin.test(data.login)) {
+            if (regPassword.test(data.password)) {
+               if (regName.test(data.firstname) && data.firstname !== undefined) {
+                  if (regName.test(data.lastname) && data.lastname !== undefined) {
+                     if (regAge.test(data.age) && data.age > 0 && data.age < 218) {
+                        if (regSex1.test(data.sex) || regSex2.test(data.sex)) {
+                           console.log(data.login);
+                           sql.query(`select id from users where login = ${sql.escape(data.login)}`, (err, result) => {
+                              console.log(result);
+                              if (result === undefined || result.length === 0) {
+                                 return true;
+                              } else {
+                                 badAns(res, "Данный логин уже занят\n\n");
+                                 return false;
+                              }
+                           })
                         } else {
-                           badAns(res, "Некорректный возраст.\n\nПоложительное число [1-217]");
+                           badAns(res, "Некорректный пол.\n\nХз как так вообще получилось");
                            return false;
                         }
                      } else {
-                        badAns(res, "Некорректная фамилия.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
+                        badAns(res, "Некорректный возраст.\n\nПоложительное число [1-217]");
                         return false;
                      }
                   } else {
-                     badAns(res, "Некорректное имя.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
+                     badAns(res, "Некорректная фамилия.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
                      return false;
                   }
                } else {
-                  badAns(res, "Некорректный пароль.\n\nОт 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_");
+                  badAns(res, "Некорректное имя.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
                   return false;
                }
             } else {
-               badAns(res, "Некорректный логин.\n\nОт 4-х до 24-х символов из русского, латинского алфавитов и цифр, а так же символы @_");
+               badAns(res, "Некорректный пароль.\n\nОт 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_");
                return false;
             }
          } else {
-            badAns(res, "Запрос может быть отправлен только со страницы регистрации.\n\n");
+            badAns(res, "Некорректный логин.\n\nОт 4-х до 24-х символов из русского, латинского алфавитов и цифр, а так же символы @_");
             return false;
          }
       } else {
-         badAns(res, "Данный логин уже занят\n\n");
+         badAns(res, "Запрос может быть отправлен только со страницы регистрации.\n\n");
          return false;
       }
    } else {
