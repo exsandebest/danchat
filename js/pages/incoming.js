@@ -51,7 +51,7 @@ function onload() {
 function acceptIncomingRequest(userlogin) {
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/user/accept/incomingRequest", true);
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.responseText == "true") {
          location.reload();

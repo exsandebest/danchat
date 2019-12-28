@@ -4,7 +4,7 @@ function changePasword() {
    var repeatNewPassword = val("repeatNewPassword");
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/user/change/password", true);
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.responseText.split(":")[0] === "true") {
          notif(1, "Good", xhr.responseText.split(":")[1], "", 100000);
@@ -35,7 +35,7 @@ function changeName() {
    var lastname = val("lastname");
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/user/change/name", true);
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.responseText.split(":")[0] === "true") {
          notif(2, "Good", xhr.responseText.split(":")[1], "", 100000);

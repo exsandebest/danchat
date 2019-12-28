@@ -304,7 +304,7 @@ app.get("/u/:userLogin", (req, res) => {
                            if (!r2) {
                               sql.query(`select * from friends_requests where to_id = ${data[0].id} and from_id = ${u.id}`, (err, r3) => {
                                  if (err) console.error(err);
-                                 if (r3){
+                                 if (r3) {
                                     uStatus = "subscriber";
                                  } else {
                                     uStatus = "default";
@@ -402,7 +402,17 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
 })
 
 
-app.post("/admin/make/user", parserURLEncoded, (req, res) => {
+app.post("/admin/make/user", parserJSON, (req, res) => {
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         sql.query(`update users set admin = 0 where login = ${sql.escape(req.body.login)}`, (err) => {
+            if (err) console.error(err);
+            res.sned("true");
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
    var adminLogin = wwt.validateAdmin(req, res);
    if (adminLogin) {
       if (fs.existsSync("userdata/" + req.body.login + ".json")) {
@@ -818,7 +828,7 @@ app.post("/urlencoded", parserURLEncoded, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 
-app.post("/json", parserJSON, (req, res)=>{
+app.post("/json", parserJSON, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 

@@ -81,7 +81,7 @@ function delFriend(friendLogin) {
             location.reload();
          }
       }
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.setRequestHeader("Content-Type", "application/json");
       xhr.send("friend=" + friendLogin);
    }
 }

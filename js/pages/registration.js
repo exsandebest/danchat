@@ -8,7 +8,7 @@ function registration() {
    var submit = val("submit");
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/registration", true);
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       console.log(xhr.responseText);
       if (xhr.responseText.split(":")[0] == "false") {

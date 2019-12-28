@@ -13,18 +13,20 @@ function sendMessage() {
 }
 
 function makeAdmin() {
-   var user = document.getElementById("inputLogin").value;
+   var login = document.getElementById("inputLogin").value;
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/admin/make/admin", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       alert(xhr.responseText);
    }
-   xhr.send(JSON.stringify({user : user}));
+   xhr.send(JSON.stringify({
+      login : login
+   }));
 }
 
 function makeUser() {
-   var login = document.getElementById("adminselector").value;
+   var login = document.getElementById("inputLogin").value;
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/admin/make/user", true);
    xhr.setRequestHeader("Content-Type", "application/json");

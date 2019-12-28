@@ -13,7 +13,7 @@ function save() {
          }, 100000);
       }
    }
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.send(JSON.stringify({
       color : colorValue,
       scroll : scrollValue

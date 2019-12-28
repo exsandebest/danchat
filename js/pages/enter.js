@@ -3,7 +3,7 @@ sessionStorage.clear();
 function enter() {
    var xhr = new XMLHttpRequest();
    xhr.open("POST", "/enter", true);
-   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.responseText === "token") {
          location = "/";
