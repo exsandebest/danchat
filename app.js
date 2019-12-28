@@ -354,53 +354,18 @@ app.get("/get/GUID", (req, res) => {
 Команды админа
 */
 
-app.get("/admin/toMakeAdmin/list", (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      fs.readFile("data/userlist.json", "utf-8", (err, data) => {
-         var users = JSON.parse(data);
-         fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
-            var admins = JSON.parse(data2);
-            admins.forEach((elem) => {
-               if (users.indexOf(elem) !== -1) {
-                  users.splice(users.indexOf(elem), 1);
-               }
-            })
-            res.send(JSON.stringify(users, "", 5));
-         });
-      });
-   }
-});
-
-
-app.get("/admin/toMakeUser/list", (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      fs.readFile("data/adminlist.json", "utf-8", (err, data) => {
-         if (!data) data = "[]";
-         res.send(data);
-      })
-   }
-});
-
 app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      if (fs.existsSync("userdata/" + req.body.user + ".json")) {
-         fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
-            if (err) throw err;
-            if (!data2) data2 = "[]";
-            var arr = JSON.parse(data2);
-            arr.push(req.body.user);
-            fs.writeFile("data/adminlist.json", JSON.stringify(arr, "", 5), (err) => {
-               if (err) throw err;
-               res.send("True");
-            });
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         sql.query(`update users set admin = 1 where login = ${sql.escape(req.body.login)}`, (err) => {
+            if (err) console.error(err);
+            res.sned("true");
          })
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
-
 
 app.post("/admin/make/user", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
@@ -413,21 +378,6 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
    }, (err) => {
       res.end("DB ERROR");
    });
-   var adminLogin = wwt.validateAdmin(req, res);
-   if (adminLogin) {
-      if (fs.existsSync("userdata/" + req.body.login + ".json")) {
-         fs.readFile("data/adminlist.json", "utf-8", (err, data2) => {
-            if (err) throw err;
-            if (!data2) data2 = "[]";
-            var arr = JSON.parse(data2);
-            arr.splice(arr.indexOf(req.body.login), 1);
-            fs.writeFile("data/adminlist.json", JSON.stringify(arr, "", 5), (err) => {
-               if (err) throw err;
-               res.send("true");
-            });
-         });
-      }
-   }
 })
 
 app.post("/admin/message", parserJSON, (req, res) => {
@@ -440,7 +390,6 @@ app.post("/admin/message", parserJSON, (req, res) => {
    });
 })
 
-//Административная панель
 app.get("/adminpanel", (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
