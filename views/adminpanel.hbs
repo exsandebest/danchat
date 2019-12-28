@@ -19,19 +19,11 @@
    {{> navbar}}
    <center>
       <div>
-         <select id="userselector" style="font: normal 17px 'Arial'">
-         </select>
+         <input type="text" class="pole2" id="inputLogin" placeholder="Сообщение">
          <br><br>
-         <input type="button" style="width:150px" onclick="makeAdmin()" value="Сделать админом">
+         <input type="button" style="width:150px" onclick="makeAdmin()" value="Сделать админом"> <input type="button" style="width:150px" onclick="makeUser()" value="Сделать user'ом">
       </div>
       <br><br>
-      <div style="margin-bottom: 80px;">
-         <select id="adminselector" style="font: normal 17px 'Arial'">
-         </select>
-         <br><br>
-         <input type="button" style="width:150px" onclick="makeUser()" value="Сделать user'ом">
-      </div>
-      <br><br><br><br>
       <div style="margin-bottom: 80px; ">
          <input type="text" class="pole2" id="message" placeholder="Сообщение">
          <input type="button" style="width:120px" onclick="sendMessage()" value="Отправить всем  + ">
