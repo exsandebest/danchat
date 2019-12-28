@@ -49,7 +49,7 @@ app.get("/login", (req, res) => {
 })
 
 //Вход
-app.post("/enter", parserURLEncoded, (req, res) => {
+app.post("/enter", parserJSON, (req, res) => {
    var Rlogin = req.body.login;
    var Rpassword = req.body.password;
    if (!Rlogin || !Rpassword) {
@@ -240,7 +240,7 @@ app.get("/onlineCounter", (req, res) => {
 });
 
 //Страница Люди
-app.get("/people", parserURLEncoded, (req, res) => {
+app.get("/people", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
@@ -266,7 +266,7 @@ app.get("/registration", (req, res) => {
 });
 
 //Процесс
-app.post("/registration", parserURLEncoded, (req, res) => {
+app.post("/registration", parserJSON, (req, res) => {
    var validate = usMod.registrationValidate(req, res);
    if (validate) {
       sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
@@ -320,6 +320,7 @@ app.get("/u/:userLogin", (req, res) => {
                      }
                   })
                }
+               // FIXME: TO EJS
                res.render("user.hbs", {
                   userStatus: uStatus,
                   imgStatus: data[0].imgStatus,
@@ -337,17 +338,6 @@ app.get("/u/:userLogin", (req, res) => {
    }, (err) => {
       res.end("DB ERROR");
    });
-   // if (user.inreqs.indexOf(userlogin) != -1) {
-   //    userstatus = "subscriber";
-   // } else if (user.outreqs.indexOf(userlogin) != -1) {
-   //    userstatus = "request sent";
-   // } else if (user.friends.indexOf(userlogin) != -1) {
-   //    userstatus = "friend";
-   // } else if (userlogin == login) {
-   //    userstatus = "self";
-   // } else {
-   //    userstatus = "default";
-   // }
 })
 
 
@@ -430,7 +420,7 @@ app.post("/admin/make/user", parserURLEncoded, (req, res) => {
    }
 })
 
-app.post("/admin/message", parserURLEncoded, (req, res) => {
+app.post("/admin/message", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
          io.emit("MESSAGE", req.body.message);
@@ -734,7 +724,7 @@ app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
 })
 
 
-app.post("/user/change/password", parserURLEncoded, (req, res) => {
+app.post("/user/change/password", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select password from users where id = ${u.id}`, (err, data) => {
@@ -755,7 +745,7 @@ app.post("/user/change/password", parserURLEncoded, (req, res) => {
 
 
 
-app.post("/user/change/name", parserURLEncoded, (req, res) => {
+app.post("/user/change/name", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
@@ -771,7 +761,7 @@ app.post("/user/change/name", parserURLEncoded, (req, res) => {
 });
 
 //Сохранить изменения в настройках
-app.post("/user/change/settings", parserURLEncoded, (req, res) => {
+app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          var scroll = true;
@@ -824,10 +814,13 @@ app.get("/logout", (req, res) => {
 })
 
 
-app.post("/", parserURLEncoded, (req, res) => {
+app.post("/urlencoded", parserURLEncoded, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 
+app.post("/json", parserJSON, (req, res)=>{
+   res.send(JSON.stringify(req.body, "", 5));
+})
 
 
 //Функция генерации токена
@@ -862,7 +855,7 @@ app.get("/console/sql", (req, res) => {
    })
 })
 
-app.post("/console/sql/query", parserURLEncoded, (req, res) => {
+app.post("/console/sql/query", parserJSON, (req, res) => {
    console.log(req.body.q);
    sql.query(req.body.q, (err, result, fields) => {
       if (err) console.error(err);

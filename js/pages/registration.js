@@ -25,7 +25,15 @@ function registration() {
    xhr.onerror = xhr.onabort = () => {
       notif("Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 5000);
    }
-   xhr.send(`login=${login}&password=${password}&firstname=${firstname}&lastname=${lastname}&age=${age}&sex=${sex}&submit=${submit}`);
+   xhr.send(JSON.stringify({
+      login : login,
+      password : password,
+      firstname : firstname,
+      lastname : lastname,
+      age : age,
+      sex : sex,
+      submit : submit
+   }));
 
 }
 

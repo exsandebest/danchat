@@ -20,7 +20,11 @@ function changePasword() {
    xhr.onerror = xhr.onabort = () => {
       notif(1, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
    }
-   xhr.send(`oldPassword=${oldPassword}&newPassword=${newPassword}&repeatNewPassword=${repeatNewPassword}`);
+   xhr.send(JSON.stringify({
+      oldPassword : oldPassword,
+      newPassword : newPassword,
+      repeatNewPassword : repeatNewPassword
+   }))
 }
 
 
@@ -44,7 +48,10 @@ function changeName() {
    xhr.onerror = xhr.onabort = () => {
       notif(2, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
    }
-   xhr.send(`firstname=${firstname}&lastname=${lastname}`);
+   xhr.send(JSON.stringify({
+      firstname : firstname,
+      lastname : lastname
+   }));
 }
 
 function notif(num, type, msg1, msg2, time) {

@@ -40,7 +40,9 @@ function sendMessage() {
    xhr.onload = () => {
       alert(xhr.responseText);
    }
-   xhr.send("message=" + message);
+   xhr.send(JSON.stringify({
+      message : message
+   }));
 
 }
 

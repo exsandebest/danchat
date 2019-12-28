@@ -14,5 +14,8 @@ function save() {
       }
    }
    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-   xhr.send("color=" + colorValue + "&scroll=" + scrollValue);
+   xhr.send(JSON.stringify({
+      color : colorValue,
+      scroll : scrollValue
+   }))
 }
