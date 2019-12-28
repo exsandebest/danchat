@@ -1,6 +1,5 @@
 console.time("Module => chat");
 const fs = require("fs");
-const getter = require('../getter');
 const sql = require("../database");
 var clients = [];
 

@@ -5,11 +5,12 @@ const fs = require("fs");
 const wwt = require("../work-with-token");
 const chat = require("../chat");
 const sql = require("../database");
+const std = require("../standart");
 
 
 exports.validate = (req, res)=>{
    var p = new Promise((resolve, reject)=>{
-      var token = getCookie(req, "token");
+      var token = std.getCookie(req, "token");
       if (token) {
          sql.query(`select id from tokens where token = '${token}'`, (err, result)=>{
             if (err){
@@ -43,7 +44,7 @@ exports.validate = (req, res)=>{
 
 exports.validateAdmin = (req, res) => {
    var p = new Promise((resolve, reject)=>{
-      var token = getCookie(req, "token");
+      var token = std.getCookie(req, "token");
       if (token) {
          sql.query(`select id from tokens where token = '${token}'`, (err, result)=>{
             if (err){
@@ -83,18 +84,6 @@ exports.validateAdmin = (req, res) => {
    });
    return p;
 }
-
-function getCookie(req, name) {
-   try {
-      var matches = req.headers.cookie.match(new RegExp(
-         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-      ));
-      return matches ? decodeURIComponent(matches[1]) : false;
-   } catch (e) {
-      return false;
-   }
-}
-
 
 
 console.timeEnd("Module => work-with-token");

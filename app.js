@@ -13,11 +13,11 @@ const http = require('http').Server(app);
 const usMod = require('./user-module');
 const io = require('socket.io')(http);
 const pars = require('body-parser');
-const getter = require('./getter');
 const parserURLEncoded = pars.urlencoded({
    extended: false
 });
 const parserJSON = pars.json();
+const std = require("./standart");
 
 
 console.time("Config");
@@ -63,7 +63,7 @@ app.post("/enter", parserJSON, (req, res) => {
          return;
       }
       var user = data[0];
-      var token = genToken();
+      var token = std.genToken();
       sql.query(`insert into tokens (id, token) values (${user.id}, ${sql.escape(token)})`, (err) => {
          if (err) console.error(err);
          sql.query(`select max(id) from users`, (err, result) => {
@@ -782,30 +782,7 @@ app.post("/json", parserJSON, (req, res) => {
 })
 
 
-//Функция генерации токена
-function genToken() {
-   var text = "";
-   var possible = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890__";
-   for (var i = 0; i < 30; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-   return text;
-}
 
-function getCookie(req, name) {
-   try {
-      var matches = req.headers.cookie.match(new RegExp(
-         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-      ));
-      return matches ? decodeURIComponent(matches[1]) : false;
-   } catch (e) {
-      console.error(e)
-      return false;
-   }
-}
-
-function rn(str) {
-   return str.replace("\r", "").replace("\n", "");
-};
 
 app.get("/console/sql", (req, res) => {
    fs.readFile("secret/consoleSql.html", "utf-8", (err, data) => {
