@@ -17,7 +17,7 @@ exports.validate = (req, res)=>{
                console.error(err);
                reject("db");
             }
-            if (result === undefined || result.length === 0){
+            if (result === undefined || result.length === 0){ // FIXME: ADD TIME UPDATE
                res.clearCookie("token");
                res.redirect("/login");
                resolve(false);
@@ -61,7 +61,7 @@ exports.validateAdmin = (req, res) => {
                      console.error(err);
                      reject("db");
                   }
-                  if (result === undefined || result.length === 0){
+                  if (result === undefined || result.length === 0){ // FIXME:  ADD TIME UPDATE
                      res.clearCookie("token");
                      res.redirect("/login");
                      resolve(false);

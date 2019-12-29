@@ -37,7 +37,9 @@ sql.query(`create table if not exists users
             DEFAULT CHARSET=utf8;`, (err) => {
             if (err) console.error(err);
             sql.query(`create table if not exists tokens
-               (token varchar(255) not null, id int(11) not null,
+               (token varchar(255) not null,
+               id int(11) not null,
+               login varchar(255) not null,
                time datetime default null)
                DEFAULT CHARSET=utf8;`, (err)=>{
                if (err) console.error(err);

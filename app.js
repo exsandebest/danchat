@@ -18,6 +18,7 @@ const parserURLEncoded = pars.urlencoded({
 });
 const parserJSON = pars.json();
 const std = require("./standart");
+// FIXME: ADD NODE-TIME
 
 
 console.time("Config");
@@ -64,7 +65,7 @@ app.post("/enter", parserJSON, (req, res) => {
       }
       var user = data[0];
       var token = std.genToken();
-      sql.query(`insert into tokens (id, token) values (${user.id}, ${sql.escape(token)})`, (err) => {
+      sql.query(`insert into tokens (id, login, token) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)})`, (err) => { // FIXME: ADD TIME INSERTION
          if (err) console.error(err);
          sql.query(`select max(id) from users`, (err, result) => {
             var msg = {};
@@ -231,12 +232,25 @@ app.get("/profile", (req, res) => {
    });
 })
 
+setInterval(()=>{
+   sql.query(`delete from tokens where time ...`, (err)=>{
+      if (err) console.error(err);
+   })
+}, 30000) // 5 min
+
 
 
 
 // Счетчик людей онлайн
 app.get("/onlineCounter", (req, res) => {
-   res.end(); // FIXME: kek;
+   wwt.validate(req, res).then((u)=>{
+      if (u) {
+         sql.query(`select login from tokens`, (err, data)=>{ // FIXME: TIME CONDITION (OPIONAL)
+            if (err) console.error(err);
+            res.send(JSON.stringify(data));
+         })
+      }
+   })
 });
 
 //Страница Люди
