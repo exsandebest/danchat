@@ -19,7 +19,7 @@ sql.query(`create table if not exists users
    sex bool default NULL,
    firstname varchar(255) NOT NULL,
    lastname varchar(255) default NULL,
-   color varchar(8) default "F00000",
+   color varchar(8) default "#000000",
    scroll bool default 1,
    admin bool default 0,
    imgStatus bool default 0)
