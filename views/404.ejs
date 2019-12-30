@@ -10,11 +10,11 @@
 </head>
 
 <body background="/bg.jpg">
-   {{> navbar}}
+   <%- include('partials/navbar.ejs') %>
    <center>
-      <h1>{{message}}</h1>
+      <h1><%=message%></h1>
    </center>
-   {{> footer}}
+   <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

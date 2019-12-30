@@ -34,9 +34,9 @@
    <nav>
       <ul>
          <li><a class="navbar" href="/">Чат</a></li>
-         <li><a class="navbar" href="/friends">Друзья</a></li>
+         <!--<li><a class="navbar" href="/friends">Друзья</a></li>-->
          <li><a class="navbar" href="/people">Люди</a></li>
-         <li style="float:right;" class="active"><a class="navbar" style="cursor:pointer" id="prof">{{login}}</a>
+         <li style="float:right;" class="active"><a class="navbar" style="cursor:pointer" id="prof"><%=login%></a>
             <ul>
                <li><a class="navbar" name="var" href="/profile"> Профиль</a></li>
                <li><a class="navbar" name="var" href="/settings"> Настройки</a></li>
@@ -58,15 +58,15 @@
       </div>
       <br><br><br>
    </center>
-   {{#if scroll}}
+   <% if (scroll) {%>
       <input type="checkbox" id="scroll" style="display:none;" checked />
-   {{else}}
+   <% } else { %>
       <input type="checkbox" id="scroll" style="display:none;" />
-   {{/if}}
+   <%}%>
    <script src="/socket.io/socket.io.js"></script>
    <script src="pages/chat.js"></script>
    <!--<span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>-->
-   {{> footer}}
+   <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

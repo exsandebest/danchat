@@ -5,11 +5,11 @@
 </head>
 
 <body background="bg.jpg">
-   {{> navbar}}
+   <%- include('partials/navbar.ejs') %>
    <center>
       <input type="button" value="Lol" onclick="go();"><br><br>
    </center>
-   {{> footer}}
+   <%- include('partials/footer.ejs') %>
    <script src="pages/test.js"></script>
 </body>
 

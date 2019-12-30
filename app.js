@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const chat = require('./chat');
 const wwt = require('./work-with-token');
 const sql = require("./database");
-const hbs = require("hbs");
+// const hbs = require("hbs");
 const md5 = require("md5");
 const express = require('express');
 const app = express();
@@ -29,15 +29,13 @@ console.timeEnd("Config");
 
 
 
-hbs.registerPartials(__dirname + "/views/partials");
-app.use(express.static(__dirname + "/pages"));
 app.use(express.static(__dirname + "/images"));
 app.use(express.static(__dirname + "/js"));
-app.use(express.static(__dirname + "/views"));
+app.use(express.static(__dirname + "/styles"));
 app.use(express.static(__dirname + "/userimages"));
 app.use(express.static(__dirname + "/sounds"));
 app.use(cookieParser());
-app.set("view engine", "hbs");
+app.set("view engine", "ejs");
 
 
 //Страница входа
@@ -45,7 +43,7 @@ app.get("/login", (req, res) => {
    res.clearCookie("token", {
       path: "/"
    });
-   res.render("enter.hbs", {});
+   res.render("enter.ejs", {});
 })
 
 //Вход
@@ -98,7 +96,7 @@ app.get("/", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select scroll from users where id = ${u.id}`, (err, result) => {
-            res.render("chat.hbs", {
+            res.render("chat.ejs", {
                scroll: result[0].scroll,
                login: u.login
             })
@@ -181,7 +179,7 @@ app.get("/settings", (req, res) => {
       if (u) {
          sql.query(`select scroll, color from users where id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            res.render("settings.hbs", {
+            res.render("settings.ejs", {
                scroll: data[0].scroll,
                color: data[0].color,
                login: u.login
@@ -200,7 +198,7 @@ app.get("/settings", (req, res) => {
 app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         res.render("friends.hbs", {
+         res.render("friends.ejs", {
             login: u.login
          });
       }
@@ -216,7 +214,7 @@ app.get("/profile", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select admin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
-            res.render("profile.hbs", {
+            res.render("profile.ejs", {
                login: u.login,
                isAdmin: data[0].admin,
                imgStatus: data[0].imgStatus,
@@ -261,7 +259,7 @@ app.get("/people", parserJSON, (req, res) => {
             data.forEach((elem) => {
                people.push(elem);
             })
-            res.render("people.hbs", {
+            res.render("people.ejs", {
                login: u.login,
                people: people
             })
@@ -274,7 +272,7 @@ app.get("/people", parserJSON, (req, res) => {
 
 //Страница регистрации
 app.get("/registration", (req, res) => {
-   res.render("registration.hbs", {});
+   res.render("registration.ejs", {});
 });
 
 //Процесс
@@ -300,7 +298,7 @@ app.get("/u/:userLogin", (req, res) => {
          sql.query(`select id, login, firstname, lastname, color, age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
             if (err) console.error(err);
             if (data === undefined || data.length === 0) {
-               res.render("404.hbs", {
+               res.render("404.ejs", {
                   message: "This user does not exist",
                   login: u.login
                })
@@ -333,7 +331,7 @@ app.get("/u/:userLogin", (req, res) => {
                   })
                }
                // FIXME: TO EJS
-               res.render("user.hbs", {
+               res.render("user.ejs", {
                   userStatus: uStatus,
                   imgStatus: data[0].imgStatus,
                   userLogin: data[0].login,
@@ -405,7 +403,7 @@ app.post("/admin/message", parserJSON, (req, res) => {
 app.get("/adminpanel", (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
-         res.render("adminpanel.hbs", {
+         res.render("adminpanel.ejs", {
             login: u.login
          })
       }
@@ -435,13 +433,13 @@ app.get("/app/get/function/:function", (req, res) => {
 
 
 app.get("/tt", (req, res) => {
-   res.render("test.hbs", {});
+   res.render("test.ejs", {});
 });
 
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         res.render("incoming.hbs", {
+         res.render("incoming.ejs", {
             login: u.login
          });
       }
@@ -454,7 +452,7 @@ app.get("/incoming", (req, res) => {
 app.get("/outcoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         res.render("outcoming.hbs", {
+         res.render("outcoming.ejs", {
             login: u.login
          });
       }

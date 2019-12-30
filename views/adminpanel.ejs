@@ -16,7 +16,7 @@
 </head>
 
 <body background="bg.jpg">
-   {{> navbar}}
+   <%- include('partials/navbar.ejs') %>
    <center>
       <div>
          <input type="text" class="pole2" id="inputLogin" placeholder="Сообщение">
@@ -30,7 +30,7 @@
       </div>
    </center>
    <script src="pages/adminpanel.js"></script>
-   {{> footer}}
+   <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

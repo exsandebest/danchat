@@ -58,31 +58,31 @@
 </head>
 
 <body background="bg.jpg">
-   {{> navbar}}
+   <%- include('partials/navbar.ejs') %>
    <center>
       <div id="list">
 
-         {{#each people}}
+         <% people.forEach((elem)=>{%>
 
             <div class="block">
 
-               {{#if imgStatus}}
-                  <img src="{{login}}.jpg">
-               {{else}}
+               <% if (elem.imgStatus) {%>
+                  <img src="<%=elem.login%>.jpg">
+               <%} else {%>
                   <img src="default.jpg">
-               {{/if}}
+               <%}%>
                <div class="datablock">
                   <br>
-                  <a id="login" href="/u/{{login}}" style="color:{{color}}">{{login}}</a><br>
+                  <a id="login" href="/u/{{login}}" style="color:{{color}}"><%=elem.login%></a><br>
                   <p></p>
-                  <span class="green" style="font: normal 15px 'Arial';" id="fullname">{{firstname}} {{lastname}}</span>
+                  <span class="green" style="font: normal 15px 'Arial';" id="fullname"><%=elem.firstname%> <%=elem.lastname%></span>
                </div>
             </div>
 
-         {{/each}}
+         <%})%>
       </div>
    </center>
-   {{> footer}}
+   <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

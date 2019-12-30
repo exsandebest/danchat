@@ -8,25 +8,24 @@
 </head>
 
 <body background="bg.jpg">
-   {{> navbar}}
+   <%- include('partials/navbar.ejs') %>
    <center>
       <span class="orange" style="cursor:default">Цвет логина в чате</span><br><br>
-      <input type="color" id="color" value="{{color}}" style="height: 44px"><br><br>
+      <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
       <label><span class="orange">Автоматически прокручивать чат</span>
          <br><br>
-         {{#if scroll}}
+         <%if (scroll) {%>
             <input type="checkbox" id="scroll" checked />
-         {{else}}
+         <%} else {%>
             <input type="checkbox" id="scroll" />
-         {{/if}}
+         <%}%>
       </label><br><br>
       <span class="green" id="notif"></span>
       <br><br>
       <buttons class="buttons" onclick="save()">Сохранить</buttons>
    </center>
    <script src="pages/settings.js"></script>
-   {{> footer}}
-
+   <%- include('partials/footer.ejs') %>
    <body>
 
 </html>
