@@ -241,7 +241,6 @@ setInterval(()=>{
 
 
 
-// Счетчик людей онлайн
 app.get("/onlineCounter", (req, res) => {
    wwt.validate(req, res).then((u)=>{
       if (u) {
