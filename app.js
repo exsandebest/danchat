@@ -18,7 +18,7 @@ const parserURLEncoded = pars.urlencoded({
 });
 const parserJSON = pars.json();
 const std = require("./standart");
-// FIXME: ADD NODE-TIME
+const dt = require("node-datetime");
 
 
 console.time("Config");
@@ -65,7 +65,7 @@ app.post("/enter", parserJSON, (req, res) => {
       }
       var user = data[0];
       var token = std.genToken();
-      sql.query(`insert into tokens (id, login, token) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)})`, (err) => { // FIXME: ADD TIME INSERTION
+      sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
          if (err) console.error(err);
          sql.query(`select max(id) from users`, (err, result) => {
             var msg = {};
@@ -158,14 +158,14 @@ app.post("/get/message", parserJSON, (req, res) => {
          var portion = 50;
          var msgId = parseInt(req.body.id);
          if (msgId === -1) {
-            sql.query(`select login, color, id, time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
+            sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
                res.send(JSON.stringify(data));
             })
          } else {
             var msgStart = msgId - portion;
             var msgEnd = msgId - 1;
-            sql.query(`select * from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
+            sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
                res.send(JSON.stringify(data));
             })
@@ -233,10 +233,10 @@ app.get("/profile", (req, res) => {
 })
 
 setInterval(()=>{
-   sql.query(`delete from tokens where time ...`, (err)=>{
+   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err)=>{
       if (err) console.error(err);
    })
-}, 30000) // 5 min
+}, 3600000) // 1 hour
 
 
 
@@ -245,7 +245,7 @@ setInterval(()=>{
 app.get("/onlineCounter", (req, res) => {
    wwt.validate(req, res).then((u)=>{
       if (u) {
-         sql.query(`select login from tokens`, (err, data)=>{ // FIXME: TIME CONDITION (OPIONAL)
+         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data)=>{
             if (err) console.error(err);
             res.send(JSON.stringify(data));
          })
@@ -774,10 +774,13 @@ app.get("/logout", (req, res) => {
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
                msg.type = "exit";
-               chat.addnewmessage(msg);
-               res.clearCookie("token");
-               res.redirect("/login");
-               res.end();
+               sql.query(`delete from tokens where id = ${u.id}`,(err)=>{
+                  if (err) console.error(err);
+                  chat.addnewmessage(msg);
+                  res.clearCookie("token");
+                  res.redirect("/login");
+                  res.end();
+               })
             })
          })
       }

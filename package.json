@@ -4,10 +4,12 @@
    "dependencies": {
       "body-parser": "*",
       "cookie-parser": "*",
+      "ejs": "^3.0.1",
       "express": "*",
       "hbs": "*",
       "md5": "^2.2.1",
       "mysql2": "^2.0.2",
+      "node-datetime": "^2.1.2",
       "nodemon": "*",
       "socket.io": "*"
    },
