@@ -380,9 +380,13 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
 app.post("/admin/make/user", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
+         if (req.body.login === "admin") {
+            res.end();
+            return;
+         }
          sql.query(`update users set admin = 0 where login = ${sql.escape(req.body.login)}`, (err) => {
             if (err) console.error(err);
-            res.sned("true");
+            res.send("true");
          })
       }
    }, (err) => {
