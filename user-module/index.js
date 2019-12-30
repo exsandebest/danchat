@@ -41,6 +41,8 @@ exports.passwordValidate = (res, password, oldPassword, newPassword, repeatNewPa
    }
 }
 
+
+
 exports.nameValidate = (res, fn, ln) => { //fn - firstname - Имя; ln - lastname - Фамилия
    if (fn && ln) {
       if (regName.test(fn)) {
@@ -59,6 +61,7 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname - Имя; ln - lastna
       return false;
    }
 }
+
 
 
 exports.registrationValidate = (req, res) => {
@@ -106,10 +109,11 @@ exports.registrationValidate = (req, res) => {
    }
 }
 
-function badAns(res, msg) {
-   res.send("false:" + msg);
-}
 
+
+function badAns(res, msg) {
+   res.send(`false:${msg}`);
+}
 
 
 

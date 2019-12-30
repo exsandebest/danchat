@@ -54,6 +54,7 @@ exports.validate = (req, res) => {
 }
 
 
+
 exports.validateAdmin = (req, res) => {
    var p = new Promise((resolve, reject) => {
       var token = std.getCookie(req, "token");

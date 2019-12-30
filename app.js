@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const chat = require('./chat');
 const wwt = require('./work-with-token');
 const sql = require("./database");
-// const hbs = require("hbs");
 const md5 = require("md5");
 const express = require('express');
 const app = express();
@@ -32,13 +31,12 @@ console.timeEnd("Config");
 app.use(express.static(__dirname + "/images"));
 app.use(express.static(__dirname + "/js"));
 app.use(express.static(__dirname + "/styles"));
-app.use(express.static(__dirname + "/userimages"));
 app.use(express.static(__dirname + "/sounds"));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
 
-//Страница входа
+
 app.get("/login", (req, res) => {
    res.clearCookie("token", {
       path: "/"
@@ -46,7 +44,8 @@ app.get("/login", (req, res) => {
    res.render("enter.ejs", {});
 })
 
-//Вход
+
+
 app.post("/enter", parserJSON, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
    var Rpassword = decodeURIComponent(req.body.password);
@@ -75,7 +74,6 @@ app.post("/enter", parserJSON, (req, res) => {
             chat.addnewmessage(msg);
             res.end();
          })
-
          res.cookie("token", token, {
             path: "/",
             httpOnly: true
@@ -87,10 +85,6 @@ app.post("/enter", parserJSON, (req, res) => {
 
 
 
-
-
-
-//Страница чата
 app.get("/", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -108,7 +102,6 @@ app.get("/", (req, res) => {
 
 
 
-//Подписка на сообщения
 app.get("/subscribe", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -119,7 +112,8 @@ app.get("/subscribe", (req, res) => {
    });
 });
 
-//Новое сообщение
+
+
 app.post("/addnewmessage", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -143,8 +137,6 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
       res.end("DB ERROR");
    });
 });
-
-
 
 
 
@@ -173,6 +165,7 @@ app.post("/get/message", parserJSON, (req, res) => {
 })
 
 
+
 app.get("/settings", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -192,22 +185,19 @@ app.get("/settings", (req, res) => {
 
 
 
-
-//Друзья
 app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          var friends = [];
          res.render("friends.ejs", {
             login: u.login,
-            friends : friends
+            friends: friends
          });
       }
    }, (err) => {
       res.end("DB ERROR");
    });
 })
-
 
 
 
@@ -230,19 +220,20 @@ app.get("/profile", (req, res) => {
    });
 })
 
-setInterval(()=>{
-   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err)=>{
+
+
+setInterval(() => {
+   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err) => {
       if (err) console.error(err);
    })
 }, 3600000) // 1 hour
 
 
 
-
 app.get("/onlineCounter", (req, res) => {
-   wwt.validate(req, res).then((u)=>{
+   wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data)=>{
+         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data) => {
             if (err) console.error(err);
             res.send(JSON.stringify(data));
          })
@@ -250,7 +241,8 @@ app.get("/onlineCounter", (req, res) => {
    })
 });
 
-//Страница Люди
+
+
 app.get("/people", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -271,15 +263,16 @@ app.get("/people", parserJSON, (req, res) => {
    });
 })
 
-//Страница регистрации
+
+
 app.get("/registration", (req, res) => {
    res.render("registration.ejs", {});
 });
 
-//Процесс
-app.post("/registration", parserJSON, (req, res) => {
 
-   for (key in req.body){
+
+app.post("/registration", parserJSON, (req, res) => {
+   for (key in req.body) {
       req.body[key] = decodeURIComponent(req.body[key]);
    }
    sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
@@ -300,7 +293,7 @@ app.post("/registration", parserJSON, (req, res) => {
 });
 
 
-//Профиль пользователя
+
 app.get("/u/:userLogin", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -360,6 +353,7 @@ app.get("/u/:userLogin", (req, res) => {
 })
 
 
+
 app.get("/get/GUID", (req, res) => {
    sql.query(`select max(id) from chat`, (err, data) => {
       res.end(String(data[0]["max(id)"]))
@@ -367,11 +361,6 @@ app.get("/get/GUID", (req, res) => {
 });
 
 
-
-
-/*
-Команды админа
-*/
 
 app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
@@ -385,6 +374,8 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
       res.end("DB ERROR");
    });
 })
+
+
 
 app.post("/admin/make/user", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
@@ -403,6 +394,8 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
    });
 })
 
+
+
 app.post("/admin/message", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
@@ -412,6 +405,8 @@ app.post("/admin/message", parserJSON, (req, res) => {
       res.end("DB ERROR");
    });
 })
+
+
 
 app.get("/adminpanel", (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
@@ -427,7 +422,9 @@ app.get("/adminpanel", (req, res) => {
 
 
 
-
+app.get("/tt", (req, res) => {
+   res.render("test.ejs", {});
+});
 
 
 
@@ -445,9 +442,6 @@ app.get("/app/get/function/:function", (req, res) => {
 })
 
 
-app.get("/tt", (req, res) => {
-   res.render("test.ejs", {});
-});
 
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
@@ -462,6 +456,7 @@ app.get("/incoming", (req, res) => {
 });
 
 
+
 app.get("/outcoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -473,6 +468,7 @@ app.get("/outcoming", (req, res) => {
       res.end("DB ERROR");
    });
 });
+
 
 
 app.get("/user/get/outreqs/data", (req, res) => {
@@ -536,6 +532,7 @@ app.get("/user/get/inreqs/data", (req, res) => {
 });
 
 
+
 app.get("/get/inreqs/count", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -548,6 +545,7 @@ app.get("/get/inreqs/count", (req, res) => {
       res.end("DB ERROR");
    });
 })
+
 
 
 app.get("/get/outreqs/count", (req, res) => {
@@ -565,8 +563,6 @@ app.get("/get/outreqs/count", (req, res) => {
 
 
 
-
-//Подать заявку на добавление в друзья
 app.post("/user/add/friend", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
@@ -593,7 +589,7 @@ app.post("/user/add/friend", parserURLEncoded, (req, res) => {
 })
 
 
-//Отвенить заявку
+
 app.post("/user/cancel/outcomingrequest", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
@@ -619,7 +615,7 @@ app.post("/user/cancel/outcomingrequest", parserURLEncoded, (req, res) => {
 })
 
 
-//Принять заявку на добавление в друзья
+
 app.post("/user/accept/incomingrequest", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
@@ -647,7 +643,8 @@ app.post("/user/accept/incomingrequest", parserURLEncoded, (req, res) => {
    }
 })
 
-//Получить данные о друзьях пользователя
+
+
 app.get("/user/get/friends/data", (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
@@ -677,7 +674,8 @@ app.get("/user/get/friends/data", (req, res) => {
    }
 });
 
-//Удалить из друзей
+
+
 app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
    var login = wwt.validate(req, res);
    if (login) {
@@ -706,8 +704,9 @@ app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
 })
 
 
+
 app.post("/user/change/password", parserJSON, (req, res) => {
-   for (key in req.body){
+   for (key in req.body) {
       req.body[key] = decodeURIComponent(req.body[key]);
    }
    wwt.validate(req, res).then((u) => {
@@ -729,9 +728,8 @@ app.post("/user/change/password", parserJSON, (req, res) => {
 
 
 
-
 app.post("/user/change/name", parserJSON, (req, res) => {
-   for (key in req.body){
+   for (key in req.body) {
       req.body[key] = decodeURIComponent(req.body[key]);
    }
    wwt.validate(req, res).then((u) => {
@@ -748,7 +746,8 @@ app.post("/user/change/name", parserJSON, (req, res) => {
    });
 });
 
-//Сохранить изменения в настройках
+
+
 app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -773,9 +772,6 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
 
 
 
-
-
-//Выход
 app.get("/logout", (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
@@ -789,7 +785,7 @@ app.get("/logout", (req, res) => {
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
                msg.type = "exit";
-               sql.query(`delete from tokens where id = ${u.id}`,(err)=>{
+               sql.query(`delete from tokens where id = ${u.id}`, (err) => {
                   if (err) console.error(err);
                   chat.addnewmessage(msg);
                   res.clearCookie("token");
@@ -805,14 +801,16 @@ app.get("/logout", (req, res) => {
 })
 
 
+
 app.post("/urlencoded", parserURLEncoded, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
 
+
+
 app.post("/json", parserJSON, (req, res) => {
    res.send(JSON.stringify(req.body, "", 5));
 })
-
 
 
 
@@ -822,6 +820,8 @@ app.get("/console/sql", (req, res) => {
       res.send(data);
    })
 })
+
+
 
 app.post("/console/sql/query", parserJSON, (req, res) => {
    console.log(req.body.q);
@@ -833,7 +833,7 @@ app.post("/console/sql/query", parserJSON, (req, res) => {
 })
 
 
-//Слушать порт
+
 http.listen(config.port, config.ip, (err) => {
    console.timeEnd("Loading");
    console.log(`Started on : ${config.ip}:${config.port}`);

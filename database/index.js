@@ -41,7 +41,7 @@ sql.query(`create table if not exists users
                id int(11) not null,
                login varchar(255) not null,
                time datetime default null)
-               DEFAULT CHARSET=utf8;`, (err)=>{
+               DEFAULT CHARSET=utf8;`, (err) => {
                if (err) console.error(err);
                sql.query(`create table if not exists chat
                (id int(11) auto_increment primary key,
@@ -51,9 +51,9 @@ sql.query(`create table if not exists users
                login varchar(255) NOT NULL,
                color varchar(8) NOT NULL,
                time datetime NOT NULL)
-               DEFAULT CHARSET=utf8;`, (err)=>{
+               DEFAULT CHARSET=utf8;`, (err) => {
                   if (err) console.error(err);
-                     console.timeEnd("Module => database");
+                  console.timeEnd("Module => database");
                })
             })
          })
@@ -62,10 +62,10 @@ sql.query(`create table if not exists users
 })
 
 
-exports.query = (a,b)=>{
-   sql.query(a,b);
+exports.query = (a, b) => {
+   sql.query(a, b);
 }
 
-exports.escape = (s)=>{
+exports.escape = (s) => {
    return sql.escape(s);
 }
