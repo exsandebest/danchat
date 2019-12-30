@@ -731,6 +731,9 @@ app.post("/user/change/password", parserJSON, (req, res) => {
 
 
 app.post("/user/change/name", parserJSON, (req, res) => {
+   for (key in req.body){
+      req.body[key] = decodeURIComponent(req.body[key]);
+   }
    wwt.validate(req, res).then((u) => {
       if (u) {
          if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
@@ -749,8 +752,6 @@ app.post("/user/change/name", parserJSON, (req, res) => {
 app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         console.log(req.body);
-         console.log(typeof req.body.scroll);
          var scroll = true;
          if (req.body.scroll === true) {
             scroll = true;
