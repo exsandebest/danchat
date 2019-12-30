@@ -24,17 +24,23 @@ exports.validate = (req, res) => {
             } else {
                sql.query(`select login from users where id = ${result[0].id}`, (err, data) => {
                   if (err) console.error(err);
-                  var obj = {
-                     id: result[0].id,
-                     login: data[0].login
-                  }
-                  sql.query(`update tokens set time = NOW() where id = ${obj.id}`, (err) => {
-                     if (err) {
-                        console.error(err);
-                        reject("db");
+                  if (data === undefined || data.length === 0) {
+                     res.clearCookie("token");
+                     res.redirect("/login");
+                     resolve(false);
+                  } else {
+                     var obj = {
+                        id: result[0].id,
+                        login: data[0].login
                      }
-                     resolve(obj);
-                  })
+                     sql.query(`update tokens set time = NOW() where id = ${obj.id}`, (err) => {
+                        if (err) {
+                           console.error(err);
+                           reject("db");
+                        }
+                        resolve(obj);
+                     })
+                  }
                })
             }
          })
@@ -67,7 +73,7 @@ exports.validateAdmin = (req, res) => {
                      console.error(err);
                      reject("db");
                   }
-                  if (result === undefined || result.length === 0) {
+                  if (data === undefined || data.length === 0) {
                      res.clearCookie("token");
                      res.redirect("/login");
                      resolve(false);
