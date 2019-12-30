@@ -733,10 +733,12 @@ app.post("/user/change/name", parserJSON, (req, res) => {
 app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
+         console.log(req.body);
+         console.log(typeof req.body.scroll);
          var scroll = true;
-         if (req.body.scroll === "true") {
+         if (req.body.scroll === true) {
             scroll = true;
-         } else if (req.body.scroll === "false") {
+         } else if (req.body.scroll === false) {
             scroll = false;
          } else {
             res.end("Incorrect values");
