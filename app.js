@@ -330,7 +330,6 @@ app.get("/u/:userLogin", (req, res) => {
                      }
                   })
                }
-               // FIXME: TO EJS
                res.render("user.ejs", {
                   userStatus: uStatus,
                   imgStatus: data[0].imgStatus,
@@ -369,7 +368,7 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
       if (u) {
          sql.query(`update users set admin = 1 where login = ${sql.escape(req.body.login)}`, (err) => {
             if (err) console.error(err);
-            res.sned("true");
+            res.send("true");
          })
       }
    }, (err) => {
