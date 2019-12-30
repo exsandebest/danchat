@@ -40,7 +40,7 @@
    <%- include('partials/navbar.ejs') %>
    <center>
       <%if (imgStatus) {%>
-         <img src="/{{userlogin}}.jpg" style="overflow: hidden; width: 250px; height: 250px; border-radius: 20px;"><br>
+         <img src="/<%=userLogin%>.jpg" style="overflow: hidden; width: 250px; height: 250px; border-radius: 20px;"><br>
       <%} else {%>
          <img src="/default.jpg" style="overflow: hidden; width: 200px; height: 200px; border-radius: 20px;"><br>
       <%}%>
