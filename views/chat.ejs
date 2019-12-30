@@ -31,20 +31,7 @@
 </style>
 
 <body background="bg.jpg" onload="getMsg();">
-   <nav>
-      <ul>
-         <li><a class="navbar" href="/">Чат</a></li>
-         <!--<li><a class="navbar" href="/friends">Друзья</a></li>-->
-         <li><a class="navbar" href="/people">Люди</a></li>
-         <li style="float:right;" class="active"><a class="navbar" style="cursor:pointer" id="prof"><%=login%></a>
-            <ul>
-               <li><a class="navbar" name="var" href="/profile"> Профиль</a></li>
-               <li><a class="navbar" name="var" href="/settings"> Настройки</a></li>
-               <li><a class="navbar" name="var" href="/logout"> Выйти</a></li>
-            </ul>
-         </li>
-      </ul>
-   </nav>
+   <%- include('partials/navbar.ejs') %>
    <center>
       <div onclick="getMsg();" style="background-color: rgba(71, 226, 73, 0.89); bottom: 0; width: 45%; height: 30px; border-radius: 25px 25px 0px 0px">
       </div>
