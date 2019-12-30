@@ -48,8 +48,8 @@ app.get("/login", (req, res) => {
 
 //Вход
 app.post("/enter", parserJSON, (req, res) => {
-   var Rlogin = req.body.login;
-   var Rpassword = req.body.password;
+   var Rlogin = decodeURIComponent(req.body.login);
+   var Rpassword = decodeURIComponent(req.body.password);
    if (!Rlogin || !Rpassword) {
       res.end("false:Заполните все поля");
       return;
@@ -72,7 +72,6 @@ app.post("/enter", parserJSON, (req, res) => {
             msg.time = new Date().toTimeString().substring(0, 5);
             msg.id = result[0]["max(id)"] + 1;
             msg.type = "enter";
-            msg.text = req.body.message;
             chat.addnewmessage(msg);
             res.end();
          })
@@ -134,7 +133,7 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
                msg.type = "message";
-               msg.text = req.body.message;
+               msg.text = decodeURIComponent(req.body.message);
                chat.addnewmessage(msg);
                res.end();
             })
@@ -283,9 +282,7 @@ app.post("/registration", parserJSON, (req, res) => {
    for (key in req.body){
       req.body[key] = decodeURIComponent(req.body[key]);
    }
-   console.log(req.body);
    sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
-      console.log(result);
       if (result === undefined || result.length === 0) {
          if (usMod.registrationValidate(req, res)) {
             sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
@@ -379,7 +376,7 @@ app.get("/get/GUID", (req, res) => {
 app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
-         sql.query(`update users set admin = 1 where login = ${sql.escape(req.body.login)}`, (err) => {
+         sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
             if (err) console.error(err);
             res.send("true");
          })
@@ -392,11 +389,11 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
 app.post("/admin/make/user", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
-         if (req.body.login === "admin") {
+         if (decodeURIComponent(req.body.login) === "admin") {
             res.end();
             return;
          }
-         sql.query(`update users set admin = 0 where login = ${sql.escape(req.body.login)}`, (err) => {
+         sql.query(`update users set admin = 0 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
             if (err) console.error(err);
             res.send("true");
          })
@@ -409,7 +406,7 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
 app.post("/admin/message", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
-         io.emit("MESSAGE", req.body.message);
+         io.emit("MESSAGE", decodeURIComponent(req.body.message));
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -710,6 +707,9 @@ app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
 
 
 app.post("/user/change/password", parserJSON, (req, res) => {
+   for (key in req.body){
+      req.body[key] = decodeURIComponent(req.body[key]);
+   }
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select password from users where id = ${u.id}`, (err, data) => {
