@@ -198,8 +198,10 @@ app.get("/settings", (req, res) => {
 app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
+         var friends = [];
          res.render("friends.ejs", {
-            login: u.login
+            login: u.login,
+            friends : friends
          });
       }
    }, (err) => {
@@ -277,16 +279,27 @@ app.get("/registration", (req, res) => {
 
 //Процесс
 app.post("/registration", parserJSON, (req, res) => {
-   var validate = usMod.registrationValidate(req, res);
-   if (validate) {
-      sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-        ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
-         if (err) console.error(err);
-         res.send("true:true");
-      })
-   } else {
-      res.end();
+
+   for (key in req.body){
+      req.body[key] = decodeURIComponent(req.body[key]);
    }
+   console.log(req.body);
+   sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
+      console.log(result);
+      if (result === undefined || result.length === 0) {
+         if (usMod.registrationValidate(req, res)) {
+            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
+              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
+               if (err) console.error(err);
+               res.send("true:true");
+            })
+         } else {
+            res.end('END');
+         }
+      } else {
+         res.send(`false:Данный логин уже занят\n\n`);
+      }
+   })
 });
 
 

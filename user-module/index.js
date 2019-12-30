@@ -71,16 +71,7 @@ exports.registrationValidate = (req, res) => {
                   if (regName.test(data.lastname) && data.lastname !== undefined) {
                      if (regAge.test(data.age) && data.age > 0 && data.age < 218) {
                         if (regSex1.test(data.sex) || regSex2.test(data.sex)) {
-                           console.log(data.login);
-                           sql.query(`select id from users where login = ${sql.escape(data.login)}`, (err, result) => {
-                              console.log(result);
-                              if (result === undefined || result.length === 0) {
-                                 return true;
-                              } else {
-                                 badAns(res, "Данный логин уже занят\n\n");
-                                 return false;
-                              }
-                           })
+                           return true;
                         } else {
                            badAns(res, "Некорректный пол.\n\nХз как так вообще получилось");
                            return false;
