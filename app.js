@@ -115,7 +115,6 @@ app.get("/", (req, res) => {
             if (err) console.error(err);
             sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
                if (err) console.error(err);
-               console.log(data);
                res.render("chat.ejs", {
                scroll: result[0].scroll,
                login: u.login,
