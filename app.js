@@ -112,9 +112,15 @@ app.get("/", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select scroll from users where id = ${u.id}`, (err, result) => {
-            res.render("chat.ejs", {
+            if (err) console.error(err);
+            sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
+               if (err) console.error(err);
+               console.log(data);
+               res.render("chat.ejs", {
                scroll: result[0].scroll,
-               login: u.login
+               login: u.login,
+               onlineCounter : data.length
+            })
             })
          })
       }
@@ -339,7 +345,7 @@ app.get("/profile", (req, res) => {
 
 
 setInterval(() => {
-   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err) => {
+   sql.query(`delete from tokens where time < (NOW() - INTERVAL 1 DAY)`, (err) => {
       if (err) console.error(err);
    })
 }, 3600000) // 1 hour
@@ -349,7 +355,7 @@ setInterval(() => {
 app.get("/onlineCounter", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data) => {
+         sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
             if (err) console.error(err);
             res.send(JSON.stringify(data));
          })

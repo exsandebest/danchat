@@ -52,7 +52,7 @@
    <%}%>
    <script src="/socket.io/socket.io.js"></script>
    <script src="pages/chat.js"></script>
-   <!--<span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" onclick="usersOnline(true);" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"></span></span>-->
+   <span class="green" style="cursor: pointer; font-size: 20px; position: fixed; bottom: 30px; right: 20px;" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"><%=onlineCounter%></span></span>
    <%- include('partials/footer.ejs') %>
 </body>
 
