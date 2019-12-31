@@ -188,11 +188,35 @@ app.get("/settings", (req, res) => {
 app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         var friends = [];
-         res.render("friends.ejs", {
-            login: u.login,
-            friends: friends
-         });
+         var obj = {
+            login : u.login
+         };
+         sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, data) => {
+            if (err) console.error(err);
+            obj.inreqsCounter = ((data === undefined || data.length === 0)? "" : ` ${data.length} `);
+            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result)=>{
+               if (err) console.error(err);
+               obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
+               sql.query(`select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id}`, (err, dt)=>{
+                  if (err) console.error(err);
+                  if (dt === undefined || dt.length === 0){
+                     obj.friends = [];
+                     res.render("friends.ejs", obj);
+                     return;
+                  }
+                  var arr = [];
+                  dt.forEach((elem)=>{
+                     arr.push(elem.ids);
+                  })
+                  sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2)=>{
+                     if (err) console.error(err);
+                     obj.friends = dt2;
+                     res.render("friends.ejs", obj);
+                  })
+               })
+            })
+         })
+
       }
    }, (err) => {
       res.end("DB ERROR");
