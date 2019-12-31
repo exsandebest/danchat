@@ -700,7 +700,31 @@ app.get("/user/get/friends/data", (req, res) => {
 
 
 
-app.post("/user/delete/friend", parserURLEncoded, (req, res) => {
+app.post("/user/delete/friend", parserJSON, (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`,(err, dt1)=>{
+            if (err) console.error(err);
+            if(dt1 === undefined || dt1.length === 0){
+               res.send("Incorrect login");
+               return;
+            }
+            var friendId = dt1[0].id;
+            sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`,(err)=>{
+               if (err) console.error(err);
+               sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err)=>{
+                  if (err) console.error(err);
+                  res.send("true");
+               })
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+
+
+
    var login = wwt.validate(req, res);
    if (login) {
       if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
