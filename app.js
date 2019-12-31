@@ -505,9 +505,30 @@ app.get("/incoming", (req, res) => {
 app.get("/outcoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         res.render("outcoming.ejs", {
+         var obj = {
             login: u.login
-         });
+         };
+         sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, result) => {
+            if (err) console.error(err);
+            obj.inreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
+            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, dt) => {
+               if (err) console.error(err);
+               if (dt === undefined || dt.length === 0) {
+                  obj.outreqs = [];
+                  res.render("outcoming.ejs", obj);
+                  return;
+               }
+               var arr = [];
+               dt.forEach((elem) => {
+                  arr.push(elem.to_id);
+               })
+               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
+                  if (err) console.error(err);
+                  obj.outreqs = dt2;
+                  res.render("outcoming.ejs", obj);
+               })
+            })
+         })
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -544,28 +565,32 @@ app.post("/user/add/friend", parserURLEncoded, (req, res) => {
 
 
 
-app.post("/user/cancel/outcomingrequest", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (fs.existsSync("userdata/" + req.body.user + ".json")) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            if (err) throw err;
-            var user = JSON.parse(data);
-            user.outreqs.splice(user.outreqs.indexOf(req.body.user), 1);
-            fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
-               if (err) throw err;
-               fs.readFile("userdata/" + req.body.user + ".json", "utf-8", (err, result) => {
-                  user = JSON.parse(result);
-                  user.inreqs.splice(user.inreqs.indexOf(login), 1);
-                  fs.writeFile("userdata/" + req.body.user + ".json", JSON.stringify(user, "", 5), (err) => {
-                     if (err) throw err;
-                     res.end("true");
-                  })
+app.post("/user/cancel/outcomingrequest", parserJSON, (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
+            if (err) console.error(err);
+            if (dt1 === undefined || dt1.length === 0) {
+               res.send("Incorrect login");
+               return;
+            }
+            var userId = dt1[0].id;
+            sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt2) => {
+               if (err) console.error(err);
+               if (dt2 === undefined || dt2.length === 0) {
+                  res.send("No requests to cancel");
+                  return;
+               }
+               sql.query(`delete from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt3) => {
+                  if (err) console.error(err);
+                  res.send("true");
                })
             })
          })
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
