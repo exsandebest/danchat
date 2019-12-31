@@ -46,7 +46,16 @@
          <img src="/default.jpg" style="overflow: hidden; width: 200px; height: 200px; border-radius: 20px;"><br>
       <%}%>
       <br><br>
-      <buttons class="buttons" id="button" style="display:none"></buttons>
+      <%console.log(userStatus)%>
+      <%if (userStatus === "default"){%>
+         <buttons class="buttons" onclick="addFriend('<%=userLogin%>')">Добавить в друзья</buttons>
+      <%} else if (userStatus === "subscriber"){%>
+         <buttons class="buttons" onclick="acceptIncomingRequest('<%=userLogin%>')">Принять заявку</buttons>
+      <%} else if (userStatus === "request sent"){%>
+         <buttons class="buttons" onclick="cancelOutcomingRequest('<%=userLogin%>')">Отменить заявку</buttons>
+      <%} else if (userStatus === "friend"){%>
+         <buttons class="buttons" onclick="delFriend('<%=userLogin%>')">Удалить из друзей</buttons>
+      <%}%>
       <br><br>
       <span style="font: bold 25px 'Trebuchet MS'; color: <%=color%>; background-color: rgba(245,255,233,0.55); border-radius: 7px;"> <%=userLogin%> </span><br><br>
       <span class="green"><%=firstname%> <%=lastname%></span><br><br>

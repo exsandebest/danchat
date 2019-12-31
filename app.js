@@ -45,6 +45,33 @@ app.get("/login", (req, res) => {
 })
 
 
+app.get("/registration", (req, res) => {
+   res.render("registration.ejs", {});
+});
+
+
+
+app.post("/registration", parserJSON, (req, res) => {
+   for (key in req.body) {
+      req.body[key] = decodeURIComponent(req.body[key]);
+   }
+   sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
+      if (result === undefined || result.length === 0) {
+         if (usMod.registrationValidate(req, res)) {
+            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
+              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
+               if (err) console.error(err);
+               res.send("true:true");
+            })
+         } else {
+            res.end('END');
+         }
+      } else {
+         res.send(`false:Данный логин уже занят\n\n`);
+      }
+   })
+});
+
 
 app.post("/enter", parserJSON, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
@@ -224,249 +251,6 @@ app.get("/friends", (req, res) => {
 })
 
 
-
-app.get("/profile", (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         sql.query(`select admin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
-            res.render("profile.ejs", {
-               login: u.login,
-               isAdmin: data[0].admin,
-               imgStatus: data[0].imgStatus,
-               color: data[0].color,
-               firstname: data[0].firstname,
-               lastname: data[0].lastname
-            })
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-setInterval(() => {
-   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err) => {
-      if (err) console.error(err);
-   })
-}, 3600000) // 1 hour
-
-
-
-app.get("/onlineCounter", (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data) => {
-            if (err) console.error(err);
-            res.send(JSON.stringify(data));
-         })
-      }
-   })
-});
-
-
-
-app.get("/people", parserJSON, (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
-            if (err) console.error(err);
-            var people = [];
-            data.forEach((elem) => {
-               people.push(elem);
-            })
-            res.render("people.ejs", {
-               login: u.login,
-               people: people
-            })
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.get("/registration", (req, res) => {
-   res.render("registration.ejs", {});
-});
-
-
-
-app.post("/registration", parserJSON, (req, res) => {
-   for (key in req.body) {
-      req.body[key] = decodeURIComponent(req.body[key]);
-   }
-   sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
-      if (result === undefined || result.length === 0) {
-         if (usMod.registrationValidate(req, res)) {
-            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
-               if (err) console.error(err);
-               res.send("true:true");
-            })
-         } else {
-            res.end('END');
-         }
-      } else {
-         res.send(`false:Данный логин уже занят\n\n`);
-      }
-   })
-});
-
-
-
-app.get("/u/:userLogin", (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         var userLogin = req.params.userLogin;
-         sql.query(`select id, login, firstname, lastname, color, age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
-            if (err) console.error(err);
-            if (data === undefined || data.length === 0) {
-               res.render("404.ejs", {
-                  message: "This user does not exist",
-                  login: u.login
-               })
-               return;
-            } else {
-               var uStatus = "self";
-               if (u.login !== data[0].login) {
-                  sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
-                     if (err) console.error(err);
-                     if (!r1) {
-                        sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
-                           if (err) console.error(err);
-                           if (!r2) {
-                              sql.query(`select * from friends_requests where to_id = ${data[0].id} and from_id = ${u.id}`, (err, r3) => {
-                                 if (err) console.error(err);
-                                 if (r3) {
-                                    uStatus = "subscriber";
-                                 } else {
-                                    uStatus = "default";
-                                 }
-                              })
-                           }
-                           uStatus = "request sent";
-                           return;
-                        })
-                     } else {
-                        uStatus = "friend";
-                        return;
-                     }
-                  })
-               }
-               res.render("user.ejs", {
-                  userStatus: uStatus,
-                  imgStatus: data[0].imgStatus,
-                  userLogin: data[0].login,
-                  firstname: data[0].firstname,
-                  lastname: data[0].lastname,
-                  color: data[0].color,
-                  age: data[0].age,
-                  login: u.login,
-                  sex: (data[0].sex ? "Мужской" : "Женский")
-               });
-            }
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.get("/get/GUID", (req, res) => {
-   sql.query(`select max(id) from chat`, (err, data) => {
-      res.end(String(data[0]["max(id)"]))
-   })
-});
-
-
-
-app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
-      if (u) {
-         sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
-            if (err) console.error(err);
-            res.send("true");
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.post("/admin/make/user", parserJSON, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
-      if (u) {
-         if (decodeURIComponent(req.body.login) === "admin") {
-            res.end();
-            return;
-         }
-         sql.query(`update users set admin = 0 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
-            if (err) console.error(err);
-            res.send("true");
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.post("/admin/message", parserJSON, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
-      if (u) {
-         io.emit("MESSAGE", decodeURIComponent(req.body.message));
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.get("/adminpanel", (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
-      if (u) {
-         res.render("adminpanel.ejs", {
-            login: u.login
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.get("/tt", (req, res) => {
-   res.render("test.ejs", {});
-});
-
-
-
-app.get("/app/get/function/:function", (req, res) => {
-   var funcName = req.params["function"];
-   res.setHeader("Content-Type", "	application/ecmascript");
-   if (fs.existsSync("js/functions/" + funcName + ".js")) {
-      fs.readFile("js/functions/" + funcName + ".js", "utf-8", (err, data) => {
-         if (err) throw err;
-         res.end(data);
-      })
-   } else {
-      res.end();
-   }
-})
-
-
-
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
@@ -537,30 +321,218 @@ app.get("/outcoming", (req, res) => {
 
 
 
+app.get("/profile", (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select admin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
+            res.render("profile.ejs", {
+               login: u.login,
+               isAdmin: data[0].admin,
+               imgStatus: data[0].imgStatus,
+               color: data[0].color,
+               firstname: data[0].firstname,
+               lastname: data[0].lastname
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
 
-app.post("/user/add/friend", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         if (err) throw err;
-         var user = JSON.parse(data);
-         user.outreqs.push(req.body.friend);
-         fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, '', 5), (err) => {
-            if (err) throw err;
-            if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
-               fs.readFile("userdata/" + req.body.friend + ".json", "utf-8", (err, result) => {
-                  if (err) throw err;
-                  var friend = JSON.parse(result);
-                  friend.inreqs.push(login);
-                  fs.writeFile("userdata/" + req.body.friend + ".json", JSON.stringify(friend, "", 5), (err) => {
-                     if (err) throw err;
-                     res.end("true")
+
+
+setInterval(() => {
+   sql.query(`delete from tokens where time < DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err) => {
+      if (err) console.error(err);
+   })
+}, 3600000) // 1 hour
+
+
+
+app.get("/onlineCounter", (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select login from tokens where time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`, (err, data) => {
+            if (err) console.error(err);
+            res.send(JSON.stringify(data));
+         })
+      }
+   })
+});
+
+
+
+app.get("/people", parserJSON, (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
+            if (err) console.error(err);
+            var people = [];
+            data.forEach((elem) => {
+               people.push(elem);
+            })
+            res.render("people.ejs", {
+               login: u.login,
+               people: people
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.get("/u/:userLogin", (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         var userLogin = req.params.userLogin;
+         sql.query(`select id, login, firstname, lastname, color, age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
+            if (err) console.error(err);
+            if (data === undefined || data.length === 0) {
+               res.render("404.ejs", {
+                  message: "This user does not exist",
+                  login: u.login
+               })
+               return;
+            } else {
+               var obj = {
+                  imgStatus: data[0].imgStatus,
+                  userLogin: data[0].login,
+                  firstname: data[0].firstname,
+                  lastname: data[0].lastname,
+                  color: data[0].color,
+                  age: data[0].age,
+                  login: u.login,
+                  sex: (data[0].sex ? "Мужской" : "Женский")
+               }
+               if (u.login !== data[0].login) {
+                  sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
+                     if (err) console.error(err);
+                     if (r1 === undefined || r1.length === 0) {
+                        sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+                           if (err) console.error(err);
+                           if (r2 === undefined || r2.length === 0) {
+                              sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                                 if (err) console.error(err);
+                                 if (r3 !== undefined && r3.length !== 0) {
+                                    obj.userStatus = "subscriber";
+                                 } else {
+                                    obj.userStatus = "default";
+                                 }
+                                 res.render("user.ejs", obj);
+                              })
+                           } else {
+                              obj.userStatus = "request sent";
+                              res.render("user.ejs", obj);
+                           }
+                        })
+                     } else {
+                        obj.userStatus = "friend";
+                        res.render("user.ejs", obj);
+                     }
                   })
-               });
+               } else {
+                  obj.userStatus = "self";
+                  res.render("user.ejs", obj);
+               }
             }
          })
-      })
-   }
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
+            if (err) console.error(err);
+            res.send("true");
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.post("/admin/make/user", parserJSON, (req, res) => {
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         if (decodeURIComponent(req.body.login) === "admin") {
+            res.end();
+            return;
+         }
+         sql.query(`update users set admin = 0 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
+            if (err) console.error(err);
+            res.send("true");
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.post("/admin/message", parserJSON, (req, res) => {
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         io.emit("MESSAGE", decodeURIComponent(req.body.message));
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.get("/adminpanel", (req, res) => {
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         res.render("adminpanel.ejs", {
+            login: u.login
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
+})
+
+
+
+app.get("/tt", (req, res) => {
+   res.render("test.ejs", {});
+});
+
+
+
+app.post("/user/add/friend", parserJSON, (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
+            if (err) console.error(err);
+            if (dt1 === undefined || dt1.length === 0) {
+               res.send("Incorrect login");
+               return;
+            }
+            var userId = dt1[0].id;
+            sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
+               if (err) console.log(err);
+               res.send("true");
+            })
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
