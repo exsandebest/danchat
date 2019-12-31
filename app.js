@@ -189,26 +189,26 @@ app.get("/friends", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          var obj = {
-            login : u.login
+            login: u.login
          };
          sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            obj.inreqsCounter = ((data === undefined || data.length === 0)? "" : ` ${data.length} `);
-            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result)=>{
+            obj.inreqsCounter = ((data === undefined || data.length === 0) ? "" : ` ${data.length} `);
+            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
                if (err) console.error(err);
                obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
-               sql.query(`select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id}`, (err, dt)=>{
+               sql.query(`select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id}`, (err, dt) => {
                   if (err) console.error(err);
-                  if (dt === undefined || dt.length === 0){
+                  if (dt === undefined || dt.length === 0) {
                      obj.friends = [];
                      res.render("friends.ejs", obj);
                      return;
                   }
                   var arr = [];
-                  dt.forEach((elem)=>{
+                  dt.forEach((elem) => {
                      arr.push(elem.ids);
                   })
-                  sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2)=>{
+                  sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
                      if (err) console.error(err);
                      obj.friends = dt2;
                      res.render("friends.ejs", obj);
@@ -470,9 +470,30 @@ app.get("/app/get/function/:function", (req, res) => {
 app.get("/incoming", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         res.render("incoming.ejs", {
+         var obj = {
             login: u.login
-         });
+         };
+         sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
+            if (err) console.error(err);
+            obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
+            sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, dt) => {
+               if (err) console.error(err);
+               if (dt === undefined || dt.length === 0) {
+                  obj.inreqs = [];
+                  res.render("incoming.ejs", obj);
+                  return;
+               }
+               var arr = [];
+               dt.forEach((elem) => {
+                  arr.push(elem.from_id);
+               })
+               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
+                  if (err) console.error(err);
+                  obj.inreqs = dt2;
+                  res.render("incoming.ejs", obj);
+               })
+            })
+         })
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -493,97 +514,6 @@ app.get("/outcoming", (req, res) => {
    });
 });
 
-
-
-app.get("/user/get/outreqs/data", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      var friendsData = [];
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         for (var i = 0; i < user.outreqs.length; i++) {
-            var friendLogin = user.outreqs[i];
-            if (fs.existsSync("userdata/" + friendLogin + ".json")) {
-               var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
-               var friend = JSON.parse(result);
-               var friendData = {}
-               friendData.login = friend.login;
-               friendData.firstname = friend.firstname;
-               friendData.lastname = friend.lastname;
-               friendData.color = friend.color;
-               if (fs.existsSync("userimages/" + friend.login + ".jpg")) {
-                  friendData.imgStatus = true;
-               } else {
-                  friendData.imgStatus = false;
-               }
-               friendsData.push(friendData);
-            }
-         }
-         res.end(JSON.stringify(friendsData, "", 5));
-      })
-   }
-});
-
-
-
-app.get("/user/get/inreqs/data", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      var friendsData = [];
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         for (var i = 0; i < user.inreqs.length; i++) {
-            var friendLogin = user.inreqs[i];
-            if (fs.existsSync("userdata/" + friendLogin + ".json")) {
-               var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
-               var friend = JSON.parse(result);
-               var friendData = {}
-               friendData.login = friend.login;
-               friendData.firstname = friend.firstname;
-               friendData.lastname = friend.lastname;
-               friendData.color = friend.color;
-               if (fs.existsSync("userimages/" + friend.login + ".jpg")) {
-                  friendData.imgStatus = true;
-               } else {
-                  friendData.imgStatus = false;
-               }
-               friendsData.push(friendData);
-            }
-         }
-         res.end(JSON.stringify(friendsData, "", 5));
-      })
-   }
-});
-
-
-
-app.get("/get/inreqs/count", (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         sql.query(`select * from friends_requests where to_id = ${u.id}`, (err, data) => {
-            if (err) console.error(err);
-            res.end(String((data === undefined ? 0 : data.length)));
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
-
-
-
-app.get("/get/outreqs/count", (req, res) => {
-   wwt.validate(req, res).then((u) => {
-      if (u) {
-         sql.query(`select * from friends_requests where from_id = ${u.id}`, (err, data) => {
-            if (err) console.error(err);
-            res.end(String((data === undefined ? 0 : data.length)));
-         })
-      }
-   }, (err) => {
-      res.end("DB ERROR");
-   });
-})
 
 
 
@@ -640,79 +570,52 @@ app.post("/user/cancel/outcomingrequest", parserURLEncoded, (req, res) => {
 
 
 
-app.post("/user/accept/incomingrequest", parserURLEncoded, (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (fs.existsSync("userdata/" + req.body.user + ".json")) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            var user = JSON.parse(data);
-            var tempUser = user.inreqs[user.inreqs.indexOf(req.body.user)];
-            user.inreqs.splice(user.inreqs.indexOf(req.body.user), 1);
-            user.friends.push(tempUser);
-            fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
-               if (err) throw err;
-               fs.readFile("userdata/" + req.body.user + ".json", "utf-8", (err, result) => {
-                  user = JSON.parse(result);
-                  tempUser = user.outreqs[user.outreqs.indexOf(login)];
-                  user.outreqs.splice(user.outreqs.indexOf(login), 1);
-                  user.friends.push(tempUser);
-                  fs.writeFile("userdata/" + req.body.user + ".json", JSON.stringify(user, "", 5), (err) => {
-                     if (err) throw err;
-                     res.end("true");
+app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
+   wwt.validate(req, res).then((u) => {
+      if (u) {
+         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
+            if (err) console.error(err);
+            if (dt1 === undefined || dt1.length === 0) {
+               res.send("Incorrect login");
+               return;
+            }
+            var userId = dt1[0].id;
+            sql.query(`select * from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err, dt2) => {
+               if (err) console.error(err);
+               if (dt2 === undefined || dt2.length === 0) {
+                  res.send("No requests to accept");
+                  return;
+               }
+               sql.query(`delete from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err, dt3) => {
+                  if (err) console.error(err);
+                  sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
+                     if (err) console.error(err);
+                     res.send("true");
                   })
                })
             })
          })
       }
-   }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
-
-
-
-app.get("/user/get/friends/data", (req, res) => {
-   var login = wwt.validate(req, res);
-   if (login) {
-      var friendsData = [];
-      fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-         var user = JSON.parse(data);
-         for (var i = 0; i < user.friends.length; i++) {
-            var friendLogin = user.friends[i];
-            if (fs.existsSync("userdata/" + friendLogin + ".json")) {
-               var result = fs.readFileSync("userdata/" + friendLogin + ".json", "utf-8");
-               var friend = JSON.parse(result);
-               var friendData = {}
-               friendData.login = friend.login;
-               friendData.firstname = friend.firstname;
-               friendData.lastname = friend.lastname;
-               friendData.color = friend.color;
-               if (fs.existsSync("userimages/" + friend.login + ".jpg")) {
-                  friendData.imgStatus = true;
-               } else {
-                  friendData.imgStatus = false;
-               }
-               friendsData.push(friendData);
-            }
-         }
-         res.end(JSON.stringify(friendsData, "", 5));
-      })
-   }
-});
 
 
 
 app.post("/user/delete/friend", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`,(err, dt1)=>{
+         sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
             if (err) console.error(err);
-            if(dt1 === undefined || dt1.length === 0){
+            if (dt1 === undefined || dt1.length === 0) {
                res.send("Incorrect login");
                return;
             }
             var friendId = dt1[0].id;
-            sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`,(err)=>{
+            sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`, (err) => {
                if (err) console.error(err);
-               sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err)=>{
+               sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err) => {
                   if (err) console.error(err);
                   res.send("true");
                })
@@ -722,33 +625,6 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
    }, (err) => {
       res.end("DB ERROR");
    });
-
-
-
-   var login = wwt.validate(req, res);
-   if (login) {
-      if (fs.existsSync("userdata/" + req.body.friend + ".json")) {
-         fs.readFile(`userdata/${login}.json`, "utf-8", (err, data) => {
-            var user = JSON.parse(data);
-            var tempUser = user.friends[user.friends.indexOf(req.body.friend)];
-            user.friends.splice(user.friends.indexOf(req.body.friend), 1);
-            user.inreqs.push(tempUser);
-            fs.writeFile(`userdata/${login}.json`, JSON.stringify(user, "", 5), (err) => {
-               if (err) throw err;
-               fs.readFile("userdata/" + req.body.friend + ".json", "utf-8", (err, result) => {
-                  user = JSON.parse(result);
-                  tempUser = user.friends[user.friends.indexOf(login)];
-                  user.friends.splice(user.friends.indexOf(login), 1);
-                  user.outreqs.push(tempUser);
-                  fs.writeFile("userdata/" + req.body.friend + ".json", JSON.stringify(user, "", 5), (err) => {
-                     if (err) throw err;
-                     res.end("true");
-                  });
-               })
-            });
-         })
-      }
-   }
 })
 
 

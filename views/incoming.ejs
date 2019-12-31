@@ -79,15 +79,29 @@
          <a class="nav-btn" style="width:auto; padding-left: 5px; padding-right: 5px; background: #2EE59D;
         box-shadow: 0 15px 20px rgba(46,229,157,.4);
         color: white;
-        transform: translateY(-7px);" style="background: #2EE59D;
-          box-shadow: 0 15px 20px rgba(46,229,157,.4);
-          color: white;
-          transform: translateY(-7px);" href="/incoming">Входящие заявки <asd id="inreqsCounter" style="width: 20px; height: 20px; font-size: 15px; border-radius: 15px; background-color: rgba(0, 230, 168, 1); color: white; "></asd></a>
+        transform: translateY(-7px);"  href="/incoming">Входящие заявки</a>
          <a class="nav-btn" href="/friends">Мои друзья</a>
-         <a class="nav-btn" style="width:auto; padding-left: 5px; padding-right: 5px;" href="/outcoming">Исходящие заявки <asd id="outreqsCounter"
-               style="width: 20px; height: 20px; font-size: 15px; border-radius: 15px; background-color: rgba(0, 230, 168, 1); color: white; "></asd></a>
+         <a class="nav-btn" style="width:auto; padding-left: 5px; padding-right: 5px;" href="/outcoming">Исходящие заявки
+         <asd style="width: 20px; height: 20px; font-size: 15px; border-radius: 15px; background-color: rgba(0, 230, 168, 1); color: white; "><%=outreqsCounter%></asd></a>
       </div>
       <div id="list" style="display:inline-block">
+         <%inreqs.forEach((elem)=>{%>
+            <div id = "block">
+               <%if (elem.imgStatus) {%>
+                  <img src="<%=elem.login%>.jpg">
+               <% }else { %>
+                  <img src="default.jpg">
+               <% } %>
+               <div id = "datablock">
+                  <br><a id = "login" href = "/u/<%=elem.login%>" style = "color:<%=elem.color%>;"><%=elem.login%></a>
+                  <p id = "fullname"><%=elem.firstname%> <%=elem.lastname%></p>
+                  <div id = "funcblock">
+                     <buttons class = "small" onclick="acceptIncomingRequest('<%=elem.login%>')">Принять</buttons>
+                  </div>
+               </div>
+            </div>
+            <br>
+         <%})%>
       </div>
    </center>
    <script src="pages/incoming.js">
