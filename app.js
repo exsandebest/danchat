@@ -24,10 +24,6 @@ var config = JSON.parse(fs.readFileSync("config/main.json", "utf-8"));
 console.timeEnd("Config");
 
 
-
-
-
-
 app.use(express.static(__dirname + "/images"));
 app.use(express.static(__dirname + "/js"));
 app.use(express.static(__dirname + "/styles"));
@@ -408,36 +404,81 @@ app.get("/u/:userLogin", (req, res) => {
                   login: u.login,
                   sex: (data[0].sex ? "Мужской" : "Женский")
                }
-               if (u.login !== data[0].login) {
-                  sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
-                     if (err) console.error(err);
-                     if (r1 === undefined || r1.length === 0) {
-                        sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+               sql.query(`select id_1 as ids from friends where id_2 = ${data[0].id} union select id_2 as ids from friends where id_1 = ${data[0].id}`, (err, dt) => {
+                  if (err) console.error(err);
+                  if (dt === undefined || dt.length === 0) {
+                     obj.friends = [];
+                     if (u.login !== data[0].login) {
+                        sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
                            if (err) console.error(err);
-                           if (r2 === undefined || r2.length === 0) {
-                              sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                           if (r1 === undefined || r1.length === 0) {
+                              sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
                                  if (err) console.error(err);
-                                 if (r3 !== undefined && r3.length !== 0) {
-                                    obj.userStatus = "subscriber";
+                                 if (r2 === undefined || r2.length === 0) {
+                                    sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                                       if (err) console.error(err);
+                                       if (r3 !== undefined && r3.length !== 0) {
+                                          obj.userStatus = "subscriber";
+                                       } else {
+                                          obj.userStatus = "default";
+                                       }
+                                       res.render("user.ejs", obj);
+                                    })
                                  } else {
-                                    obj.userStatus = "default";
+                                    obj.userStatus = "request sent";
+                                    res.render("user.ejs", obj);
                                  }
-                                 res.render("user.ejs", obj);
                               })
                            } else {
-                              obj.userStatus = "request sent";
+                              obj.userStatus = "friend";
                               res.render("user.ejs", obj);
                            }
                         })
                      } else {
-                        obj.userStatus = "friend";
+                        obj.userStatus = "self";
                         res.render("user.ejs", obj);
                      }
-                  })
-               } else {
-                  obj.userStatus = "self";
-                  res.render("user.ejs", obj);
-               }
+                  } else {
+                     var arr = [];
+                     dt.forEach((elem) => {
+                        arr.push(elem.ids);
+                     })
+                     sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
+                        if (err) console.error(err);
+                        obj.friends = dt2;
+                        if (u.login !== data[0].login) {
+                           sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
+                              if (err) console.error(err);
+                              if (r1 === undefined || r1.length === 0) {
+                                 sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+                                    if (err) console.error(err);
+                                    if (r2 === undefined || r2.length === 0) {
+                                       sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                                          if (err) console.error(err);
+                                          if (r3 !== undefined && r3.length !== 0) {
+                                             obj.userStatus = "subscriber";
+                                          } else {
+                                             obj.userStatus = "default";
+                                          }
+                                          res.render("user.ejs", obj);
+                                       })
+                                    } else {
+                                       obj.userStatus = "request sent";
+                                       res.render("user.ejs", obj);
+                                    }
+                                 })
+                              } else {
+                                 obj.userStatus = "friend";
+                                 res.render("user.ejs", obj);
+                              }
+                           })
+                        } else {
+                           obj.userStatus = "self";
+                           res.render("user.ejs", obj);
+                        }
+                     })
+                  }
+               })
             }
          })
       }
@@ -525,7 +566,7 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
             }
             var userId = dt1[0].id;
             sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
-               if (err) console.log(err);
+               if (err) console.error(err);
                res.send("true");
             })
          })

@@ -46,7 +46,6 @@
          <img src="/default.jpg" style="overflow: hidden; width: 200px; height: 200px; border-radius: 20px;"><br>
       <%}%>
       <br><br>
-      <%console.log(userStatus)%>
       <%if (userStatus === "default"){%>
          <buttons class="buttons" onclick="addFriend('<%=userLogin%>')">Добавить в друзья</buttons>
       <%} else if (userStatus === "subscriber"){%>
@@ -61,21 +60,23 @@
       <span class="green"><%=firstname%> <%=lastname%></span><br><br>
       <span class="green">Возраст: </span><span class="red"><%=age%></span><br><br>
       <span class="green">Пол: </span><span class="red"><%=sex%></span><br><br>
-      <!--<span class="green">Друзья:</span><br><br>
+      <span class="green">Друзья:</span><br><br>
       <div id="friends">
-         {{#each friends}}
-            <a class="friendLink" href="/u/{{login}}">
-               {{#if imgStatus}}
-                  <img class="friend" src="{{login}}.jpg" title="{{firstname}} {{lastname}}"><br>
-               {{else}}
-                  <img class="friend" src="default.jpg" title="{{firstname}} {{lastname}}"><br>
-               {{/if}}
-               <span style="font-size: 0.8em">{{login}}</span>
+         <%if (friends.length !== 0) {%>
+            <%friends.forEach((elem)=>{%>
+            <a class="friendLink" href="/u/<%=elem.login%>">
+               <%if (elem.imgStatus) {%>
+                  <img class="friend" src="<%=elem.login%>.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+               <% } else { %>
+                  <img class="friend" src="/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+               <% } %>
+               <span style="font-size: 0.8em"><%=elem.login%></span>
             </a>
-         {{else}}
+            <%})%>
+         <%} else {%>
             <span style="margin: 10px" class="red">Друзей нет</span>
-         {{/each}}
-      </div>-->
+         <%}%>
+      </div>
    </center>
    <script src="/pages/user.js"></script>
    <%- include('partials/footer.ejs') %>
