@@ -47,13 +47,13 @@
       <%}%>
       <br><br>
       <%if (userStatus === "default"){%>
-         <buttons class="buttons" onclick="addFriend('<%=userLogin%>')">Добавить в друзья</buttons>
+         <btn class="standart" onclick="addFriend('<%=userLogin%>')">Добавить в друзья</btn>
       <%} else if (userStatus === "subscriber"){%>
-         <buttons class="buttons" onclick="acceptIncomingRequest('<%=userLogin%>')">Принять заявку</buttons>
+         <btn class="standart" onclick="acceptIncomingRequest('<%=userLogin%>')">Принять заявку</btn>
       <%} else if (userStatus === "request sent"){%>
-         <buttons class="buttons" onclick="cancelOutcomingRequest('<%=userLogin%>')">Отменить заявку</buttons>
+         <btn class="standart" onclick="cancelOutcomingRequest('<%=userLogin%>')">Отменить заявку</btn>
       <%} else if (userStatus === "friend"){%>
-         <buttons class="buttons" onclick="delFriend('<%=userLogin%>')">Удалить из друзей</buttons>
+         <btn class="standart" onclick="delFriend('<%=userLogin%>')">Удалить из друзей</btn>
       <%}%>
       <br><br>
       <span style="font: bold 25px 'Trebuchet MS'; color: <%=color%>; background-color: rgba(245,255,233,0.55); border-radius: 7px;"> <%=userLogin%> </span><br><br>

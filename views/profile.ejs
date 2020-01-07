@@ -62,11 +62,11 @@
       <span class="green"><%=firstname%> <%=lastname%></span>
       <br><br><br>
       <%if (isAdmin) {%>
-      <buttons class="buttons" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</buttons>
+      <btn class="standart" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</btn>
       <br><br><br><br>
       <%}%>
-      <buttons class="buttons" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИО</buttons><br><br><br><br>
-      <buttons class="buttons" onClick="getElementById('winChangePassword').removeAttribute('style');" type="button">Сменить пароль</buttons>
+      <btn class="standart" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИО</btn><br><br><br><br>
+      <btn class="standart" onClick="getElementById('winChangePassword').removeAttribute('style');" type="button">Сменить пароль</btn>
       <br><br><br>
    </center>
    <%- include('partials/footer.ejs') %>
@@ -82,10 +82,10 @@
                   <input id="repeatNewPassword" type="password" class="pole2" placeholder="Повторите новый пароль" /><br><br>
                   <span class="red" id="notif"> </span>
                   <br>
-                  <buttons class="buttons" onclick="changePasword()">Сменить</buttons>
+                  <btn class="standart" onclick="changePasword()">Сменить</btn>
                </center>
             </div>
-            <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</buttons>
+            <btn class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</btn>
          </div>
       </div>
       <div id="winChangeName" style="display:none;">
@@ -99,10 +99,10 @@
                   <input id="lastname" type="text" class="pole2" placeholder="Фамилия" value="<%=lastname%>" /><br><br>
                   <span class="red" id="notif2"> </span>
                   <br>
-                  <buttons class="buttons" onclick="changeName()">Сохранить</buttons>
+                  <btn class="standart" onclick="changeName()">Сохранить</btn>
                </center>
             </div>
-            <buttons class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</buttons>
+            <btn class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</btn>
          </div>
       </div>
 </body>
