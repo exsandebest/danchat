@@ -136,8 +136,28 @@ btn:not(:hover) {
    transition: 0.5s;
 }
 
-.inputSmall {
+.inputSmall:focus {
    border: solid 5px rgba(0, 231, 255, 0.92);
+}
+
+/* Footer */
+
+footer div {
+   background-color: rgba(70, 230, 72, 0.49);
+   margin-top: 30px;
+   position: fixed;
+   bottom: 0;
+   width: 100%;
+   height: 30px;
+   left:0;
+   border-radius: 25px 25px 0px 0px;
+}
+
+footer div p {
+   margin-left: 25px;
+   margin-top: 8px;
+   color:rgba(70, 230, 72, 1);
+   font-weight:bold;
 }
 
 
