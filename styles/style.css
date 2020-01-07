@@ -8,7 +8,7 @@ strong.login {
    font-size: 1em;
 }
 
-a[name=var] {
+nav ul li ul li a{
    font: normal 18px "Arial";
    cursor: pointer;
 }
@@ -34,10 +34,6 @@ h3 a {
    color: #FFF;
 }
 
-a.navbar {
-   color: #FFF;
-}
-
 span.red {
    font-family: Garamond;
    font-size: 1.6em;
@@ -53,6 +49,9 @@ span.green {
    text-shadow: 0 0 10px #00FF7F, 0 0 20px #00FF7F, 0 0 30px #00FF7F, 0 0 40px #00FF7F, 0 0 70px #00FF7F, 0 0 80px #00FF7F, 0 0 100px #00FF7F, 0 0 150px #00FF7F;
 }
 
+
+
+/* Navigation bar */
 nav {
    margin-left: 20%;
    margin-right: 20%;
@@ -61,21 +60,18 @@ nav {
    border-radius: 50px;
    top: 0px;
 }
-
 nav ul {
    padding: 0;
    margin: 0;
    list-style: none;
    position: relative;
 }
-
 nav ul li {
    display: inline-block;
    width: auto;
    text-align: center;
    background-color: #000000;
 }
-
 nav a {
    display: block;
    padding: 0 0.6em;
@@ -83,30 +79,41 @@ nav a {
    font-size: 1.2em;
    line-height: 3em;
    text-decoration: none;
+   color: #FFF;
 }
-
 nav a#prof:hover {
    background-color: #5cd661;
+   cursor:pointer;
 }
-
 nav a:hover {
    background-color: #696969;
 }
-
 nav ul ul {
    display: none;
 }
-
 nav ul li:hover>ul {
    display: block;
 }
-
 nav ul ul li {
    width: auto;
    float: none;
    display: list-item;
    position: relative;
 }
+nav ul li.active {
+   background-color: #4CAF50;
+   float:right;
+}
+nav ul li a span#counter {
+   width: 20px;
+   height: 20px;
+   font-size: 15px;
+   border-radius: 10px;
+   background-color: rgba(230,103,0,1);
+   color: #ffe86f;
+   border: solid 0px orange;
+}
+
 
 #notification {
    transition: 1s;
@@ -118,9 +125,7 @@ nav ul ul li {
    opacity: 0;
 }
 
-.active {
-   background-color: #4CAF50;
-}
+
 
 strong {
    cursor: pointer;
