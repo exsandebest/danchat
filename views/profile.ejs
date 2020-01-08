@@ -38,11 +38,6 @@
          border-bottom: 1px solid #ccc;
          background: WhiteSmoke;
       }
-
-      #notif2 {
-         opacity: 0;
-         transition: 1s;
-      }
    </style>
 </head>
 
@@ -80,7 +75,7 @@
                   <input id="oldPassword" type="password" class="inputSmall" placeholder="Старый пароль" /><br><br>
                   <input id="newPassword" type="password" class="inputSmall" placeholder="Новый пароль" /><br><br>
                   <input id="repeatNewPassword" type="password" class="inputSmall" placeholder="Повторите новый пароль" /><br><br>
-                  <span class="red" id="notif"> </span>
+                  <span class="red notification" id="notif"> </span>
                   <br>
                   <btn class="standart" onclick="changePasword()">Сменить</btn>
                </center>
@@ -97,7 +92,7 @@
                <center>
                   <input id="firstname" type="text" class="inputSmall" placeholder="Имя" value="<%=firstname%>" /><br><br>
                   <input id="lastname" type="text" class="inputSmall" placeholder="Фамилия" value="<%=lastname%>" /><br><br>
-                  <span class="red" id="notif2"> </span>
+                  <span class="red notification" id="notif2"> </span>
                   <br>
                   <btn class="standart" onclick="changeName()">Сохранить</btn>
                </center>

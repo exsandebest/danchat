@@ -161,97 +161,11 @@ footer div p {
 }
 
 
+/* Notifications */
 
-
-
-
-
-
-
-
-div#chat {
-   overflow-y: auto;
-   overflow-x: hidden;
-   background-color: rgba(254, 254, 254, 0.70);
-}
-
-strong.login {
-   font-size: 1em;
-}
-
-
-
-a.login {
-   text-decoration: none;
-   color: #000;
-}
-
-h1 {
-   font-size: 3em;
-   text-align: center;
-   color: #FFF;
-}
-
-h3 {
-   font-size: 1.5em;
-   text-align: center;
-   color: #FFF;
-}
-
-h3 a {
-   color: #FFF;
-}
-
-span.red {
-   font-family: Garamond;
-   font-size: 1.6em;
-   color: #DC143C;
-   text-shadow: 0 0 10px #DC143C, 0 0 20px #FA8072, 0 0 30px #DC143C, 0 0 40px #DC143C, 0 0 70px #DC143C, 0 0 80px #DC143C, 0 0 100px #DC143C, 0 0 150px #DC143C;
-}
-
-span.green {
-   cursor: default;
-   font-family: Garamond;
-   font-size: 1.4em;
-   color: #00FF7F;
-   text-shadow: 0 0 10px #00FF7F, 0 0 20px #00FF7F, 0 0 30px #00FF7F, 0 0 40px #00FF7F, 0 0 70px #00FF7F, 0 0 80px #00FF7F, 0 0 100px #00FF7F, 0 0 150px #00FF7F;
-}
-
-
-
-
-
-
-#notification {
+.notification {
    transition: 1s;
    opacity: 0;
-}
-
-#notif {
-   transition: 1s;
-   opacity: 0;
-}
-
-
-
-strong {
-   cursor: pointer;
-}
-
-span.orange {
-   font-family: Garamond;
-   font: normal 1em "arial";
-   color: #fff;
-   text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF8C00, 0 0 40px #FF8C00, 0 0 70px #FF8C00, 0 0 80px #FF8C00;
-}
-
-h1 {
-   padding: 10px 20px;
-   font: bold 3em arial;
-   text-align: center;
-   color: #FFFFFF;
-   cursor: default;
-   text-shadow: 0 0 10px #fff, 0 0 20px #00d2ff, 0 0 30px #00d2ff, 0 0 40px #00d2ff, 0 0 50px #00d2ff, 0 0 60px #00d2ff, 0 0 70px #00d2ff;
 }
 
 
@@ -278,4 +192,100 @@ span.purple {
    color: #FFFFFF;
    cursor: default;
    text-shadow: 0 0 10px #fff, 0 0 20px #6A5ACD, 0 0 30px #6A5ACD, 0 0 40px #6A5ACD, 0 0 50px #6A5ACD, 0 0 60px #6A5ACD, 0 0 70px #6A5ACD;
+}
+
+span.red {
+   font-family: Garamond;
+   font-size: 1.6em;
+   color: #DC143C;
+   text-shadow: 0 0 10px #DC143C, 0 0 20px #FA8072, 0 0 30px #DC143C, 0 0 40px #DC143C, 0 0 70px #DC143C, 0 0 80px #DC143C, 0 0 100px #DC143C, 0 0 150px #DC143C;
+}
+
+span.green {
+   cursor: default;
+   font-family: Garamond;
+   font-size: 1.4em;
+   color: #00FF7F;
+   text-shadow: 0 0 10px #00FF7F, 0 0 20px #00FF7F, 0 0 30px #00FF7F, 0 0 40px #00FF7F, 0 0 70px #00FF7F, 0 0 80px #00FF7F, 0 0 100px #00FF7F, 0 0 150px #00FF7F;
+}
+
+
+span.orange {
+   font-family: Garamond;
+   font: normal 1em "arial";
+   color: #fff;
+   text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF8C00, 0 0 40px #FF8C00, 0 0 70px #FF8C00, 0 0 80px #FF8C00;
+}
+
+
+div#chat {
+   overflow-y: auto;
+   overflow-x: hidden;
+   background-color: rgba(254, 254, 254, 0.70);
+   position:relative;
+   word-break: break-all;
+   width: 55%;
+   height: 35%;
+   font-size: 17px;
+   white-space: pre-wrap;
+   text-align:left;
+   border-radius: 30px;
+   padding: 1.5%;
+}
+
+
+textarea#message{
+   min-height:50px;
+   width:60%;
+   border-radius: 15px;
+   background-color:rgba(254, 254, 254, 0.8);
+   resize:none;
+   font: normal 15px 'arial';
+}
+
+div#btnGetMsg{
+   background-color: rgba(71, 226, 73, 0.89);
+   bottom: 0;
+   width: 45%;
+   height: 30px;
+   border-radius: 25px 25px 0px 0px;
+}
+
+
+span.messageTime {
+   float: right;
+   color: rgba(248, 249, 255, 1);
+}
+
+
+span#onlineCounterCover{
+   cursor: pointer;
+   font-size: 20px;
+   position: fixed;
+   bottom: 30px;
+   right: 20px;
+}
+
+
+b.login {
+   font-size: 1em;
+   cursor: pointer;
+}
+a.login {
+   text-decoration: none;
+}
+
+.msgText {
+   bottom: 0;
+   cursor: default;
+}
+
+
+h1.mainLabel {
+   padding: 10px 20px;
+   font: bold 3em arial;
+   text-align: center;
+   color: #FFFFFF;
+   cursor: default;
+   text-shadow: 0 0 10px #fff, 0 0 20px #00d2ff, 0 0 30px #00d2ff, 0 0 40px #00d2ff, 0 0 50px #00d2ff, 0 0 60px #00d2ff, 0 0 70px #00d2ff;
 }
