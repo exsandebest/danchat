@@ -7,33 +7,6 @@
    <title>
       <%=userLogin%>
    </title>
-   <style>
-      .friend {
-         width: 3em;
-         height: 3em;
-         border-radius: 1.5em;
-         margin-top: 0.4em;
-         margin-left: 0.4em;
-         margin-right: 0.4em;
-      }
-
-      #friends {
-         background-color: rgba(248, 249, 255, 0.67);
-         border-radius: 0.6em;
-         max-width: 15em;
-         display: inline-flex;
-         flex-wrap: wrap;
-         justify-content: space-around;
-         margin-bottom: 40px;
-      }
-
-      .friendLink {
-         text-decoration: none;
-         color: #000;
-         margin-left: 0.4em;
-         margin-right: 0.4em;
-      }
-   </style>
 </head>
 
 <body background="/bg.jpg">
@@ -41,9 +14,9 @@
    <%- include('partials/scripts.ejs') %>
    <center>
       <%if (imgStatus) {%>
-         <img src="/<%=userLogin%>.jpg" style="overflow: hidden; width: 250px; height: 250px; border-radius: 20px;"><br>
+         <img class="user-friend-img" src="/<%=userLogin%>.jpg"><br>
       <%} else {%>
-         <img src="/default.jpg" style="overflow: hidden; width: 200px; height: 200px; border-radius: 20px;"><br>
+         <img class="user-friend-img" src="/default.jpg"><br>
       <%}%>
       <br><br>
       <%if (userStatus === "default"){%>
@@ -56,19 +29,19 @@
          <btn class="standart" onclick="delFriend('<%=userLogin%>')">Удалить из друзей</btn>
       <%}%>
       <br><br>
-      <span style="font: bold 25px 'Trebuchet MS'; color: <%=color%>; background-color: rgba(245,255,233,0.55); border-radius: 7px;"> <%=userLogin%> </span><br><br>
+      <span class="user-login" style="color: <%=color%>;"> <%=userLogin%> </span><br><br>
       <span class="green"><%=firstname%> <%=lastname%></span><br><br>
       <span class="green">Возраст: </span><span class="red"><%=age%></span><br><br>
       <span class="green">Пол: </span><span class="red"><%=sex%></span><br><br>
       <span class="green">Друзья:</span><br><br>
-      <div id="friends">
+      <div id="user-friends">
          <%if (friends.length !== 0) {%>
             <%friends.forEach((elem)=>{%>
-            <a class="friendLink" href="/u/<%=elem.login%>">
+            <a class="user-friendLink" href="/u/<%=elem.login%>">
                <%if (elem.imgStatus) {%>
-                  <img class="friend" src="<%=elem.login%>.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+                  <img class="user-friend" src="<%=elem.login%>.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
                <% } else { %>
-                  <img class="friend" src="/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+                  <img class="user-friend" src="/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
                <% } %>
                <span style="font-size: 0.8em"><%=elem.login%></span>
             </a>
