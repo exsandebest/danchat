@@ -9,6 +9,7 @@ function save() {
          var elem = document.getElementById("notif");
          elem.setAttribute("style", "opacity:0");
          elem.innerHTML = "<span class='notificationGood'>Настройки успешно сохранены</span>";
+         elem.setAttribute("style", "opacity:1");
          setTimeout(() => {
             elem.setAttribute("style", "opacity:0");
          }, 100000);
