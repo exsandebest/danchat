@@ -368,36 +368,12 @@ a.friend-login {
    transform: translateY(-7px);
 }
 
-/* Notifications */
-
-.notification {
-   transition: 1s;
-   opacity: 0;
-}
-
-
-notificationBad {
-   padding: 10px 20px;
-   font: bold 18px arial;
-   text-align: center;
-   color: #FFFFFF;
-   cursor: default;
-   text-shadow: 0 0 10px #fff, 0 0 20px red, 0 0 30px red, 0 0 40px red, 0 0 50px red, 0 0 60px red, 0 0 70px red;
-}
-
-notificationGood {
-   padding: 10px 20px;
-   font: bold 18px arial;
-   text-align: center;
-   color: #FFFFFF;
-   cursor: default;
-   text-shadow: 0 0 10px #fff, 0 0 20px green, 0 0 30px green, 0 0 40px green, 0 0 50px green, 0 0 60px green, 0 0 70px green;
-}
+/* Span colors */
 
 span.purple {
-   font: bold 14px arial;
+   font-family: Garamond;
+   font-size: 14px;
    color: #FFFFFF;
-   cursor: default;
    text-shadow: 0 0 10px #fff, 0 0 20px #6A5ACD, 0 0 30px #6A5ACD, 0 0 40px #6A5ACD, 0 0 50px #6A5ACD, 0 0 60px #6A5ACD, 0 0 70px #6A5ACD;
 }
 
@@ -409,7 +385,6 @@ span.red {
 }
 
 span.green {
-   cursor: default;
    font-family: Garamond;
    font-size: 1.4em;
    color: #00FF7F;
@@ -419,10 +394,39 @@ span.green {
 
 span.orange {
    font-family: Garamond;
-   font: normal 1em "arial";
+   font-size: 1em;
    color: #fff;
    text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF8C00, 0 0 40px #FF8C00, 0 0 70px #FF8C00, 0 0 80px #FF8C00;
 }
+
+
+/* Notifications */
+
+.notification {
+   transition: 1s;
+   opacity: 0;
+}
+
+
+.notificationBad {
+   padding: 10px 20px;
+   font: bold 18px arial;
+   text-align: center;
+   color: #FFFFFF;
+   cursor: default;
+   text-shadow: 0 0 10px #fff, 0 0 20px red, 0 0 30px red, 0 0 40px red, 0 0 50px red, 0 0 60px red, 0 0 70px red;
+}
+
+.notificationGood {
+   padding: 10px 20px;
+   font: bold 18px arial;
+   text-align: center;
+   color: #FFFFFF;
+   cursor: default;
+   text-shadow: 0 0 10px #fff, 0 0 20px green, 0 0 30px green, 0 0 40px green, 0 0 50px green, 0 0 60px green, 0 0 70px green;
+}
+
+
 
 
 div#chat {

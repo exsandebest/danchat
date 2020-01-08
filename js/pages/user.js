@@ -36,7 +36,6 @@ function addFriend(userLogin) {
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
      if (xhr.responseText == "true") {
-         alert("Успешно!")
          location.reload();
      } else {
         alert(`Ошибка: ${xhr.responseText}`);
@@ -54,7 +53,6 @@ function delFriend(userLogin) {
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onload = () => {
          if (xhr.responseText == "true") {
-            alert("Успешно.");
             location.reload();
          } else {
             alert(`Ошибка: ${xhr.responseText}`);

@@ -42,10 +42,11 @@ function val(id) {
 }
 
 function notif(type, msg1, msg2, time) {
-   document.getElementById("notification").setAttribute("style", "opacity:0");
-   document.getElementById("notification").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><br><span class='orange'>" + msg2 + "</span>";
-   document.getElementById("notification").setAttribute("style", "opacity:1");
+   var elem = document.getElementById("notification");
+   elem.setAttribute("style", "opacity:0");
+   elem.innerHTML = `<span class = "notification${type}">${msg1}</span><br><br><span class='orange'>${msg2}</span>`;
+   elem.setAttribute("style", "opacity:1");
    setTimeout(() => {
-      document.getElementById("notification").setAttribute("style", "opacity:0");
+      elem.setAttribute("style", "opacity:0");
    }, time);
 }

@@ -55,21 +55,18 @@ function changeName() {
 }
 
 function notif(num, type, msg1, msg2, time) {
-   if (num == 1) {
-      document.getElementById("notif").setAttribute("style", "opacity:0");
-      document.getElementById("notif").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><span class='orange'>" + msg2 + "</span>";
-      document.getElementById("notif").setAttribute("style", "opacity:1");
-      setTimeout(() => {
-         document.getElementById("notif").setAttribute("style", "opacity:0");
-      }, time);
+   var elem;
+   if (num === 1){
+      elem = document.getElementById("notif");
    } else {
-      document.getElementById("notif2").setAttribute("style", "opacity:0");
-      document.getElementById("notif2").innerHTML = "<notification" + type + ">" + msg1 + "</notification" + type + "><br><span class='orange'>" + msg2 + "</span>";
-      document.getElementById("notif2").setAttribute("style", "opacity:1");
-      setTimeout(() => {
-         document.getElementById("notif2").setAttribute("style", "opacity:0");
-      }, time);
+      elem = document.getElementById("notif2");
    }
+   elem.setAttribute("style", "opacity:0");
+   elem.innerHTML = `<span class='notification${type}'>${msg1}</span><br><span class = 'orange'>${msg2}</span>`;
+   elem.setAttribute("style", "opacity:1");
+   setTimeout(() => {
+      elem.setAttribute("style", "opacity:0");
+   }, time);
 }
 
 

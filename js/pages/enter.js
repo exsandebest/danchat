@@ -14,6 +14,9 @@ function enter() {
          notif("Проблемы с сервером<br>Приносим извинения");
       }
    }
+   xhr.onerror = xhr.onabort = () => {
+      notif("Проблемы с сервером<br>Приносим извинения")
+   }
    xhr.send(JSON.stringify({
       login : document.getElementById("login").value.replace(/\s/,""),
       password : document.getElementById("password").value.replace(/\s/,"")
@@ -21,11 +24,12 @@ function enter() {
 }
 
 function notif(msg) {
-   document.getElementById("notification").setAttribute("style", "opacity:0");
-   document.getElementById("notification").innerHTML = `<notificationBad>${msg}</notificationBad>`;
-   document.getElementById("notification").setAttribute("style", "opacity:1");
+   var elem = document.getElementById("notification");
+   elem.setAttribute("style", "opacity:0");
+   elem.innerHTML = `<span class='notificationBad'>${msg}</span>`;
+   elem.setAttribute("style", "opacity:1");
    setTimeout(() => {
-      document.getElementById("notification").setAttribute("style", "opacity:0");
+      elem.setAttribute("style", "opacity:0");
    }, 5000);
 
 }

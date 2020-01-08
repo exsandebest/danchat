@@ -6,11 +6,11 @@ function save() {
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.status == 200) {
-         document.getElementById("notif").setAttribute("style", "opacity:0");
-         document.getElementById("notif").innerHTML = "<notificationGood>Настройки успешно сохранены</notificationGood>";
-         document.getElementById("notif").setAttribute("style", "opacity:1");
+         var elem = document.getElementById("notif");
+         elem.setAttribute("style", "opacity:0");
+         elem.innerHTML = "<span class='notificationGood'>Настройки успешно сохранены</span>";
          setTimeout(() => {
-            document.getElementById("notif").setAttribute("style", "opacity:0");
+            elem.setAttribute("style", "opacity:0");
          }, 100000);
       }
    }
