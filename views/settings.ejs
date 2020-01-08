@@ -11,9 +11,9 @@
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
-      <span class="orange" style="cursor:default">Цвет логина в чате</span><br><br>
+      <span class="purple">Цвет логина в чате</span><br><br>
       <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
-      <label><span class="orange">Автоматически прокручивать чат</span>
+      <label><span class="purple">Автоматически прокручивать чат</span>
          <br><br>
          <%if (scroll) {%>
          <input type="checkbox" id="scroll" checked />
@@ -28,5 +28,5 @@
    <script src="pages/settings.js"></script>
    <%- include('partials/footer.ejs') %>
 <body>
-   
+
 </html>
