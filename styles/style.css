@@ -290,6 +290,84 @@ img.user-img{
 }
 
 
+/* Friends-page */
+
+span.reqsCounter{
+   width: 20px;
+   height: 20px;
+   font-size: 15px;
+   border-radius: 15px;
+   background-color: rgba(0, 230, 168, 1);
+   color: white;
+}
+
+img.friend-img {
+   float: left;
+   margin: 10px;
+   border-radius: 120px;
+   width: 130px;
+   height: 130px;
+}
+
+div.friend-block {
+   height: 150px;
+   width: 400px;
+   background: rgba(254, 254, 254, 0.6);
+   border-radius: 20px;
+}
+
+div.friend-datablock {
+   height: 100px;
+   width: 250px;
+   float: right;
+}
+
+p.friend-fullname {
+   font: normal 17px 'Arial';
+   cursor: default;
+}
+
+a.friend-login {
+   font: bold 20px 'Trebuchet MS';
+   cursor: pointer;
+   width: auto;
+   text-decoration: none;
+}
+#friend-list{
+   display:inline-block;
+}
+
+.friend-nav-btn {
+   cursor: pointer;
+   text-decoration: none;
+   outline: none;
+   display: inline-block;
+   width: auto;
+   padding-left: 5px;
+   padding-right: 5px;
+   height: 45px;
+   line-height: 45px;
+   border-radius: 45px;
+   margin: 10px 20px;
+   font-family: 'Montserrat', sans-serif;
+   font-size: 11px;
+   text-transform: uppercase;
+   text-align: center;
+   letter-spacing: 3px;
+   font-weight: 600;
+   color: #524f4e;
+   background: white;
+   box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+   transition: .3s;
+}
+
+.friend-nav-btn:hover, .friend-nav-btn-active {
+   background: #2EE59D;
+   box-shadow: 0 15px 20px rgba(46, 229, 157, .4);
+   color: white;
+   transform: translateY(-7px);
+}
+
 /* Notifications */
 
 .notification {

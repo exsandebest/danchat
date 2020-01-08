@@ -4,26 +4,27 @@
    <link rel="stylesheet" type="text/css" href="style.css">
    <title>Люди</title>
 </head>
+
 <body background="bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
       <div id="people-list">
          <% people.forEach((elem)=>{%>
-            <div class="people-block">
-               <% if (elem.imgStatus) {%>
-                  <img class = "people" src="<%=elem.login%>.jpg">
-               <%} else {%>
-                  <img class = "people" src="default.jpg">
-               <%}%>
+         <div class="people-block">
+            <% if (elem.imgStatus) {%>
+            <img class="people" src="<%=elem.login%>.jpg">
+            <%} else {%>
+            <img class="people" src="default.jpg">
+            <%}%>
                <div class="people-datablock">
                   <br>
                   <a class="people-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>"><%=elem.login%></a><br>
-                  <p></p>
-                  <span class="green people-fullname" style="font-size: 1.2em;"><%=elem.firstname%> <%=elem.lastname%></span>
-               </div>
-            </div>
-         <%})%>
+            <p></p>
+            <span class="green people-fullname" style="font-size: 1.2em;"><%=elem.firstname%> <%=elem.lastname%></span>
+         </div>
+      </div>
+      <%})%>
       </div>
    </center>
    <%- include('partials/footer.ejs') %>

@@ -11,12 +11,11 @@
 <body background="bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <center>
-      <div onclick="getMsg();" id = "btnGetMsg">
+      <div onclick="getMsg();" id="btnGetMsg">
       </div>
       <div id="chat"></div><br>
       <div style="width:779px; display:inline-block">
-         <textarea placeholder="Напишите сообщение..."
-            onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
+         <textarea placeholder="Напишите сообщение..." onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
          <br><br>
          <br>
          <btn class="standart" onclick="sendMessage()">Отправить</btn>
