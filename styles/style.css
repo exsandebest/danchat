@@ -114,10 +114,16 @@ btn:not(:hover) {
 /* Inputs */
 
 .inputBig {
-   font: normal 17px 'Arial';
+   font-style: normal;
+   font-family: "Arial";
+   font-size: 1em;
    color: #4B0082;
    opacity: 0.85;
    background-image: linear-gradient(#40E0D0, #1E90FF);
+   padding: 10px;
+   border: 5px solid rgba(255, 255, 255, .5);
+   outline: none;
+   width: 20%;
 }
 
 .inputBig:focus {
