@@ -166,6 +166,52 @@ footer div p {
    font-weight:bold;
 }
 
+/* People-page */
+
+img.people {
+   float: left;
+   margin: 10px;
+   border-radius: 70px;
+   width: 85px;
+   height: 85px;
+}
+
+div.people-block {
+   height: 100px;
+   width: 275px;
+   background: rgba(254, 254, 254, 0.6);
+   margin: 10px;
+   margin-bottom: 20px;
+   border: outset 4px #20ccff;
+   border-radius: 20px;
+}
+
+div.people-datablock {
+   height: 65px;
+   width: 150px;
+   float: right;
+}
+
+
+span.people-fullname {
+   cursor: default;
+}
+
+a.people-login {
+   font: bold 20px 'Trebuchet MS';
+   cursor: pointer;
+   width: auto;
+   text-decoration: none;
+}
+
+div#people-list {
+   display: inline-flex;
+   flex-wrap: wrap;
+   margin-left: 5%;
+   justify-content: space-around;
+   margin-right: 5%
+}
+
 
 /* Notifications */
 
