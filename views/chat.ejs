@@ -8,7 +8,7 @@
    </title>
 </head>
 
-<body background="bg.jpg" onload="getMsg();">
+<body background="bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <center>
       <div onclick="getMsg();" id = "btnGetMsg">
@@ -23,11 +23,6 @@
       </div>
       <br><br><br>
    </center>
-   <% if (scroll) {%>
-      <input type="checkbox" id="scroll" style="display:none;" checked />
-   <% } else { %>
-      <input type="checkbox" id="scroll" style="display:none;" />
-   <%}%>
    <script src="/socket.io/socket.io.js"></script>
    <script src="pages/chat.js"></script>
    <span class="green" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"><%=onlineCounter%></span></span>

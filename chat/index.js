@@ -17,6 +17,7 @@ exports.addnewmessage = function(msg) {
       if (err) console.error(err);
          delete msg["user_id"];
          clients.forEach((res) => {
+            msg.scroll = res.scroll;
             res.send(JSON.stringify(msg));
          });
          clients = [];

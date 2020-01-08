@@ -133,7 +133,10 @@ app.get("/", (req, res) => {
 app.get("/subscribe", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         chat.subscribe(req, res);
+         sql.query(`select scroll from users where id = ${u.id}`, (err, data)=>{
+            res.scroll = data[0].scroll;
+            chat.subscribe(req, res);
+         })
       }
    }, (err) => {
       res.end("DB ERROR");

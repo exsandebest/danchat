@@ -1,7 +1,10 @@
 var login = document.getElementById("prof").innerText;
+var chat = document.getElementById("chat");
 var minId = -1;
 
 sessionStorage.setItem("counter", 0);
+getMsg(1);
+
 
 
 
@@ -37,7 +40,7 @@ function sendMessage() {
 }
 
 function complex(r, str) {
-   addToChat(str);
+   addToChat(str, r.scroll);
    if (r.type === "message") {
       document.getElementById(`msg${r.id}`).innerText = r.text;
    }
@@ -47,11 +50,9 @@ function complex(r, str) {
    }
 }
 
-//Подписка на сообщение
 function subscribe() {
    var xhr = new XMLHttpRequest();
    xhr.open("GET", "/subscribe", true);
-   //Когда сообщение получено
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
       if (r.type === "message") {
@@ -79,13 +80,17 @@ function subscribe() {
 
 
 
-function getMsg() {
+function getMsg(scroll) {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "/get/message", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onload = () => {
-
          parsMsg(JSON.parse(xhr.responseText));
+         if (scroll){
+            chat.scrollTop = 9999999999999999999;
+         } else {
+            chat.scrollTop = 0;
+         }
       }
       xhr.onerror = xhr.onabort = ()=>{
         alert("Ошибка при получении сообщений");
@@ -98,7 +103,6 @@ function getMsg() {
 
 function parsMsg(msgObj) {
    if (msgObj.length === 0) return;
-   var chat = document.getElementById("chat");
    minId = msgObj[msgObj.length-1].id;
    msgObj.forEach((m) => {
       if (m.type === "message") {
@@ -113,9 +117,9 @@ function parsMsg(msgObj) {
 }
 
 
-function addToChat(str) {
-   document.getElementById("chat").innerHTML += str;
-   if (document.getElementById("scroll").checked) {
-      document.getElementById("chat").scrollTop = 99999999999999999999;
+function addToChat(str, scroll) {
+   chat.innerHTML += str;
+   if (scroll) {
+      chat.scrollTop = 99999999999999999999;
    }
 }
