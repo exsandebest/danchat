@@ -5,11 +5,13 @@ function enter() {
    xhr.open("POST", "/enter", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      if (xhr.responseText === "token") {
-         location = "/";
-
-      } else if (xhr.responseText.split(":")[0] === "false") {
-         notif(xhr.responseText.split(":")[1]);
+      if (xhr.status == 200){
+         var obj = JSON.parse(xhr.responseText);
+         if (obj.status){
+            location = "/";
+         } else {
+            notif(obj.text);
+         }
       } else {
          notif("Проблемы с сервером<br>Приносим извинения");
       }

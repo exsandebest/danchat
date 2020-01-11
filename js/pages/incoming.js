@@ -3,7 +3,7 @@ function acceptIncomingRequest(userLogin) {
    xhr.open("POST", "/user/accept/incomingRequest", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      if (xhr.responseText === "true") {
+      if (JSON.parse(xhr.responseText).status) {
          location.reload();
       } else {
          alert(`Ошибка: ${xhr.responseText}`);

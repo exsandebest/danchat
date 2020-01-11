@@ -4,7 +4,7 @@ function delFriend(friendLogin) {
       xhr.open("POST", "/user/delete/friend", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onload = () => {
-         if (xhr.responseText === "true") {
+         if (JSON.parse(xhr.responseText).status) {
             location.reload();
          } else {
             alert(`Ошибка: ${xhr.responseText}`);

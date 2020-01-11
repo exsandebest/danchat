@@ -2,6 +2,7 @@ console.time("Module => user-module");
 const fs = require('fs');
 const md5 = require("md5");
 const sql = require("../database");
+const ResponseObject = require("../ResponseObject");
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
@@ -112,7 +113,7 @@ exports.registrationValidate = (req, res) => {
 
 
 function badAns(res, msg) {
-   res.send(`false:${msg}`);
+   res.json(new ResponseObject(false, msg));
 }
 
 

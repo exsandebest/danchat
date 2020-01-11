@@ -30,6 +30,15 @@ function sendMessage() {
       document.getElementById("message").value = "";
       xhr.open("POST", "/addnewmessage", true);
       xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = () =>{
+         if (xhr.status === 200){
+            if (!JSON.parse(xhr.responseText).status){
+               alert("Ошибка при отправке сообщения");
+            }
+         } else {
+            alert("Ошибка при отправке сообщения");
+         }
+      }
       xhr.onerror = xhr.onabort = ()=>{
         alert("Ошибка при отправке сообщения");
       }

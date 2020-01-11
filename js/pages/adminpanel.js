@@ -4,7 +4,7 @@ function sendMessage() {
    xhr.open("POST", "/admin/message", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      alert(xhr.responseText);
+      alert(JSON.parse(xhr.responseText).status);
    }
    xhr.send(JSON.stringify({
       message : message
@@ -18,7 +18,7 @@ function makeAdmin() {
    xhr.open("POST", "/admin/make/admin", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      alert(xhr.responseText);
+      alert(JSON.parse(xhr.responseText).status);
    }
    xhr.send(JSON.stringify({
       login : login
@@ -31,7 +31,7 @@ function makeUser() {
    xhr.open("POST", "/admin/make/user", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      alert(xhr.responseText);
+      alert(JSON.parse(xhr.responseText).status);
    }
    xhr.send(JSON.stringify({
       login : login

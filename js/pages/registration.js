@@ -10,14 +10,16 @@ function registration() {
    xhr.open("POST", "/registration", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      console.log(xhr.responseText);
-      if (xhr.responseText.split(":")[0] == "false") {
-         notif("Bad", xhr.responseText.split(":")[1].split("\n\n")[0], xhr.responseText.split(":")[1].split("\n\n")[1], 10000);
-      } else if (xhr.responseText.split(":")[0] === "true") {
-         notif("Good", "Вы успешно зарегестрированы!", "", 9999999);
-         setTimeout(() => {
-            location = "/login";
-         }, 3000);
+      if (xhr.status == 200) {
+         var obj = JSON.parse(xhr.responseText);
+         if (obj.status){
+            notif("Good", "Вы успешно зарегестрированы!", "", 9999999);
+            setTimeout(() => {
+               location = "/login";
+            }, 3000);
+         } else {
+            notif("Bad", obj.text.split("\n\n")[0], obj.text.split("\n\n")[1], 10000);
+         }
       } else {
          notif("Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 5000);
       }

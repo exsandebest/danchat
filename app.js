@@ -17,6 +17,7 @@ const parserURLEncoded = pars.urlencoded({
 });
 const parserJSON = pars.json();
 const std = require("./standart");
+const ResponseObject = require("./ResponseObject");
 
 
 console.time("Config");
@@ -57,13 +58,13 @@ app.post("/registration", parserJSON, (req, res) => {
             sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
               ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
-               res.send("true:true");
+               res.json(new ResponseObject(true));
             })
          } else {
             res.end('END');
          }
       } else {
-         res.send(`false:Данный логин уже занят\n\n`);
+         res.json(new ResponseObject(false, "Данные логин уже занят\n\n"));
       }
    })
 });
@@ -73,13 +74,13 @@ app.post("/enter", parserJSON, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
    var Rpassword = decodeURIComponent(req.body.password);
    if (!Rlogin || !Rpassword) {
-      res.end("false:Заполните все поля");
+      res.json(new ResponseObject(false, "Заполните все поля"));
       return;
    }
    sql.query(`select id, login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
       if (err) console.error(err);
       if (data === undefined || data.length === 0) {
-         res.end("false:Неверный логин или пароль");
+         res.json(new ResponseObject(false, "Неверный логин или пароль"));
          return;
       }
       var user = data[0];
@@ -101,7 +102,7 @@ app.post("/enter", parserJSON, (req, res) => {
             path: "/",
             httpOnly: true
          });
-         res.end("token");
+         res.json(new ResponseObject(true));
       })
    })
 })
@@ -160,7 +161,7 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
                msg.type = "message";
                msg.text = decodeURIComponent(req.body.message);
                chat.addnewmessage(msg);
-               res.end();
+               res.json(new ResponseObject(true));
             })
          })
       }
@@ -179,14 +180,14 @@ app.post("/get/message", parserJSON, (req, res) => {
          if (msgId === -1) {
             sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
-               res.send(JSON.stringify(data));
+               res.json(data);
             })
          } else {
             var msgStart = msgId - portion;
             var msgEnd = msgId - 1;
             sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
-               res.send(JSON.stringify(data));
+               res.json(data);
             })
          }
       }
@@ -359,7 +360,7 @@ app.get("/onlineCounter", (req, res) => {
       if (u) {
          sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
             if (err) console.error(err);
-            res.send(JSON.stringify(data));
+            res.json(data);
          })
       }
    })
@@ -502,7 +503,7 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
       if (u) {
          sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
             if (err) console.error(err);
-            res.send("true");
+            res.json(new ResponseObject(true));
          })
       }
    }, (err) => {
@@ -521,7 +522,7 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
          }
          sql.query(`update users set admin = 0 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
             if (err) console.error(err);
-            res.send("true");
+            res.json(new ResponseObject(true));
          })
       }
    }, (err) => {
@@ -575,7 +576,7 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
             var userId = dt1[0].id;
             sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
                if (err) console.error(err);
-               res.send("true");
+               res.json(new ResponseObject(true));
             })
          })
       }
@@ -604,7 +605,7 @@ app.post("/user/cancel/outcomingrequest", parserJSON, (req, res) => {
                }
                sql.query(`delete from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt3) => {
                   if (err) console.error(err);
-                  res.send("true");
+                  res.json(new ResponseObject(true));
                })
             })
          })
@@ -636,7 +637,7 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                   if (err) console.error(err);
                   sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
                      if (err) console.error(err);
-                     res.send("true");
+                     res.json(new ResponseObject(true));
                   })
                })
             })
@@ -663,7 +664,7 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
                if (err) console.error(err);
                sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err) => {
                   if (err) console.error(err);
-                  res.send("true");
+                  res.json(new ResponseObject(true));
                })
             })
          })
@@ -686,7 +687,7 @@ app.post("/user/change/password", parserJSON, (req, res) => {
             if (usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
                sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${u.id}`, (err) => {
                   if (err) console.error(err);
-                  res.send("true:Пароль успешно изменён!");
+                  res.json(new ResponseObject(true, "Пароль успешно изменён!\n\n"));
                })
             }
          })
@@ -707,7 +708,7 @@ app.post("/user/change/name", parserJSON, (req, res) => {
          if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
             sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${u.id}`, (err) => {
                if (err) console.error(err);
-               res.send("true:Данные успешно сохранены\n\n");
+               res.json(new ResponseObject(true, "Данные успешно сохранены!\n\n"));
             })
          }
       }
@@ -773,13 +774,13 @@ app.get("/logout", (req, res) => {
 
 
 app.post("/urlencoded", parserURLEncoded, (req, res) => {
-   res.send(JSON.stringify(req.body, "", 5));
+   res.json(req.body);
 })
 
 
 
 app.post("/json", parserJSON, (req, res) => {
-   res.send(JSON.stringify(req.body, "", 5));
+   res.json(req.body);
 })
 
 
@@ -798,7 +799,7 @@ app.post("/console/sql/query", parserJSON, (req, res) => {
    sql.query(req.body.q, (err, result, fields) => {
       if (err) console.error(err);
       console.log(result);
-      res.send(JSON.stringify(result, "", 5));
+      res.json(result);
    })
 })
 

@@ -3,7 +3,7 @@ function acceptIncomingRequest(userLogin) {
    xhr.open("POST", "/user/accept/incomingrequest", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      if (xhr.responseText == "true") {
+      if (JSON.parse(xhr.responseText).status) {
          location.reload();
       } else {
          alert(`Ошибка: ${xhr.responseText}`);
@@ -19,7 +19,7 @@ function cancelOutcomingRequest(userLogin) {
    xhr.open("POST", "/user/cancel/outcomingrequest", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-      if (xhr.responseText == "true") {
+      if (JSON.parse(xhr.responseText).status) {
          location.reload();
       } else {
          alert(`Ошибка: ${xhr.responseText}`);
@@ -35,7 +35,7 @@ function addFriend(userLogin) {
    xhr.open("POST", "/user/add/friend", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
-     if (xhr.responseText == "true") {
+     if (JSON.parse(xhr.responseText).status) {
          location.reload();
      } else {
         alert(`Ошибка: ${xhr.responseText}`);
@@ -52,7 +52,7 @@ function delFriend(userLogin) {
       xhr.open("POST", "/user/delete/friend", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onload = () => {
-         if (xhr.responseText == "true") {
+         if (JSON.parse(xhr.responseText).status) {
             location.reload();
          } else {
             alert(`Ошибка: ${xhr.responseText}`);

@@ -20,4 +20,5 @@ exports.genToken = () => {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
    return text;
 }
+
 console.timeEnd("Module => standart");
