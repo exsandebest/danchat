@@ -117,10 +117,10 @@ app.get("/", (req, res) => {
             sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
                if (err) console.error(err);
                res.render("chat.ejs", {
-               scroll: result[0].scroll,
-               login: u.login,
-               onlineCounter : data.length
-            })
+                  scroll: result[0].scroll,
+                  login: u.login,
+                  onlineCounter: data.length
+               })
             })
          })
       }
@@ -134,7 +134,7 @@ app.get("/", (req, res) => {
 app.get("/subscribe", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select scroll from users where id = ${u.id}`, (err, data)=>{
+         sql.query(`select scroll from users where id = ${u.id}`, (err, data) => {
             res.scroll = data[0].scroll;
             chat.subscribe(req, res);
          })
@@ -229,22 +229,11 @@ app.get("/friends", (req, res) => {
             sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
                if (err) console.error(err);
                obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
-               sql.query(`select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id}`, (err, dt) => {
+               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+                     (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
                   if (err) console.error(err);
-                  if (dt === undefined || dt.length === 0) {
-                     obj.friends = [];
-                     res.render("friends.ejs", obj);
-                     return;
-                  }
-                  var arr = [];
-                  dt.forEach((elem) => {
-                     arr.push(elem.ids);
-                  })
-                  sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
-                     if (err) console.error(err);
-                     obj.friends = dt2;
-                     res.render("friends.ejs", obj);
-                  })
+                  obj.friends = (dt === undefined ? [] : dt);
+                  res.render("friends.ejs", obj);
                })
             })
          })
@@ -265,22 +254,10 @@ app.get("/incoming", (req, res) => {
          sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
             obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
-            sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, dt) => {
+            sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
-               if (dt === undefined || dt.length === 0) {
-                  obj.inreqs = [];
-                  res.render("incoming.ejs", obj);
-                  return;
-               }
-               var arr = [];
-               dt.forEach((elem) => {
-                  arr.push(elem.from_id);
-               })
-               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
-                  if (err) console.error(err);
-                  obj.inreqs = dt2;
-                  res.render("incoming.ejs", obj);
-               })
+               obj.inreqs = (data === undefined ? [] : data);
+               res.render("incoming.ejs", obj);
             })
          })
       }
@@ -300,22 +277,10 @@ app.get("/outcoming", (req, res) => {
          sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
             obj.inreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
-            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, dt) => {
+            sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
-               if (dt === undefined || dt.length === 0) {
-                  obj.outreqs = [];
-                  res.render("outcoming.ejs", obj);
-                  return;
-               }
-               var arr = [];
-               dt.forEach((elem) => {
-                  arr.push(elem.to_id);
-               })
-               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
-                  if (err) console.error(err);
-                  obj.outreqs = dt2;
-                  res.render("outcoming.ejs", obj);
-               })
+               obj.outreqs = (data === undefined ? [] : data);
+               res.render("outcoming.ejs", obj);
             })
          })
       }
@@ -413,79 +378,38 @@ app.get("/u/:userLogin", (req, res) => {
                   login: u.login,
                   sex: (data[0].sex ? "Мужской" : "Женский")
                }
-               sql.query(`select id_1 as ids from friends where id_2 = ${data[0].id} union select id_2 as ids from friends where id_1 = ${data[0].id}`, (err, dt) => {
+               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select id_1 as ids from friends where id_2 = ${data[0].id} union select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
                   if (err) console.error(err);
-                  if (dt === undefined || dt.length === 0) {
-                     obj.friends = [];
-                     if (u.login !== data[0].login) {
-                        sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
-                           if (err) console.error(err);
-                           if (r1 === undefined || r1.length === 0) {
-                              sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
-                                 if (err) console.error(err);
-                                 if (r2 === undefined || r2.length === 0) {
-                                    sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
-                                       if (err) console.error(err);
-                                       if (r3 !== undefined && r3.length !== 0) {
-                                          obj.userStatus = "subscriber";
-                                       } else {
-                                          obj.userStatus = "default";
-                                       }
-                                       res.render("user.ejs", obj);
-                                    })
-                                 } else {
-                                    obj.userStatus = "request sent";
-                                    res.render("user.ejs", obj);
-                                 }
-                              })
-                           } else {
-                              obj.userStatus = "friend";
-                              res.render("user.ejs", obj);
-                           }
-                        })
-                     } else {
-                        obj.userStatus = "self";
-                        res.render("user.ejs", obj);
-                     }
-                  } else {
-                     var arr = [];
-                     dt.forEach((elem) => {
-                        arr.push(elem.ids);
-                     })
-                     sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (${arr.join()})`, (err, dt2) => {
+                  obj.friends = (dt2 === undefined ? [] : dt2);
+                  if (u.login !== data[0].login) {
+                     sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
                         if (err) console.error(err);
-                        obj.friends = dt2;
-                        if (u.login !== data[0].login) {
-                           sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
+                        if (r1 === undefined || r1.length === 0) {
+                           sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
                               if (err) console.error(err);
-                              if (r1 === undefined || r1.length === 0) {
-                                 sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+                              if (r2 === undefined || r2.length === 0) {
+                                 sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
                                     if (err) console.error(err);
-                                    if (r2 === undefined || r2.length === 0) {
-                                       sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
-                                          if (err) console.error(err);
-                                          if (r3 !== undefined && r3.length !== 0) {
-                                             obj.userStatus = "subscriber";
-                                          } else {
-                                             obj.userStatus = "default";
-                                          }
-                                          res.render("user.ejs", obj);
-                                       })
+                                    if (r3 !== undefined && r3.length !== 0) {
+                                       obj.userStatus = "subscriber";
                                     } else {
-                                       obj.userStatus = "request sent";
-                                       res.render("user.ejs", obj);
+                                       obj.userStatus = "default";
                                     }
+                                    res.render("user.ejs", obj);
                                  })
                               } else {
-                                 obj.userStatus = "friend";
+                                 obj.userStatus = "request sent";
                                  res.render("user.ejs", obj);
                               }
                            })
                         } else {
-                           obj.userStatus = "self";
+                           obj.userStatus = "friend";
                            res.render("user.ejs", obj);
                         }
                      })
+                  } else {
+                     obj.userStatus = "self";
+                     res.render("user.ejs", obj);
                   }
                })
             }
