@@ -10,7 +10,7 @@ or
 **You have to fill these directories with necessary files to correct work**
 
 ### Structure of configurations
-```js
+```
 config/main.json
 config/database.json
 ```
@@ -34,14 +34,14 @@ config/database.json
 ```
 
 ### Structure of sounds
-```js
+```
 sounds/enter.mp3 //sound of login
 sounds/exit.mp3 //sound of logout
 sounds/msg.mp3 //sound of message
 ```
 
 ### Structure of images
-```js
+```
 images/bg.jpg //main background
 images/default.jpg //default user photo
 images/favicon.ico //favicon
