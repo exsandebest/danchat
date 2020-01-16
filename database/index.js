@@ -1,14 +1,12 @@
 console.time("Module => database");
 const mysql = require("mysql2");
-const fs = require('fs');
 const md5 = require("md5");
-const dbconfig = JSON.parse(fs.readFileSync("config/database.json", "utf-8"));
 
 var sql = mysql.createPool({
-   host: dbconfig.host,
-   user: dbconfig.user,
-   database: dbconfig.name,
-   password: dbconfig.password
+   host: process.env.DB_HOST,
+   user: process.env.DB_USER,
+   database: process.env.DB_NAME,
+   password: process.env.DB_PASSWORD
 })
 
 sql.query(`create table if not exists users

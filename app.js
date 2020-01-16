@@ -1,5 +1,6 @@
 console.time("Loading");
 console.log("Loading...");
+require('dotenv').config({path : "config/.env"});
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const chat = require('./chat');
@@ -18,11 +19,6 @@ const parserURLEncoded = pars.urlencoded({
 const parserJSON = pars.json();
 const std = require("./standart");
 const ResponseObject = require("./ResponseObject");
-
-
-console.time("Config");
-var config = JSON.parse(fs.readFileSync("config/main.json", "utf-8"));
-console.timeEnd("Config");
 
 
 app.use(express.static(__dirname + "/images"));
@@ -715,7 +711,7 @@ app.post("/console/sql/query", parserJSON, (req, res) => {
 
 
 
-http.listen(config.port, config.ip, (err) => {
+http.listen(process.env.PORT, process.env.IP, (err) => {
    console.timeEnd("Loading");
-   console.log(`Started on : ${config.ip}:${config.port}`);
+   console.log(`Started on : ${process.env.IP}:${process.env.PORT}`);
 });
