@@ -291,15 +291,8 @@ app.get("/outcoming", (req, res) => {
 app.get("/profile", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select admin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
-            res.render("profile.ejs", {
-               login: u.login,
-               isAdmin: data[0].admin,
-               imgStatus: data[0].imgStatus,
-               color: data[0].color,
-               firstname: data[0].firstname,
-               lastname: data[0].lastname
-            })
+         sql.query(`select login, admin as isAdmin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
+            res.render("profile.ejs", data[0]);
          })
       }
    }, (err) => {
