@@ -17,7 +17,7 @@
     "demon": "nodemon app.js",
     "build": "node app.js"
   },
-  "description": "Chat, friends, communication with Node.js",
+  "description": "Chat, friends and communication with danchat and Node.js",
   "devDependencies": {},
   "repository": {
     "type": "git",
@@ -29,7 +29,14 @@
     "communication",
     "node.js",
     "js",
-    "long-polling"
+    "long-polling",
+    "SQL",
+    "database",
+    "users",
+    "messages",
+    "socket",
+    "ejs",
+    "express"
   ],
   "author": "Daniil Bogdanov",
   "license": "MIT",
