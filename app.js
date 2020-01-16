@@ -225,7 +225,6 @@ app.get("/friends", (req, res) => {
          };
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            console.log(data);
             obj.inreqsCounter = ` ${data[0].reqs} `;
             obj.outreqsCounter = ` ${data[1].reqs} `;
             sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
@@ -336,13 +335,9 @@ app.get("/people", parserJSON, (req, res) => {
       if (u) {
          sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
             if (err) console.error(err);
-            var people = [];
-            data.forEach((elem) => {
-               people.push(elem);
-            })
             res.render("people.ejs", {
                login: u.login,
-               people: people
+               people: data
             })
          })
       }
