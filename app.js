@@ -223,18 +223,16 @@ app.get("/friends", (req, res) => {
          var obj = {
             login: u.login
          };
-         sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, data) => {
+         sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            obj.inreqsCounter = ((data === undefined || data.length === 0) ? "" : ` ${data.length} `);
-            sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
-               if (err) console.error(err);
-               obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
-               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+            console.log(data);
+            obj.inreqsCounter = ` ${data[0].reqs} `;
+            obj.outreqsCounter = ` ${data[1].reqs} `;
+            sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
                      (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
-                  if (err) console.error(err);
-                  obj.friends = (dt === undefined ? [] : dt);
-                  res.render("friends.ejs", obj);
-               })
+               if (err) console.error(err);
+               obj.friends = (dt === undefined ? [] : dt);
+               res.render("friends.ejs", obj);
             })
          })
 
@@ -251,9 +249,9 @@ app.get("/incoming", (req, res) => {
          var obj = {
             login: u.login
          };
-         sql.query(`select to_id from friends_requests where from_id = ${u.id}`, (err, result) => {
+         sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.outreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
+            obj.outreqsCounter = ` ${result[0].reqs} `;
             sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
                obj.inreqs = (data === undefined ? [] : data);
@@ -274,9 +272,9 @@ app.get("/outcoming", (req, res) => {
          var obj = {
             login: u.login
          };
-         sql.query(`select from_id from friends_requests where to_id = ${u.id}`, (err, result) => {
+         sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.inreqsCounter = ((result === undefined || result.length === 0) ? "" : ` ${result.length} `);
+            obj.inreqsCounter = ` ${result[0].reqs} `;
             sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
                obj.outreqs = (data === undefined ? [] : data);
