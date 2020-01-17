@@ -3,7 +3,6 @@ console.log("Loading...");
 require('dotenv').config({
    path: "config/.env"
 });
-const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
@@ -724,21 +723,30 @@ app.post("/json", parserJSON, (req, res) => {
 
 
 app.get("/console/sql", (req, res) => {
-   fs.readFile("secret/consoleSql.html", "utf-8", (err, data) => {
-      if (err) console.error(err);
-      res.send(data);
-   })
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         res.render("consoleSql.ejs");
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 
 
 app.post("/console/sql/query", parserJSON, (req, res) => {
-   console.log(req.body.q);
-   sql.query(req.body.q, (err, result, fields) => {
-      if (err) console.error(err);
-      console.log(result);
-      res.json(result);
-   })
+   wwt.validateAdmin(req, res).then((u) => {
+      if (u) {
+         console.log(req.body.q);
+         sql.query(req.body.q, (err, result, fields) => {
+            if (err) console.error(err);
+            console.log(result);
+            res.json(result);
+         })
+      }
+   }, (err) => {
+      res.end("DB ERROR");
+   });
 })
 
 

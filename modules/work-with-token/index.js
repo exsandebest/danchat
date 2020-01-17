@@ -18,7 +18,10 @@ exports.validate = (req, res) => {
                resolve(false);
             } else {
                sql.query(`select login from users where id = ${result[0].id}`, (err, data) => {
-                  if (err) console.error(err);
+                  if (err) {
+                     console.error(err);
+                     reject("db");
+                  }
                   if (data === undefined || data.length === 0) {
                      res.clearCookie("token");
                      res.redirect("/login");
