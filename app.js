@@ -1,6 +1,8 @@
 console.time("Loading");
 console.log("Loading...");
-require('dotenv').config({path : "config/.env"});
+require('dotenv').config({
+   path: "config/.env"
+});
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const chat = require('./chat');
@@ -34,15 +36,17 @@ app.get("/login", (req, res) => {
    res.clearCookie("token", {
       path: "/"
    });
-   res.render("login.ejs", {notification:""});
+   res.render("login.ejs", {
+      notification: ""
+   });
 })
 
 
 app.get("/registration", (req, res) => {
    res.render("registration.ejs", {
-      notificationType : "Good",
-      notificationText1 : "",
-      notificationText2 : ""
+      notificationType: "Good",
+      notificationText1: "",
+      notificationText2: ""
    });
 });
 
@@ -56,23 +60,23 @@ app.post("/registration", parserURLEncoded, (req, res) => {
               ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
                res.render("registration.ejs", {
-                  notificationType : "Good",
-                  notificationText1 : "Вы успешно зарегистрированы!",
-                  notificationText2 : ""
+                  notificationType: "Good",
+                  notificationText1: "Вы успешно зарегистрированы!",
+                  notificationText2: ""
                })
             })
          } else {
             res.render("registration.ejs", {
-               notificationType : "Bad",
-               notificationText1 : validation.text1,
-               notificationText2 : validation.text2
+               notificationType: "Bad",
+               notificationText1: validation.text1,
+               notificationText2: validation.text2
             })
          }
       } else {
          res.render("registration.ejs", {
-            notificationType : "Bad",
-            notificationText1 : "Данный логин уже занят",
-            notificationText2 : ""
+            notificationType: "Bad",
+            notificationText1: "Данный логин уже занят",
+            notificationText2: ""
          });
       }
    })
@@ -84,7 +88,7 @@ app.post("/login", parserURLEncoded, (req, res) => {
    var Rpassword = decodeURIComponent(req.body.password);
    if (!Rlogin || !Rpassword) {
       res.render("login.ejs", {
-         notification : "Заполните все поля"
+         notification: "Заполните все поля"
       })
       return;
    }
@@ -607,11 +611,14 @@ app.post("/user/change/password", parserJSON, (req, res) => {
       if (u) {
          sql.query(`select password from users where id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            if (usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword) === true) {
+            var validation = usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword)
+            if (validation.status) {
                sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${u.id}`, (err) => {
                   if (err) console.error(err);
-                  res.json(new ResponseObject(true, "Пароль успешно изменён!\n\n"));
+                  res.json(new ResponseObject(true, "Пароль успешно изменён!"));
                })
+            } else {
+               res.json(new ResponseObject(false, validation.text1, validation.text2));
             }
          })
       }
@@ -628,11 +635,14 @@ app.post("/user/change/name", parserJSON, (req, res) => {
    }
    wwt.validate(req, res).then((u) => {
       if (u) {
-         if (usMod.nameValidate(res, req.body.firstname, req.body.lastname) === true) {
+         var validation = usMod.nameValidate(res, req.body.firstname, req.body.lastname)
+         if (validation.status) {
             sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${u.id}`, (err) => {
                if (err) console.error(err);
-               res.json(new ResponseObject(true, "Данные успешно сохранены!\n\n"));
+               res.json(new ResponseObject(true, "Данные успешно сохранены!"));
             })
+         } else {
+            res.json(new ResponseObject(false, validation.text1, validation.text2));
          }
       }
    }, (err) => {

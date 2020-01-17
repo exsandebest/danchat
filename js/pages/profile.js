@@ -8,13 +8,13 @@ function changePasword() {
    xhr.onload = () => {
       if (xhr.status == 200) {
          var obj = JSON.parse(xhr.responseText);
-         if (obj.status){
-            notif(1, "Good", obj.text.split("\n\n")[0], obj.text.split("\n\n")[1], 100000);
+         if (obj.status) {
+            notif(1, "Good", obj.text, obj.text2, 100000);
             document.getElementById("oldPassword").innerHTML = "";
             document.getElementById("newPassword").innerHTML = "";
             document.getElementById("repeatNewPassword").innerHTML = "";
          } else {
-            notif(1, "Bad", obj.text.split("\n\n")[0], obj.text.split("\n\n")[1], 10000);
+            notif(1, "Bad", obj.text, obj.text2, 10000);
          }
       } else {
          notif(1, "Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 10000);
@@ -24,9 +24,9 @@ function changePasword() {
       notif(1, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
    }
    xhr.send(JSON.stringify({
-      oldPassword : oldPassword,
-      newPassword : newPassword,
-      repeatNewPassword : repeatNewPassword
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+      repeatNewPassword: repeatNewPassword
    }))
 }
 
@@ -42,10 +42,10 @@ function changeName() {
    xhr.onload = () => {
       if (xhr.status == 200) {
          var obj = JSON.parse(xhr.responseText);
-         if (obj.status){
-            notif(2, "Good", obj.text.split("\n\n")[0], obj.text.split("\n\n")[1], 100000);
+         if (obj.status) {
+            notif(2, "Good", obj.text, obj.text2, 10000);
          } else {
-            notif(2, "Bad", obj.text.split("\n\n")[0], obj.text.split("\n\n")[1], 10000);
+            notif(2, "Bad", obj.text, obj.text2, 10000);
          }
       } else {
          notif(2, "Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 10000);
@@ -55,14 +55,14 @@ function changeName() {
       notif(2, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
    }
    xhr.send(JSON.stringify({
-      firstname : firstname,
-      lastname : lastname
+      firstname: firstname,
+      lastname: lastname
    }));
 }
 
 function notif(num, type, msg1, msg2, time) {
    var elem;
-   if (num === 1){
+   if (num === 1) {
       elem = document.getElementById("notif");
    } else {
       elem = document.getElementById("notif2");
