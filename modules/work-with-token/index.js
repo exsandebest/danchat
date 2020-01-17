@@ -1,9 +1,4 @@
 console.time("Module => work-with-token");
-var logins = [];
-var tokens = [];
-const fs = require("fs");
-const wwt = require("../work-with-token");
-const chat = require("../chat");
 const sql = require("../database");
 const std = require("../standart");
 

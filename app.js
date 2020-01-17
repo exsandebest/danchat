@@ -5,23 +5,21 @@ require('dotenv').config({
 });
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
-const chat = require('./chat');
-const wwt = require('./work-with-token');
-const sql = require("./database");
-const md5 = require("md5");
-const express = require('express');
-const app = express();
-const http = require('http').Server(app);
-const usMod = require('./user-module');
-const io = require('socket.io')(http);
 const pars = require('body-parser');
+const md5 = require("md5");
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const chat = require('./modules/chat');
+const wwt = require('./modules/work-with-token');
+const sql = require("./modules/database");
+const usMod = require('./modules/user-module');
+const std = require("./modules/standart");
+const ResponseObject = require("./modules/ResponseObject");
 const parserURLEncoded = pars.urlencoded({
    extended: false
 });
 const parserJSON = pars.json();
-const std = require("./standart");
-const ResponseObject = require("./ResponseObject");
-
 
 app.use(express.static(__dirname + "/public"));
 app.use(cookieParser());

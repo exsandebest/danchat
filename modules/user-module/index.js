@@ -1,6 +1,5 @@
 console.time("Module => user-module");
 const md5 = require("md5");
-const sql = require("../database");
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;

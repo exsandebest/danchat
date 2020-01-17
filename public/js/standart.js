@@ -26,11 +26,9 @@ socket.on("MESSAGE", function(serverData) {
    alert(serverData);
 });
 
-//Подписка на сообщение
 function subscribe() {
    var xhr = new XMLHttpRequest();
    xhr.open("GET", "/subscribe", true);
-   //Когда сообщение получено
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
       if (r.type === "message") {
