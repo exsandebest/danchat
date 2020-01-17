@@ -1,8 +1,8 @@
 console.time("Loading");
 console.log("Loading...");
-require('dotenv').config({
+/*require('dotenv').config({
    path: "config/.env"
-});
+});*/
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
@@ -751,7 +751,7 @@ app.post("/console/sql/query", parserJSON, (req, res) => {
 
 
 
-http.listen(process.env.PORT, process.env.IP, (err) => {
+http.listen(process.env.PORT || 5000, (err) => {
    console.timeEnd("Loading");
-   console.log(`Started on : ${process.env.IP}:${process.env.PORT}`);
+   console.log(`Started on :${process.env.PORT || 5000}`);
 });
