@@ -671,7 +671,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
          sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)}
          where id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            res.end("OK");
+            res.json(new ResponseObject(true));
          })
       }
    }, (err) => {
