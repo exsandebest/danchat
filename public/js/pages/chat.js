@@ -10,11 +10,11 @@ getMsg(1);
 
 var audio = {};
 audio.message = new Audio();
-audio.message.src = "msg.mp3";
+audio.message.src = "/sounds/msg.mp3";
 audio.enter = new Audio();
-audio.enter.src = "enter.mp3";
+audio.enter.src = "/sounds/enter.mp3";
 audio.exit = new Audio();
-audio.exit.src = "exit.mp3";
+audio.exit.src = "/sounds/exit.mp3";
 
 subscribe();
 
