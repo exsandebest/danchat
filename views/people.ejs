@@ -1,11 +1,11 @@
 <html>
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
    <title>Люди</title>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
@@ -15,7 +15,7 @@
             <% if (elem.imgStatus) {%>
             <img class="people" src="<%=elem.login%>.jpg">
             <%} else {%>
-            <img class="people" src="default.jpg">
+            <img class="people" src="/images/default.jpg">
             <%}%>
                <div class="people-datablock">
                   <br>

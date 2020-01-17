@@ -1,19 +1,19 @@
 ﻿<html>
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
    <title>Профиль</title>
 </head>
 
-<body background="bg.jpg">
-   <script src="pages/profile.js"></script>
+<body background="/images/bg.jpg">
+   <script src="/js/pages/profile.js"></script>
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
       <% if (imgStatus) {%>
       <img src="<%=login%>.jpg" class="user-img" />
       <%} else {%>
-      <img src="default.jpg" class="user-img" />
+      <img src="/images/default.jpg" class="user-img" />
       <%}%>
       <br><br>
       <span style="color: <%=color%>;" class="user-login"> <%=login%> </span><br><br>

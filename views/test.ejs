@@ -1,17 +1,17 @@
 <html>
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
       <input type="button" value="Lol" onclick="go();"><br><br>
    </center>
    <%- include('partials/footer.ejs') %>
-   <script src="pages/test.js"></script>
+   <script src="/js/pages/test.js"></script>
 </body>
 
 </html>

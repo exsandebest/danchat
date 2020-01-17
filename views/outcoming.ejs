@@ -1,13 +1,12 @@
 <html>
-<meta charset="utf-8">
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
    <title>Исходящие заявки</title>
    </style>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
@@ -23,7 +22,7 @@
             <%if (elem.imgStatus) {%>
             <img class="friend-img" src="<%=elem.login%>.jpg">
             <% }else { %>
-            <img class="friend-img" src="default.jpg">
+            <img class="friend-img" src="/images/default.jpg">
             <% } %>
             <div class="friend-datablock">
                <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
@@ -37,7 +36,7 @@
          <%})%>
       </div>
    </center>
-   <script src="pages/outcoming.js"></script>
+   <script src="/js/pages/outcoming.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 

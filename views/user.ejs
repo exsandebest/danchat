@@ -1,22 +1,20 @@
-﻿
-<meta charset="utf-8">
 <html>
 
 <head>
-   <link rel="stylesheet" type="text/css" href="/style.css">
+   <%- include('partials/header.ejs') %>
    <title>
       <%=userLogin%>
    </title>
 </head>
 
-<body background="/bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
       <%if (imgStatus) {%>
       <img class="user-img" src="/<%=userLogin%>.jpg"><br>
       <%} else {%>
-      <img class="user-img" src="/default.jpg"><br>
+      <img class="user-img" src="/images/default.jpg"><br>
       <%}%>
       <br><br>
       <%if (userStatus === "default"){%>
@@ -41,7 +39,7 @@
             <%if (elem.imgStatus) {%>
             <img class="user-friend" src="<%=elem.login%>.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
             <% } else { %>
-            <img class="user-friend" src="/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+            <img class="user-friend" src="/images/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
             <% } %>
             <span style="font-size: 0.8em"><%=elem.login%></span>
          </a>
@@ -51,7 +49,7 @@
          <%}%>
       </div>
    </center>
-   <script src="/pages/user.js"></script>
+   <script src="/js/pages/user.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 
