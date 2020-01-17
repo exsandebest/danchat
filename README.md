@@ -12,14 +12,14 @@ or
 
 ### Structure of sounds
 ```
-sounds/enter.mp3 //sound of login
-sounds/exit.mp3 //sound of logout
-sounds/msg.mp3 //sound of message
+public/sounds/enter.mp3 //sound of login
+public/sounds/exit.mp3 //sound of logout
+public/sounds/msg.mp3 //sound of message
 ```
 
 ### Structure of images
 ```
-images/bg.jpg //main background
-images/default.jpg //default user photo
-images/favicon.ico //favicon
+public/images/bg.jpg //main background
+public/images/default.jpg //default user photo
+public/images/favicon.ico //favicon
 ```
