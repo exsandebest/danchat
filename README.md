@@ -7,8 +7,9 @@ or
 `npm run demon` - runs [nodemon npm package](https://www.npmjs.com/package/nodemon)
 
 # Structure of main directories
-**You have to fill these directories with necessary files to correct work**  
-**You also have to create and fill `config/.env` with necessary data, see [`config/.env.example`](https://github.com/exsandebest/danchat/blob/master/config/.env.example) to learn more**
+* **You have to fill these directories with necessary files to correct work**  
+* **You also have to create and fill `config/.env` with necessary data, see [`config/.env.example`](https://github.com/exsandebest/danchat/blob/master/config/.env.example) as example and uncomment lines 3-5 in [`app.js`](https://github.com/exsandebest/danchat/blob/master/app.js) to use these constants**
+
 
 ### Structure of sounds
 ```
