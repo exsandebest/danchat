@@ -34,7 +34,7 @@ app.get("/login", (req, res) => {
    res.clearCookie("token", {
       path: "/"
    });
-   res.render("login.ejs", {});
+   res.render("login.ejs", {notification:""});
 })
 
 
@@ -66,17 +66,21 @@ app.post("/registration", parserJSON, (req, res) => {
 });
 
 
-app.post("/login", parserJSON, (req, res) => {
+app.post("/login", parserURLEncoded, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
    var Rpassword = decodeURIComponent(req.body.password);
    if (!Rlogin || !Rpassword) {
-      res.json(new ResponseObject(false, "Заполните все поля"));
+      res.render("login.ejs", {
+         notification : "Заполните все поля"
+      })
       return;
    }
    sql.query(`select id, login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
       if (err) console.error(err);
       if (data === undefined || data.length === 0) {
-         res.json(new ResponseObject(false, "Неверный логин или пароль"));
+         res.render("login.ejs", {
+            notification: "Неверный логин или пароль"
+         })
          return;
       }
       var user = data[0];
@@ -98,7 +102,7 @@ app.post("/login", parserJSON, (req, res) => {
             path: "/",
             httpOnly: true
          });
-         res.json(new ResponseObject(true));
+         res.redirect("/");
       })
    })
 })

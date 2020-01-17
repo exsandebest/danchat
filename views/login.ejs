@@ -13,11 +13,14 @@
    </style>
    <link rel="stylesheet" type="text/css" href="style.css">
    <center>
-      <input class='inputBig' type="text" required name="login" autofocus id="login" title="Логин" placeholder="Введите логин"><br><br>
-      <input class='inputBig' type="password" required name="password" id="password" title="Пароль" onkeypress="if(event.keyCode == 13) enter()" placeholder="Введите пароль"><br><br>
-      <div class="notification" id="notification"> 
+   <form action="/login" method="post" enctype="application/x-www-form-urlencoded" name="authorizationForm">
+      <input class='inputBig' type="text" required name="login" autofocus title="Логин" autocomplete="username" placeholder="Введите логин"><br><br>
+      <input class='inputBig' type="password" required name="password" title="Пароль" autocomplete="current-password" onkeypress="if(event.keyCode == 13) document.forms.authorizationForm.submit()" placeholder="Введите пароль"><br><br>
+   </form>
+      <div class="notification" id = "notification">
+         <span class="notificationBad"><%=notification%></span>
       </div><br>
-      <btn class="standart" type="button" onclick="enter()">Войти</btn><br><br>
+      <btn class="standart" type="button" onclick="document.forms.authorizationForm.submit()">Войти</btn><br><br>
       <span class="purple">или</span><br><br>
       <a href="/registration" style="text-decoration: none;">
          <btn class="standart" type="button">Зарегистрироваться</btn>
