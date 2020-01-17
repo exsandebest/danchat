@@ -39,28 +39,41 @@ app.get("/login", (req, res) => {
 
 
 app.get("/registration", (req, res) => {
-   res.render("registration.ejs", {});
+   res.render("registration.ejs", {
+      notificationType : "Good",
+      notificationText1 : "",
+      notificationText2 : ""
+   });
 });
 
 
-
-app.post("/registration", parserJSON, (req, res) => {
-   for (key in req.body) {
-      req.body[key] = decodeURIComponent(req.body[key]);
-   }
+app.post("/registration", parserURLEncoded, (req, res) => {
    sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
       if (result === undefined || result.length === 0) {
-         if (usMod.registrationValidate(req, res)) {
+         var validation = usMod.registrationValidate(req, res);
+         if (validation.status) {
             sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
               ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
-               res.json(new ResponseObject(true));
+               res.render("registration.ejs", {
+                  notificationType : "Good",
+                  notificationText1 : "Вы успешно зарегистрированы!",
+                  notificationText2 : ""
+               })
             })
          } else {
-            res.end('END');
+            res.render("registration.ejs", {
+               notificationType : "Bad",
+               notificationText1 : validation.text1,
+               notificationText2 : validation.text2
+            })
          }
       } else {
-         res.json(new ResponseObject(false, "Данные логин уже занят\n\n"));
+         res.render("registration.ejs", {
+            notificationType : "Bad",
+            notificationText1 : "Данный логин уже занят",
+            notificationText2 : ""
+         });
       }
    })
 });

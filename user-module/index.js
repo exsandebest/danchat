@@ -8,8 +8,7 @@ const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
 const regName = /^[a-zA-ZА-Яа-яЁё]{2,24}$/;
 const regAge = /^[0-9]{1,3}$/;
-const regSex1 = /[01]/;
-const regSex2 = /[01]/;
+const regSex = /[01]/;
 
 
 
@@ -67,47 +66,28 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname - Имя; ln - lastna
 
 exports.registrationValidate = (req, res) => {
    var data = req.body;
-   if (data.age && data.firstname && data.lastname && data.login && data.sex && data.password) {
-      if (data.submit === "REAL") {
-         if (regLogin.test(data.login)) {
-            if (regPassword.test(data.password)) {
-               if (regName.test(data.firstname) && data.firstname !== undefined) {
-                  if (regName.test(data.lastname) && data.lastname !== undefined) {
-                     if (regAge.test(data.age) && data.age > 0 && data.age < 218) {
-                        if (regSex1.test(data.sex) || regSex2.test(data.sex)) {
-                           return true;
-                        } else {
-                           badAns(res, "Некорректный пол.\n\nХз как так вообще получилось");
-                           return false;
-                        }
-                     } else {
-                        badAns(res, "Некорректный возраст.\n\nПоложительное число [1-217]");
-                        return false;
-                     }
-                  } else {
-                     badAns(res, "Некорректная фамилия.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
-                     return false;
-                  }
-               } else {
-                  badAns(res, "Некорректное имя.\n\nОт 2-х до 24-х символов из русского или латинского алфавита");
-                  return false;
-               }
-            } else {
-               badAns(res, "Некорректный пароль.\n\nОт 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_");
-               return false;
-            }
-         } else {
-            badAns(res, "Некорректный логин.\n\nОт 4-х до 24-х символов из русского, латинского алфавитов и цифр, а так же символы @_");
-            return false;
-         }
-      } else {
-         badAns(res, "Запрос может быть отправлен только со страницы регистрации.\n\n");
-         return false;
-      }
-   } else {
-      badAns(res, "Заполните все поля\n\n");
-      return false;
+   if (!data.age || !data.firstname || !data.lastname || !data.login || !data.sex || !data.password){
+      return new Verdict("Заполните все поля");
    }
+   if (!regLogin.test(data.login)){
+      return new Verdict("Некорректный логин", "От 4-х до 24-х символов из русского, латинского алфавитов и цифр, а так же символы @_");
+   }
+   if (!regPassword.test(data.password)){
+      return new Verdict("Некорректный пароль", "От 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_")
+   }
+   if (!regName.test(data.firstname)){
+      return new Verdict("Некорректное имя","От 2-х до 24-х символов из русского или латинского алфавита");
+   }
+   if (!regName.test(data.lastname)){
+      return new Verdict("Некорректная фамилия","От 2-х до 24-х символов из русского или латинского алфавита");
+   }
+   if (!regAge.test(data.age)){
+      return new Verdict("Некорректный возраст","Положительное число [1-217]");
+   }
+   if (!regSex.test(data.sex)){
+      return new Verdict("Некорректный пол","Что-то пошло не так...");
+   }
+   return new Verdict("","",true);
 }
 
 
@@ -116,6 +96,11 @@ function badAns(res, msg) {
    res.json(new ResponseObject(false, msg));
 }
 
+function Verdict(text1 = "", text2 = "", status = false) {
+   this.text1 = text1;
+   this.text2 = text2;
+   this.status = status;
+}
 
 
 console.timeEnd("Module => user-module");
