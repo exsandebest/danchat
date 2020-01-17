@@ -2,7 +2,7 @@ sessionStorage.clear();
 
 function enter() {
    var xhr = new XMLHttpRequest();
-   xhr.open("POST", "/enter", true);
+   xhr.open("POST", "/login", true);
    xhr.setRequestHeader("Content-Type", "application/json");
    xhr.onload = () => {
       if (xhr.status == 200){

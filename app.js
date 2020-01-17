@@ -34,7 +34,7 @@ app.get("/login", (req, res) => {
    res.clearCookie("token", {
       path: "/"
    });
-   res.render("enter.ejs", {});
+   res.render("login.ejs", {});
 })
 
 
@@ -66,7 +66,7 @@ app.post("/registration", parserJSON, (req, res) => {
 });
 
 
-app.post("/enter", parserJSON, (req, res) => {
+app.post("/login", parserJSON, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
    var Rpassword = decodeURIComponent(req.body.password);
    if (!Rlogin || !Rpassword) {
