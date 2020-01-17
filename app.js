@@ -494,12 +494,6 @@ app.get("/adminpanel", (req, res) => {
 
 
 
-app.get("/tt", (req, res) => {
-   res.render("test.ejs", {});
-});
-
-
-
 app.post("/user/add/friend", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
