@@ -1,13 +1,13 @@
 <html>
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
    <title>Настройки</title>
    <style>
    </style>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <%- include('partials/scripts.ejs') %>
    <center>
@@ -25,8 +25,9 @@
       <br><br>
       <btn class="standart" onclick="save()">Сохранить</btn>
    </center>
-   <script src="pages/settings.js"></script>
+   <script src="/js/pages/settings.js"></script>
    <%- include('partials/footer.ejs') %>
+
 <body>
 
 </html>

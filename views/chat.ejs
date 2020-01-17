@@ -1,14 +1,13 @@
 ﻿<html>
-<meta charset="utf-8">
 
 <head>
-   <link rel="stylesheet" type="text/css" href="style.css">
+   <%- include('partials/header.ejs') %>
    <title id="t">
       Чат
    </title>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <center>
       <div onclick="getMsg();" id="btnGetMsg">
@@ -23,7 +22,7 @@
       <br><br><br>
    </center>
    <script src="/socket.io/socket.io.js"></script>
-   <script src="pages/chat.js"></script>
+   <script src="/js/pages/chat.js"></script>
    <span class="green" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"><%=onlineCounter%></span></span>
    <%- include('partials/footer.ejs') %>
 </body>

@@ -1,16 +1,12 @@
 <html>
 
 <head>
-   <meta charset="utf-8">
-   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+   <%- include('partials/header.ejs') %>
    <title>Регистрация</title>
 </head>
 
-<body background="bg.jpg">
+<body background="/images/bg.jpg">
    <h1 class="mainLabel">Регистрация</h1>
-   <style>
-   </style>
-   <link rel="stylesheet" type="text/css" href="style.css">
    <center>
       <form name="registration" action="/registration" method="post" enctype="application/x-www-form-urlencoded">
          <input class='inputSmall' type="text" autocomplete="username" required name="login" title="Логин" placeholder="Логин"><br><br>
@@ -40,7 +36,7 @@
          <btn class="standart">Войти</btn>
       </a>
    </center>
-   <script src="pages/registration.js"></script>
+   <script src="/js/pages/registration.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 
