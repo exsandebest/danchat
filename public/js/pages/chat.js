@@ -65,7 +65,7 @@ function subscribe() {
    xhr.onload = () => {
       var r = JSON.parse(xhr.responseText);
       if (r.type === "message") {
-         var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a>:<msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
+         var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a>: <msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
          complex(r, str);
       } else if (r.type === "enter") {
          var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a><b> вошел(ла) в чат</b><span class="messageTime">${r.time}</span></span><br>`;
