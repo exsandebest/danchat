@@ -7,7 +7,8 @@ const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
-const app = require('express')();
+const express = require('express');
+const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const chat = require('./modules/chat');
@@ -56,10 +57,9 @@ app.post("/registration", parserURLEncoded, (req, res) => {
               ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
-               res.render("registration.ejs", {
-                  notificationType: "Good",
-                  notificationText1: "Вы успешно зарегистрированы!",
-                  notificationText2: ""
+               sql.query(`select login, color, id from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
+                  if (err) console.error(err);
+                  enter(res, data[0]);
                })
             })
          } else {
@@ -80,6 +80,30 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 });
 
 
+function enter(res, user) { //login, color, id
+   var token = std.genToken();
+   sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
+      if (err) console.error(err);
+      sql.query(`select max(id) from users`, (err, result) => {
+         var msg = {};
+         msg.user_id = user.id;
+         msg.login = user.login;
+         msg.color = user.color;
+         msg.time = new Date().toTimeString().substring(0, 5);
+         msg.id = result[0]["max(id)"] + 1;
+         msg.type = "enter";
+         chat.addnewmessage(msg);
+         res.cookie("token", token, {
+            path: "/",
+            httpOnly: true
+         });
+         res.redirect("/");
+      })
+   })
+}
+
+
+
 app.post("/login", parserURLEncoded, (req, res) => {
    var Rlogin = decodeURIComponent(req.body.login);
    var Rpassword = decodeURIComponent(req.body.password);
@@ -97,27 +121,7 @@ app.post("/login", parserURLEncoded, (req, res) => {
          })
          return;
       }
-      var user = data[0];
-      var token = std.genToken();
-      sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
-         if (err) console.error(err);
-         sql.query(`select max(id) from users`, (err, result) => {
-            var msg = {};
-            msg.user_id = user.id;
-            msg.login = user.login;
-            msg.color = user.color;
-            msg.time = new Date().toTimeString().substring(0, 5);
-            msg.id = result[0]["max(id)"] + 1;
-            msg.type = "enter";
-            chat.addnewmessage(msg);
-            res.end();
-         })
-         res.cookie("token", token, {
-            path: "/",
-            httpOnly: true
-         });
-         res.redirect("/");
-      })
+      enter(res, data[0]);
    })
 })
 
