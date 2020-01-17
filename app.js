@@ -51,8 +51,10 @@ app.post("/registration", parserURLEncoded, (req, res) => {
       if (result === undefined || result.length === 0) {
          var validation = usMod.registrationValidate(req, res);
          if (validation.status) {
-            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))}, ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
+            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values
+            (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
+              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))},
+              ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
                res.render("registration.ejs", {
                   notificationType: "Good",
@@ -190,14 +192,16 @@ app.post("/get/message", parserJSON, (req, res) => {
          var portion = 50;
          var msgId = parseInt(req.body.id);
          if (msgId === -1) {
-            sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
+            sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat
+            where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
                res.json(data);
             })
          } else {
             var msgStart = msgId - portion;
             var msgEnd = msgId - 1;
-            sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
+            sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time
+            from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                if (err) console.error(err);
                res.json(data);
             })
@@ -235,7 +239,8 @@ app.get("/friends", (req, res) => {
          var obj = {
             login: u.login
          };
-         sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
+         sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union
+         all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
             obj.inreqsCounter = ` ${data[0].reqs} `;
             obj.outreqsCounter = ` ${data[1].reqs} `;
@@ -263,7 +268,8 @@ app.get("/incoming", (req, res) => {
          sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
             obj.outreqsCounter = ` ${result[0].reqs} `;
-            sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
+            sql.query(`select login, color, imgStatus, firstname, lastname from users
+               where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
                obj.inreqs = (data === undefined ? [] : data);
                res.render("incoming.ejs", obj);
@@ -286,7 +292,8 @@ app.get("/outcoming", (req, res) => {
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
             obj.inreqsCounter = ` ${result[0].reqs} `;
-            sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
+            sql.query(`select login, color, imgStatus, firstname, lastname from users
+               where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
                obj.outreqs = (data === undefined ? [] : data);
                res.render("outcoming.ejs", obj);
@@ -376,11 +383,14 @@ app.get("/u/:userLogin", (req, res) => {
                   login: u.login,
                   sex: (data[0].sex ? "Мужской" : "Женский")
                }
-               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in (select id_1 as ids from friends where id_2 = ${data[0].id} union select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
+               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+                  (select id_1 as ids from friends where id_2 = ${data[0].id} union
+                  select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
                   if (err) console.error(err);
                   obj.friends = (dt2 === undefined ? [] : dt2);
                   if (u.login !== data[0].login) {
-                     sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
+                     sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or
+                     (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
                         if (err) console.error(err);
                         if (r1 === undefined || r1.length === 0) {
                            sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
@@ -632,7 +642,8 @@ app.post("/user/change/name", parserJSON, (req, res) => {
       if (u) {
          var validation = usMod.nameValidate(res, req.body.firstname, req.body.lastname)
          if (validation.status) {
-            sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)} where id = ${u.id}`, (err) => {
+            sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)}
+            where id = ${u.id}`, (err) => {
                if (err) console.error(err);
                res.json(new ResponseObject(true, "Данные успешно сохранены!"));
             })
@@ -659,7 +670,8 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
             res.end("Incorrect values");
             return;
          }
-         sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)} where id = ${u.id}`, (err, data) => {
+         sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)}
+         where id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
             res.end("OK");
          })

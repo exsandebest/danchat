@@ -39,7 +39,10 @@
     "ejs",
     "express"
   ],
-  "author": "Daniil Bogdanov",
+  "author": {
+     "name" : "Daniil Bogdanov",
+     "email" : "exsandebest@yandex.ru"
+ },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/exsandebest/danchat/issues"
