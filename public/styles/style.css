@@ -12,12 +12,14 @@ nav ul {
    margin: 0;
    list-style: none;
    position: relative;
+   border-radius: 50px;
 }
 nav ul li {
    display: inline-block;
    width: auto;
    text-align: center;
    background-color: #000000;
+   border-radius: 50px;
 }
 nav a {
    display: block;
@@ -31,9 +33,12 @@ nav a {
 nav a#prof:hover {
    background-color: #5cd661;
    cursor:pointer;
+   border-radius: 50px;
 }
+
 nav a:hover {
    background-color: #696969;
+   border-radius: 50px;
 }
 nav ul ul {
    display: none;
@@ -50,6 +55,7 @@ nav ul ul li {
 nav ul li.active {
    background-color: #4CAF50;
    float:right;
+   min-width: 115px;
 }
 nav ul li a span#counter {
    width: 20px;
