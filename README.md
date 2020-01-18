@@ -16,7 +16,7 @@ or
 ```
 public/sounds/enter.mp3 //sound of login
 public/sounds/exit.mp3 //sound of logout
-public/sounds/msg.mp3 //sound of message
+public/sounds/message.mp3 //sound of message
 ```
 
 ### Structure of images

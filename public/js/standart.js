@@ -11,12 +11,11 @@ if (sessionStorage.getItem("counter") === null) {
 }
 
 var audio = {};
-audio.message = new Audio();
-audio.message.src = "/sounds/msg.mp3";
-audio.enter = new Audio();
-audio.enter.src = "/sounds/enter.mp3";
-audio.exit = new Audio();
-audio.exit.src = "/sounds/exit.mp3";
+var audioTypes = ["message", "enter", "exit"];
+audioTypes.forEach((item) => {
+   audio[item] = new Audio();
+   audio[item].src = `/sounds/${item}.mp3`;
+});
 
 var socket = io();
 socket.on("ADMINMESSAGE", function(serverData) {
