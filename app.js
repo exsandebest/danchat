@@ -672,19 +672,15 @@ app.post("/user/change/name", parserJSON, (req, res) => {
 app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         var scroll = true;
-         if (req.body.scroll === true) {
-            scroll = true;
-         } else if (req.body.scroll === false) {
-            scroll = false;
-         } else {
-            res.end("Incorrect values");
+         var validation = usMod.validateSetting(req.body);
+         if (!validation.status){
+            res.json(new ResponseObject(false, validation.text1 , validation.text2));
             return;
          }
-         sql.query(`update users set scroll = ${(scroll?1:0)}, color = ${sql.escape(req.body.color)}
+         sql.query(`update users set scroll = ${req.body.scroll}, color = ${sql.escape(req.body.color)}
          where id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            res.json(new ResponseObject(true));
+            res.json(new ResponseObject(true, "Настройки успешно обновлены"));
          })
       }
    }, (err) => {

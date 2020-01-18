@@ -7,10 +7,11 @@ function save() {
    xhr.onload = () => {
       var elem = document.getElementById("notif");
       elem.setAttribute("style", "opacity:0");
-      if (xhr.status == 200 && JSON.parse(xhr.responseText).status) {
-         elem.innerHTML = "<span class='notificationGood'>Настройки успешно сохранены</span>";
+      var res = JSON.parse(xhr.responseText);
+      if (xhr.status == 200 && res.status) {
+         elem.innerHTML = `<span class='notificationGood'>${res.text}</span>`;
       } else {
-         elem.innerHTML = `<span class='notificationBad'>Ошибка при сохранении</span>`;
+         elem.innerHTML = `<span class='notificationBad'>${res.text}</span>`;
       }
       elem.setAttribute("style", "opacity:1");
       setTimeout(() => {

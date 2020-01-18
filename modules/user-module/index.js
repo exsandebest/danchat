@@ -6,6 +6,7 @@ const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
 const regName = /^[a-zA-ZА-Яа-яЁё]{2,24}$/;
 const regAge = /^[0-9]{1,3}$/;
 const regSex = /[01]/;
+const regColor = /^#[a-fA-F0-9]{3,8}$/;
 
 
 
@@ -67,6 +68,17 @@ exports.registrationValidate = (req, res) => {
    }
    if (!regSex.test(data.sex)) {
       return new Verdict("Некорректный пол", "Что-то пошло не так...");
+   }
+   return new Verdict("", "", true);
+}
+
+
+exports.validateSetting = (data) => {
+   if (!regColor.test(data.color)){
+      return new Verdict("Incorrect values: color");
+   }
+   if (data.scroll !== false && data.scroll!== true){
+      return new Verdict("Incorrect values: scroll");
    }
    return new Verdict("", "", true);
 }
