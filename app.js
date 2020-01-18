@@ -83,22 +83,25 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 function enter(res, user) { //login, color, id
    var token = std.genToken();
-   sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
+   sql.query(`delete from tokens where id = ${user.id}`, (err)=>{
       if (err) console.error(err);
-      sql.query(`select max(id) from users`, (err, result) => {
-         var msg = {};
-         msg.user_id = user.id;
-         msg.login = user.login;
-         msg.color = user.color;
-         msg.time = new Date().toTimeString().substring(0, 5);
-         msg.id = result[0]["max(id)"] + 1;
-         msg.type = "enter";
-         chat.addnewmessage(msg);
-         res.cookie("token", token, {
-            path: "/",
-            httpOnly: true
-         });
-         res.redirect("/");
+      sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
+         if (err) console.error(err);
+         sql.query(`select max(id) from users`, (err, result) => {
+            var msg = {};
+            msg.user_id = user.id;
+            msg.login = user.login;
+            msg.color = user.color;
+            msg.time = new Date().toTimeString().substring(0, 5);
+            msg.id = result[0]["max(id)"] + 1;
+            msg.type = "enter";
+            chat.addnewmessage(msg);
+            res.cookie("token", token, {
+               path: "/",
+               httpOnly: true
+            });
+            res.redirect("/");
+         })
       })
    })
 }
