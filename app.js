@@ -83,7 +83,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 function enter(res, user) { //login, color, id
    var token = std.genToken();
-   sql.query(`delete from tokens where id = ${user.id}`, (err)=>{
+   sql.query(`delete from tokens where id = ${user.id}`, (err) => {
       if (err) console.error(err);
       sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
          if (err) console.error(err);
@@ -395,7 +395,7 @@ app.get("/u/:userLogin", (req, res) => {
                }
                sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE) and id = ${data[0].id}`, (err, respose) => {
                   if (err) console.error(err);
-                  if (respose === undefined || respose.length === 0){
+                  if (respose === undefined || respose.length === 0) {
                      obj.userOnlineStatus = "offline";
                   } else {
                      obj.userOnlineStatus = "online";
@@ -675,8 +675,8 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          var validation = usMod.validateSetting(req.body);
-         if (!validation.status){
-            res.json(new ResponseObject(false, validation.text1 , validation.text2));
+         if (!validation.status) {
+            res.json(new ResponseObject(false, validation.text1, validation.text2));
             return;
          }
          sql.query(`update users set scroll = ${req.body.scroll}, color = ${sql.escape(req.body.color)}
@@ -732,8 +732,6 @@ app.post("/urlencoded", parserURLEncoded, (req, res) => {
 app.post("/json", parserJSON, (req, res) => {
    res.json(req.body);
 })
-
-
 
 app.get("/console/sql", (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
