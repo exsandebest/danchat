@@ -1,6 +1,6 @@
 console.time("Loading");
 console.log("Loading...");
-if (!process.env.USING_HEROKU){
+if (!process.env.USING_HEROKU) {
    require('dotenv').config({
       path: "config/.env"
    });
@@ -247,8 +247,8 @@ app.get("/friends", (req, res) => {
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union
          all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            obj.inreqsCounter = data[0].reqs?` ${data[0].reqs} `:"";
-            obj.outreqsCounter = data[1].reqs?` ${data[1].reqs} `:"";
+            obj.inreqsCounter = data[0].reqs ? ` ${data[0].reqs} ` : "";
+            obj.outreqsCounter = data[1].reqs ? ` ${data[1].reqs} ` : "";
             sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
                      (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
                if (err) console.error(err);
@@ -272,7 +272,7 @@ app.get("/incoming", (req, res) => {
          };
          sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.outreqsCounter = result[0].reqs?` ${result[0].reqs} `:"";
+            obj.outreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
             sql.query(`select login, color, imgStatus, firstname, lastname from users
                where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
@@ -296,7 +296,7 @@ app.get("/outcoming", (req, res) => {
          };
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.inreqsCounter = result[0].reqs?` ${result[0].reqs} `:"";
+            obj.inreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
             sql.query(`select login, color, imgStatus, firstname, lastname from users
                where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
@@ -388,42 +388,51 @@ app.get("/u/:userLogin", (req, res) => {
                   login: u.login,
                   sex: (data[0].sex ? "Мужской" : "Женский")
                }
-               sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+               sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE) and id = ${data[0].id}`, (err, respose) => {
+                  if (err) console.error(err);
+                  if (respose === undefined || respose.length === 0){
+                     obj.userOnlineStatus = "offline";
+                  } else {
+                     obj.userOnlineStatus = "online";
+                  }
+                  sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
                   (select id_1 as ids from friends where id_2 = ${data[0].id} union
                   select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
-                  if (err) console.error(err);
-                  obj.friends = (dt2 === undefined ? [] : dt2);
-                  if (u.login !== data[0].login) {
-                     sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or
+                     if (err) console.error(err);
+                     obj.friends = (dt2 === undefined ? [] : dt2);
+                     if (u.login !== data[0].login) {
+                        sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or
                      (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
-                        if (err) console.error(err);
-                        if (r1 === undefined || r1.length === 0) {
-                           sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
-                              if (err) console.error(err);
-                              if (r2 === undefined || r2.length === 0) {
-                                 sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
-                                    if (err) console.error(err);
-                                    if (r3 !== undefined && r3.length !== 0) {
-                                       obj.userStatus = "subscriber";
-                                    } else {
-                                       obj.userStatus = "default";
-                                    }
+                           if (err) console.error(err);
+                           if (r1 === undefined || r1.length === 0) {
+                              sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+                                 if (err) console.error(err);
+                                 if (r2 === undefined || r2.length === 0) {
+                                    sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                                       if (err) console.error(err);
+                                       if (r3 !== undefined && r3.length !== 0) {
+                                          obj.userStatus = "subscriber";
+                                       } else {
+                                          obj.userStatus = "default";
+                                       }
+                                       res.render("user.ejs", obj);
+                                    })
+                                 } else {
+                                    obj.userStatus = "request sent";
                                     res.render("user.ejs", obj);
-                                 })
-                              } else {
-                                 obj.userStatus = "request sent";
-                                 res.render("user.ejs", obj);
-                              }
-                           })
-                        } else {
-                           obj.userStatus = "friend";
-                           res.render("user.ejs", obj);
-                        }
-                     })
-                  } else {
-                     obj.userStatus = "self";
-                     res.render("user.ejs", obj);
-                  }
+                                 }
+                              })
+                           } else {
+                              obj.userStatus = "friend";
+                              res.render("user.ejs", obj);
+                           }
+                        })
+                     } else {
+                        obj.userStatus = "self";
+                        res.render("user.ejs", obj);
+                     }
+                  })
+
                })
             }
          })

@@ -378,14 +378,14 @@ a.friend-login {
 
 span.purple {
    font-family: Garamond;
-   font-size: 1.3em;
-   color: #FFFFFF;
-   text-shadow: 0 0 10px #fff, 0 0 20px #6A5ACD, 0 0 30px #6A5ACD, 0 0 40px #6A5ACD, 0 0 50px #6A5ACD, 0 0 60px #6A5ACD, 0 0 70px #6A5ACD;
+   font-size: 1.4em;
+   color: #ffffff;
+   text-shadow: 0 0 10px #6A5ACD, 0 0 20px #6A5ACD, 0 0 30px #6A5ACD, 0 0 40px #6A5ACD, 0 0 50px #6A5ACD, 0 0 60px #6A5ACD, 0 0 70px #6A5ACD, 0 0 80px #6A5ACD;
 }
 
 span.red {
    font-family: Garamond;
-   font-size: 1.6em;
+   font-size: 1.4em;
    color: #DC143C;
    text-shadow: 0 0 10px #DC143C, 0 0 20px #FA8072, 0 0 30px #DC143C, 0 0 40px #DC143C, 0 0 70px #DC143C, 0 0 80px #DC143C, 0 0 100px #DC143C, 0 0 150px #DC143C;
 }
