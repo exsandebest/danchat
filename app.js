@@ -245,8 +245,8 @@ app.get("/friends", (req, res) => {
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union
          all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
             if (err) console.error(err);
-            obj.inreqsCounter = ` ${data[0].reqs} `;
-            obj.outreqsCounter = ` ${data[1].reqs} `;
+            obj.inreqsCounter = data[0].reqs?` ${data[0].reqs} `:"";
+            obj.outreqsCounter = data[1].reqs?` ${data[1].reqs} `:"";
             sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
                      (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
                if (err) console.error(err);
@@ -270,7 +270,7 @@ app.get("/incoming", (req, res) => {
          };
          sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.outreqsCounter = ` ${result[0].reqs} `;
+            obj.outreqsCounter = result[0].reqs?` ${result[0].reqs} `:"";
             sql.query(`select login, color, imgStatus, firstname, lastname from users
                where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
@@ -294,7 +294,7 @@ app.get("/outcoming", (req, res) => {
          };
          sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
-            obj.inreqsCounter = ` ${result[0].reqs} `;
+            obj.inreqsCounter = result[0].reqs?` ${result[0].reqs} `:"";
             sql.query(`select login, color, imgStatus, firstname, lastname from users
                where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
                if (err) console.error(err);
