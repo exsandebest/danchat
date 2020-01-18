@@ -62,7 +62,7 @@ exports.registrationValidate = (req, res) => {
    if (!regName.test(data.lastname)) {
       return new Verdict("Некорректная фамилия", "От 2-х до 24-х символов из русского или латинского алфавита");
    }
-   if (!regAge.test(data.age)) {
+   if (!regAge.test(data.age) || parseInt(data.age) > 217 || parseInt(data.age) < 1) {
       return new Verdict("Некорректный возраст", "Положительное число [1-217]");
    }
    if (!regSex.test(data.sex)) {
