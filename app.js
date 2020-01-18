@@ -1,8 +1,10 @@
 console.time("Loading");
 console.log("Loading...");
-/*require('dotenv').config({
-   path: "config/.env"
-});*/
+if (!process.env.USING_HEROKU){
+   require('dotenv').config({
+      path: "config/.env"
+   });
+}
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
