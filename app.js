@@ -89,12 +89,13 @@ function enter(res, user) { //login, color, id
          if (err) console.error(err);
          sql.query(`select max(id) from users`, (err, result) => {
             var msg = {};
+            msg.type = "enter";
+            io.emit("chatMessage", msg);
             msg.user_id = user.id;
             msg.login = user.login;
             msg.color = user.color;
             msg.time = new Date().toTimeString().substring(0, 5);
             msg.id = result[0]["max(id)"] + 1;
-            msg.type = "enter";
             chat.addnewmessage(msg);
             res.cookie("token", token, {
                path: "/",
@@ -175,12 +176,13 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
             if (err) console.error(err);
             sql.query(`select max(id) from chat`, (err, data) => {
                var msg = {};
+               msg.type = "message";
+               io.emit("chatMessage", msg);
                msg.user_id = u.id;
                msg.login = u.login;
                msg.color = result[0].color;
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
-               msg.type = "message";
                msg.text = decodeURIComponent(req.body.message);
                chat.addnewmessage(msg);
                res.json(new ResponseObject(true));
@@ -484,7 +486,7 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
 app.post("/admin/message", parserJSON, (req, res) => {
    wwt.validateAdmin(req, res).then((u) => {
       if (u) {
-         io.emit("MESSAGE", decodeURIComponent(req.body.message));
+         io.emit("ADMINMESSAGE", decodeURIComponent(req.body.message));
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -697,12 +699,13 @@ app.get("/logout", (req, res) => {
             if (err) console.error(err);
             sql.query(`select max(id) from users`, (err, data) => {
                var msg = {};
+               msg.type = "exit";
+               io.emit("chatMessage", msg);
                msg.user_id = u.id;
                msg.login = u.login;
                msg.color = result[0].color;
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
-               msg.type = "exit";
                sql.query(`delete from tokens where id = ${u.id}`, (err) => {
                   if (err) console.error(err);
                   chat.addnewmessage(msg);

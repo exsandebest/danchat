@@ -18,43 +18,15 @@ audio.enter.src = "/sounds/enter.mp3";
 audio.exit = new Audio();
 audio.exit.src = "/sounds/exit.mp3";
 
-subscribe();
-
-
 var socket = io();
-socket.on("MESSAGE", function(serverData) {
+socket.on("ADMINMESSAGE", function(serverData) {
    alert(serverData);
 });
 
-function subscribe() {
-   var xhr = new XMLHttpRequest();
-   xhr.open("GET", "/subscribe", true);
-   xhr.onload = () => {
-      var r = JSON.parse(xhr.responseText);
-      if (r.type === "message") {
-         audio.message.play();
-         updateCounter();
-         subscribe();
-      } else if (r.type === "enter") {
-         audio.enter.play();
-         updateCounter();
-         subscribe();
-      } else if (r.type === "exit") {
-         audio.exit.play();
-         updateCounter();
-         subscribe();
-      }
-   }
-   xhr.onerror = xhr.onabort = () => {
-      if (xhr.status == 324) {
-         setTimeout(subscribe, 0);
-      } else {
-         setTimeout(subscribe, 2000);
-      }
-   }
-   xhr.send();
-}
-
+socket.on("chatMessage", (msg) => {
+   audio[msg.type].play();
+   updateCounter();
+})
 
 
 function updateCounter() {
