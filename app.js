@@ -450,7 +450,7 @@ app.get("/u/:userLogin", (req, res) => {
 
 
 app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
             if (err) console.error(err);
@@ -465,7 +465,7 @@ app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
 
 
 app.post("/admin/make/user", parserJSON, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          if (decodeURIComponent(req.body.login) === "admin") {
             res.end();
@@ -484,7 +484,7 @@ app.post("/admin/make/user", parserJSON, (req, res) => {
 
 
 app.post("/admin/message", parserJSON, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          io.emit("ADMINMESSAGE", decodeURIComponent(req.body.message));
       }
@@ -496,7 +496,7 @@ app.post("/admin/message", parserJSON, (req, res) => {
 
 
 app.get("/adminpanel", (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          res.render("adminpanel.ejs", {
             login: u.login
@@ -693,7 +693,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
 
 
 app.get("/logout", (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res).then((u) => {
       if (u) {
          sql.query(`select color from users where id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
@@ -734,7 +734,7 @@ app.post("/json", parserJSON, (req, res) => {
 })
 
 app.get("/console/sql", (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          res.render("consoleSql.ejs");
       }
@@ -746,7 +746,7 @@ app.get("/console/sql", (req, res) => {
 
 
 app.post("/console/sql/query", parserJSON, (req, res) => {
-   wwt.validateAdmin(req, res).then((u) => {
+   wwt.validate(req, res, true).then((u) => {
       if (u) {
          console.log(req.body.q);
          sql.query(req.body.q, (err, result, fields) => {
