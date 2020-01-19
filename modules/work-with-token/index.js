@@ -5,7 +5,7 @@ const std = require("../standart");
 
 exports.validate = (req, res, isAdmin = false) => {
    var p = new Promise((resolve, reject) => {
-      var token = std.getCookie(req, "token");
+      var token = std.getCookie(req, "danchat.token");
       if (token) {
          sql.query(`select id from tokens where token = '${token}'`, (err, result) => {
             if (err) {
@@ -13,7 +13,7 @@ exports.validate = (req, res, isAdmin = false) => {
                reject("db");
             }
             if (result === undefined || result.length === 0) {
-               res.clearCookie("token");
+               res.clearCookie("danchat.token");
                res.redirect("/login");
                resolve(false);
             } else {
@@ -23,7 +23,7 @@ exports.validate = (req, res, isAdmin = false) => {
                      reject("db");
                   }
                   if (data === undefined || data.length === 0) {
-                     res.clearCookie("token");
+                     res.clearCookie("danchat.token");
                      res.redirect("/login");
                      resolve(false);
                   } else {
@@ -43,7 +43,7 @@ exports.validate = (req, res, isAdmin = false) => {
             }
          })
       } else {
-         res.clearCookie("token");
+         res.clearCookie("danchat.token");
          res.redirect("/login");
          resolve(false);
       }

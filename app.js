@@ -30,7 +30,7 @@ app.set("view engine", "ejs");
 
 
 app.get("/login", (req, res) => {
-   res.clearCookie("token", {
+   res.clearCookie("danchat.token", {
       path: "/"
    });
    res.render("login.ejs", {
@@ -97,7 +97,7 @@ function enter(res, user) { //login, color, id
             msg.time = new Date().toTimeString().substring(0, 5);
             msg.id = result[0]["max(id)"] + 1;
             chat.addnewmessage(msg);
-            res.cookie("token", token, {
+            res.cookie("danchat.token", token, {
                path: "/",
                httpOnly: true
             });
@@ -709,7 +709,7 @@ app.get("/logout", (req, res) => {
                sql.query(`delete from tokens where id = ${u.id}`, (err) => {
                   if (err) console.error(err);
                   chat.addnewmessage(msg);
-                  res.clearCookie("token");
+                  res.clearCookie("danchat.token");
                   res.redirect("/login");
                   res.end();
                })
