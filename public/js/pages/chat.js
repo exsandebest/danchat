@@ -62,6 +62,10 @@ function subscribe() {
    var xhr = new XMLHttpRequest();
    xhr.open("GET", "/subscribe", true);
    xhr.onload = () => {
+      if (xhr.status === 503){
+         subscribe();
+         return;
+      }
       var r = JSON.parse(xhr.responseText);
       if (r.type === "message") {
          var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a>: <msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
