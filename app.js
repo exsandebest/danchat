@@ -98,8 +98,7 @@ function enter(res, user) { //login, color, id
             msg.id = result[0]["max(id)"] + 1;
             chat.addnewmessage(msg);
             res.cookie("danchat.token", token, {
-               path: "/",
-               httpOnly: true
+               path: "/"
             });
             res.redirect("/");
          })
@@ -521,7 +520,24 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
             var userId = dt1[0].id;
             sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
                if (err) console.error(err);
-               res.json(new ResponseObject(true));
+               sql.query(`select token from tokens where id = ${userId}`, (err, data) => {
+                  if (err) console.error(err);
+                  if (data === undefined || data.length === 0) {
+                     res.json(new ResponseObject(true));
+                  } else {
+                     sql.query(`select login, firstname, lastname, color, sex from users where id = ${u.id}`, (err, dt2) => {
+                        if (err) console.error(err);
+                        io.emit(data[0].token, {
+                           type: "newIncomingRequest",
+                           login: dt2[0].login,
+                           name: `${dt2[0].firstname} ${dt2[0].lastname}`,
+                           color : dt2[0].color,
+                           sex : dt2[0].sex
+                        })
+                        res.json(new ResponseObject(true));
+                     })
+                  }
+               })
             })
          })
       }
@@ -582,7 +598,24 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                   if (err) console.error(err);
                   sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
                      if (err) console.error(err);
-                     res.json(new ResponseObject(true));
+                     sql.query(`select token from tokens where id = ${userId}`, (err, data) => {
+                        if (err) console.error(err);
+                        if (data === undefined || data.length === 0) {
+                           res.json(new ResponseObject(true));
+                        } else {
+                           sql.query(`select login, firstname, lastname, sex, color from users where id = ${u.id}`, (err, dt2) => {
+                              if (err) console.error(err);
+                              io.emit(data[0].token, {
+                                 type: "acceptOutcomingRequest",
+                                 login: dt2[0].login,
+                                 name: `${dt2[0].firstname} ${dt2[0].lastname}`,
+                                 color : dt2[0].color,
+                                 sex : dt2[0].sex
+                              })
+                              res.json(new ResponseObject(true));
+                           })
+                        }
+                     })
                   })
                })
             })
@@ -609,7 +642,24 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
                if (err) console.error(err);
                sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err) => {
                   if (err) console.error(err);
-                  res.json(new ResponseObject(true));
+                  sql.query(`select token from tokens where id = ${friendId}`, (err, data) => {
+                     if (err) console.error(err);
+                     if (data === undefined || data.length === 0) {
+                        res.json(new ResponseObject(true));
+                     } else {
+                        sql.query(`select login, firstname, lastname, sex, color from users where id = ${u.id}`, (err, dt2) => {
+                           if (err) console.error(err);
+                           io.emit(data[0].token, {
+                              type: "deletingFromFriends",
+                              login: dt2[0].login,
+                              name: `${dt2[0].firstname} ${dt2[0].lastname}`,
+                              color : dt2[0].color,
+                              sex : dt2[0].sex
+                           })
+                           res.json(new ResponseObject(true));
+                        })
+                     }
+                  })
                })
             })
          })
