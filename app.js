@@ -23,7 +23,7 @@ const parserURLEncoded = pars.urlencoded({
 });
 const parserJSON = pars.json();
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public", {maxAge: "30d"}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
