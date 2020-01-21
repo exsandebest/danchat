@@ -101,6 +101,9 @@ function getMsg(scroll) {
             .catch(err => errorChatPage(err, "gm"));
       }
    }).catch(err => errorChatPage(err, "gm"));
+   if (scroll) {
+      chat.scrollTop = chat.scrollHeight;
+   }
 }
 
 
