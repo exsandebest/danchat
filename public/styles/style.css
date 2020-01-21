@@ -30,10 +30,11 @@ nav a {
    text-decoration: none;
    color: #FFF;
 }
-nav a#prof:hover {
-   background-color: #5cd661;
-   cursor:pointer;
-   border-radius: 50px;
+
+nav a#prof:hover{
+   cursor: default;
+   background-color: #39c63e;
+   border-radius: 100px 100px 0px 0px;
 }
 
 nav a:hover {
@@ -53,7 +54,7 @@ nav ul ul li {
    position: relative;
 }
 nav ul li.active {
-   background-color: #4CAF50;
+   background-color: #39c63e;
    float:right;
    min-width: 115px;
 }
@@ -168,8 +169,9 @@ footer div {
 footer div p {
    margin-left: 25px;
    margin-top: 8px;
-   color:rgba(70, 230, 72, 1);
+   color: rgba(240, 240, 240, 0.9);
    font-weight:bold;
+   font-family: "Trebuchet MS";
 }
 
 /* People-page */
@@ -460,11 +462,15 @@ textarea#message{
 }
 
 div#btnGetMsg{
-   background-color: rgba(71, 226, 73, 0.89);
+   background-color: rgba(92, 203, 94, 0.89);
    bottom: 0;
    width: 45%;
-   height: 30px;
+   height: auto;
    border-radius: 25px 25px 0px 0px;
+   color: rgba(236, 238, 238, 0.88);
+   padding: 5px;
+   cursor: pointer;
+   font-family: "Trebuchet MS";
 }
 
 
@@ -475,7 +481,7 @@ span.messageTime {
 
 
 span#onlineCounterCover{
-   cursor: pointer;
+   cursor: default;
    font-size: 20px;
    position: fixed;
    bottom: 30px;

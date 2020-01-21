@@ -9,13 +9,11 @@ or
 # Structure of main directories
 * **You have to fill these directories with necessary files to correct work**  
 * **You also have to create and fill `config/.env` with necessary data, see [`config/.env.example`](https://github.com/exsandebest/danchat/blob/master/config/.env.example) as example**  
-*They were commented because of using heroku*
 
 
 ### Structure of sounds
 ```
-public/sounds/enter.mp3 //sound of login
-public/sounds/exit.mp3 //sound of logout
+public/sounds/registration.mp3 //sound of new user registration
 public/sounds/message.mp3 //sound of message
 ```
 

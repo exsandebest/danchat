@@ -4,3 +4,11 @@ function getCookie(name) {
    ));
    return matches ? decodeURIComponent(matches[1]) : undefined;
 }
+
+function error(text){
+   VanillaToasts.create({
+      title: "Ошибка",
+      text,
+      type: "error"
+   });
+}

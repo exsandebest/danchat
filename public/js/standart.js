@@ -1,41 +1,44 @@
-if (sessionStorage.getItem("counter") === null) {
-   sessionStorage.setItem("counter", 0);
+if (sessionStorage.getItem("danchat.counter") === null) {
+   sessionStorage.setItem("danchat.counter", 0);
 } else {
-   if (Number(sessionStorage.getItem("counter")) != 0) {
-      if (Number(sessionStorage.getItem("counter")) > 99) {
-         document.getElementById("counter").innerHTML = "99+";
+   let val = parseInt(sessionStorage.getItem("danchat.counter"));
+   let elem = document.getElementById("counter");
+   if (val != 0) {
+      if (val > 99) {
+         elem.innerText = "99+";
       } else {
-         document.getElementById("counter").innerHTML = " " + sessionStorage.getItem("counter") + " ";
+         elem.innerText = ` ${val} `;
       }
    }
 }
 
 var audio = {};
-var audioTypes = ["message", "enter", "exit"];
+var audioTypes = ["message", "registration"];
 audioTypes.forEach((item) => {
    audio[item] = new Audio();
    audio[item].src = `/sounds/${item}.mp3`;
 });
 
 var socket = io();
-socket.on("ADMINMESSAGE", function(serverData) {
+socket.on("ADMINMESSAGE", serverData => {
    alert(serverData);
 });
 
-socket.on("chatMessage", (msg) => {
+socket.on("chatMessage", msg => {
    audio[msg.type].play();
    updateCounter();
 })
 
 
 function updateCounter() {
-   sessionStorage.setItem("counter", Number(sessionStorage.getItem("counter")) + 1);
-   var count = Number(sessionStorage.getItem("counter"));
+   sessionStorage.setItem("danchat.counter", parseInt(sessionStorage.getItem("danchat.counter")) + 1);
+   var count = parseInt(sessionStorage.getItem("danchat.counter"));
+   let elem = document.getElementById("counter");
    if (count != 0) {
       if (count > 99) {
-         document.getElementById("counter").innerHTML = "99+";
+         elem.innerText = "99+";
       } else {
-         document.getElementById("counter").innerHTML = " " + count + " ";
+         elem.innerText = ` ${count} `;
       }
    }
 }

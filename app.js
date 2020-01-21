@@ -23,7 +23,9 @@ const parserURLEncoded = pars.urlencoded({
 });
 const parserJSON = pars.json();
 
-app.use(express.static(__dirname + "/public", {maxAge: "30d"}));
+app.use(express.static(__dirname + "/public", {
+   maxAge: "1h"
+}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
@@ -60,7 +62,19 @@ app.post("/registration", parserURLEncoded, (req, res) => {
                if (err) console.error(err);
                sql.query(`select login, color, id from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
                   if (err) console.error(err);
-                  enter(res, data[0]);
+                  sql.query(`select max(id) as maxId from chat`, (err, result) => {
+                     var msg = {};
+                     msg.type = "registration";
+                     io.emit("chatMessage", msg);
+                     msg.user_id = data[0].id;
+                     msg.login = data[0].login;
+                     msg.color = data[0].color;
+                     msg.time = new Date().toTimeString().substring(0, 5);
+                     msg.id = result[0].maxId + 1;
+                     chat.addnewmessage(msg);
+                     enter(res, data[0]);
+                  })
+
                })
             })
          } else {
@@ -87,21 +101,10 @@ function enter(res, user) { //login, color, id
       if (err) console.error(err);
       sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
          if (err) console.error(err);
-         sql.query(`select max(id) from users`, (err, result) => {
-            var msg = {};
-            msg.type = "enter";
-            io.emit("chatMessage", msg);
-            msg.user_id = user.id;
-            msg.login = user.login;
-            msg.color = user.color;
-            msg.time = new Date().toTimeString().substring(0, 5);
-            msg.id = result[0]["max(id)"] + 1;
-            chat.addnewmessage(msg);
-            res.cookie("danchat.token", token, {
-               path: "/"
-            });
-            res.redirect("/");
-         })
+         res.cookie("danchat.token", token, {
+            path: "/"
+         });
+         res.redirect("/");
       })
    })
 }
@@ -486,6 +489,7 @@ app.post("/admin/message", parserJSON, (req, res) => {
    wwt.validate(req, res, true).then((u) => {
       if (u) {
          io.emit("ADMINMESSAGE", decodeURIComponent(req.body.message));
+         res.json(new ResponseObject(true));
       }
    }, (err) => {
       res.end("DB ERROR");
@@ -531,8 +535,8 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
                            type: "newIncomingRequest",
                            login: dt2[0].login,
                            name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                           color : dt2[0].color,
-                           sex : dt2[0].sex
+                           color: dt2[0].color,
+                           sex: dt2[0].sex
                         })
                         res.json(new ResponseObject(true));
                      })
@@ -609,8 +613,8 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                                  type: "acceptOutcomingRequest",
                                  login: dt2[0].login,
                                  name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                                 color : dt2[0].color,
-                                 sex : dt2[0].sex
+                                 color: dt2[0].color,
+                                 sex: dt2[0].sex
                               })
                               res.json(new ResponseObject(true));
                            })
@@ -653,8 +657,8 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
                               type: "deletingFromFriends",
                               login: dt2[0].login,
                               name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                              color : dt2[0].color,
-                              sex : dt2[0].sex
+                              color: dt2[0].color,
+                              sex: dt2[0].sex
                            })
                            res.json(new ResponseObject(true));
                         })
@@ -745,25 +749,11 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
 app.get("/logout", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         sql.query(`select color from users where id = ${u.id}`, (err, result) => {
+         sql.query(`delete from tokens where id = ${u.id}`, (err) => {
             if (err) console.error(err);
-            sql.query(`select max(id) from users`, (err, data) => {
-               var msg = {};
-               msg.type = "exit";
-               io.emit("chatMessage", msg);
-               msg.user_id = u.id;
-               msg.login = u.login;
-               msg.color = result[0].color;
-               msg.time = new Date().toTimeString().substring(0, 5);
-               msg.id = data[0]["max(id)"] + 1;
-               sql.query(`delete from tokens where id = ${u.id}`, (err) => {
-                  if (err) console.error(err);
-                  chat.addnewmessage(msg);
-                  res.clearCookie("danchat.token");
-                  res.redirect("/login");
-                  res.end();
-               })
-            })
+            res.clearCookie("danchat.token");
+            res.redirect("/login");
+            res.end();
          })
       }
    }, (err) => {
@@ -772,16 +762,6 @@ app.get("/logout", (req, res) => {
 })
 
 
-
-app.post("/urlencoded", parserURLEncoded, (req, res) => {
-   res.json(req.body);
-})
-
-
-
-app.post("/json", parserJSON, (req, res) => {
-   res.json(req.body);
-})
 
 app.get("/console/sql", (req, res) => {
    wwt.validate(req, res, true).then((u) => {

@@ -11,6 +11,7 @@
    <%- include('partials/navbar.ejs') %>
    <center>
       <div onclick="getMsg();" id="btnGetMsg">
+         <span>Просмотреть предыдущие сообщения</span>
       </div>
       <div id="chat"></div><br>
       <div style="width:779px; display:inline-block">
@@ -22,10 +23,10 @@
       <br><br><br>
    </center>
    <script src="/socket.io/socket.io.js"></script>
+   <script src="/js/vanillatoasts.js"></script>
    <script src="/js/functions.js"></script>
    <script src="/js/pages/chat.js"></script>
    <script src="/js/notifications.js"></script>
-   <script src="/js/vanillatoasts.js"></script>
    <span class="green" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"><%=onlineCounter%></span></span>
    <%- include('partials/footer.ejs') %>
 </body>

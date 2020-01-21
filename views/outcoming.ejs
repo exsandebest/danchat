@@ -28,7 +28,7 @@
                <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
                <p class="friend-fullname"><%=elem.firstname%> <%=elem.lastname%></p>
                <div class="friend-funcblock">
-                  <btn class="small" onclick="cancelOutcomingRequest('<%=elem.login%>')">Отменить</btn>
+                  <btn class="small" onclick="friendsChanges('<%=elem.login%>', 'request sent')">Отменить</btn>
                </div>
             </div>
          </div>
@@ -36,7 +36,7 @@
          <%})%>
       </div>
    </center>
-   <script src="/js/pages/outcoming.js"></script>
+   <script src="/js/friendsFunctions.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 

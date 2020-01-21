@@ -3,8 +3,6 @@
 <head>
    <%- include('partials/header.ejs') %>
    <title>Настройки</title>
-   <style>
-   </style>
 </head>
 
 <body background="/images/bg.jpg">
@@ -13,21 +11,22 @@
    <center>
       <span class="purple">Цвет логина в чате</span><br><br>
       <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
-      <label><span class="purple">Автоматически прокручивать чат</span>
-         <br><br>
-         <%if (scroll) {%>
-         <input type="checkbox" id="scroll" checked />
-         <%} else {%>
-         <input type="checkbox" id="scroll" />
-         <%}%>
-      </label><br><br>
-      <span class="green notification" id="notif"></span>
-      <br><br>
+      <label>
+      <%if (scroll) {%>
+      <input type="checkbox" id="scroll" checked />
+      <%} else {%>
+      <input type="checkbox" id="scroll" />
+      <%}%>
+      <span class="purple">Автоматически прокручивать чат</span>
+      </label>
+      <br><br><br>
+</div>
+</section>
       <btn class="standart" onclick="save()">Сохранить</btn>
    </center>
    <script src="/js/pages/settings.js"></script>
    <%- include('partials/footer.ejs') %>
 
-<body>
+         <body>
 
 </html>

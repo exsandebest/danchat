@@ -27,7 +27,7 @@
                <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
                <p class="friend-fullname"><%=elem.firstname%> <%=elem.lastname%></p>
                <div class="friend-funcblock">
-                  <btn class="small" onclick="acceptIncomingRequest('<%=elem.login%>')">Принять</btn>
+                  <btn class="small" onclick="friendsChanges('<%=elem.login%>', 'subscriber')">Принять</btn>
                </div>
             </div>
          </div>
@@ -35,8 +35,7 @@
          <%})%>
       </div>
    </center>
-   <script src="/js/pages/incoming.js">
-   </script>
+   <script src="/js/friendsFunctions.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 

@@ -1,72 +1,60 @@
 function changePasword() {
-   var oldPassword = val("oldPassword");
-   var newPassword = val("newPassword");
-   var repeatNewPassword = val("repeatNewPassword");
-   var xhr = new XMLHttpRequest();
-   xhr.open("POST", "/user/change/password", true);
-   xhr.setRequestHeader("Content-Type", "application/json");
-   xhr.onload = () => {
-      if (xhr.status == 200) {
-         var obj = JSON.parse(xhr.responseText);
-         if (obj.status) {
-            notif(1, "Good", obj.text, obj.text2, 100000);
-            document.getElementById("oldPassword").innerHTML = "";
-            document.getElementById("newPassword").innerHTML = "";
-            document.getElementById("repeatNewPassword").innerHTML = "";
-         } else {
-            notif(1, "Bad", obj.text, obj.text2, 10000);
-         }
+   fetch("/user/change/password", {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+         oldPassword: val("oldPassword"),
+         newPassword: val("newPassword"),
+         repeatNewPassword: val("repeatNewPassword")
+      })
+   }).then(res => {
+      if (!res.ok) {
+         error(res.status);
       } else {
-         notif(1, "Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 10000);
+         res.json().then(data => {
+            if (data.status) {
+               notif(1, "Good", data.text, data.text2, 100000);
+               document.getElementById("oldPassword").innerHTML = "";
+               document.getElementById("newPassword").innerHTML = "";
+               document.getElementById("repeatNewPassword").innerHTML = "";
+            } else {
+               notif(1, "Bad", data.text, data.text2, 10000);
+            }
+         }).catch(err => error(err));
       }
-   }
-   xhr.onerror = xhr.onabort = () => {
-      notif(1, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
-   }
-   xhr.send(JSON.stringify({
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-      repeatNewPassword: repeatNewPassword
-   }))
+   }).catch(err => error(err));
 }
-
-
 
 
 function changeName() {
-   var firstname = val("firstname");
-   var lastname = val("lastname");
-   var xhr = new XMLHttpRequest();
-   xhr.open("POST", "/user/change/name", true);
-   xhr.setRequestHeader("Content-Type", "application/json");
-   xhr.onload = () => {
-      if (xhr.status == 200) {
-         var obj = JSON.parse(xhr.responseText);
-         if (obj.status) {
-            notif(2, "Good", obj.text, obj.text2, 10000);
-         } else {
-            notif(2, "Bad", obj.text, obj.text2, 10000);
-         }
+   fetch("/user/change/name", {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+         firstname: val("firstname"),
+         lastname: val("lastname")
+      })
+   }).then(res => {
+      if (!res.ok) {
+         error(res.status);
       } else {
-         notif(2, "Bad", "Проблемы с сервером. Приносим свои извинения", "Попробуйте позже", 10000);
+         res.json().then(data => {
+            if (data.status) {
+               notif(2, "Good", data.text, data.text2, 10000);
+            } else {
+               notif(2, "Bad", data.text, data.text2, 10000);
+            }
+         }).catch(err => error(err));
       }
-   }
-   xhr.onerror = xhr.onabort = () => {
-      notif(2, "Bad", "Проблемы с сервером, приносим свои извинения", "Попробуйте позже", 10000);
-   }
-   xhr.send(JSON.stringify({
-      firstname: firstname,
-      lastname: lastname
-   }));
+   }).catch(err => error(err));
 }
 
 function notif(num, type, msg1, msg2, time) {
-   var elem;
-   if (num === 1) {
-      elem = document.getElementById("notif");
-   } else {
-      elem = document.getElementById("notif2");
-   }
+   let elem = document.getElementById(`notif${num === 1 ? "" : 2}`);
    elem.setAttribute("style", "opacity:0");
    elem.innerHTML = `<span class='notification${type}'>${msg1}</span><br><span class = 'orange'>${msg2}</span>`;
    elem.setAttribute("style", "opacity:1");
@@ -74,13 +62,6 @@ function notif(num, type, msg1, msg2, time) {
       elem.setAttribute("style", "opacity:0");
    }, time);
 }
-
-
-
-
-
-
-
 
 
 function val(id) {

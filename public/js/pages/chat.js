@@ -1,15 +1,11 @@
 var login = document.getElementById("prof").innerText;
 var chat = document.getElementById("chat");
 var minId = -1;
-
 sessionStorage.setItem("counter", 0);
 getMsg(1);
 
-
-
-
 var audio = {};
-var audioTypes = ["message", "enter", "exit"];
+var audioTypes = ["message", "registration"];
 audioTypes.forEach((item) => {
    audio[item] = new Audio();
    audio[item].src = `/sounds/${item}.mp3`;
@@ -18,112 +14,107 @@ audioTypes.forEach((item) => {
 subscribe();
 
 var socket = io();
-socket.on("ADMINMESSAGE", function(serverData) {
+socket.on("ADMINMESSAGE", serverData => {
    alert(serverData);
 });
 
 function sendMessage() {
-   var msg = document.getElementById("message").value;
-   if (msg){
-      var xhr = new XMLHttpRequest();
-      document.getElementById("message").value = "";
-      xhr.open("POST", "/addnewmessage", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onload = () =>{
-         if (xhr.status === 200){
-            if (!JSON.parse(xhr.responseText).status){
-               alert("Ошибка при отправке сообщения");
+   let elem = document.getElementById("message");
+   let message = elem.value;
+   if (!message) return;
+   fetch("/addnewmessage", {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+         message
+      })
+   }).then(res => {
+      if (!res.ok) {
+         errorChatPage(res.status, "sm");
+      } else {
+         res.json().then(data => {
+            if (!data.status) {
+               errorChatPage(data.text || data, "sm");
+            } else {
+               elem.value = "";
             }
-         } else {
-            alert("Ошибка при отправке сообщения");
-         }
+         }).catch(err => errorChatPage(err, "sm"));
       }
-      xhr.onerror = xhr.onabort = ()=>{
-        alert("Ошибка при отправке сообщения");
-      }
-      xhr.send(JSON.stringify({
-        message : msg
-      }));
-   }
+   }).catch(err => errorChatPage(err, "sm"));
 }
 
-function complex(r, str) {
-   addToChat(str, r.scroll);
-   if (r.type === "message") {
-      document.getElementById(`msg${r.id}`).innerText = r.text;
-   }
-   subscribe();
-   if (login != r.login) {
-         audio[r.type].play();
-   }
-}
 
 function subscribe() {
-   var xhr = new XMLHttpRequest();
-   xhr.open("GET", "/subscribe", true);
-   xhr.onload = () => {
-      if (xhr.status === 503){
-         subscribe();
-         return;
-      }
-      var r = JSON.parse(xhr.responseText);
-      if (r.type === "message") {
-         var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a>: <msg id = "msg${r.id}"></msg><span class="messageTime">${r.time}</span></span><br>`;
-         complex(r, str);
-      } else if (r.type === "enter") {
-         var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a><b> вошел(ла) в чат</b><span class="messageTime">${r.time}</span></span><br>`;
-         complex(r, str);
-      } else if (r.type === "exit") {
-         var str = `<span class="msgText" idx="${r.id}"><a class="login" href="/u/${r.login}"><b style="color: ${r.color};">${r.login}</b></a><b> покинул(а) чат</b><span class="messageTime">${r.time}</span></span><br>`;
-         complex(r, str);
-      }
-   }
-   //Когда долго нет ответа или ошибка сервера
-   xhr.onerror = xhr.onabort = () => {
-      if (xhr.status == 324) {
-         setTimeout(subscribe, 0);
+   fetch("/subscribe").then(res => {
+      if (!res.ok) {
+         if (res.status === 503 || res.status === 324) {
+            subscribe();
+         } else {
+            errorChatPage(res.status, "gm");
+         }
       } else {
-         setTimeout(subscribe, 2000);
+         res.json().then(m => {
+            let templateStart = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
+            let templateEnd = `<span class="messageTime">${m.time}</span></span><br>`;
+            if (m.type === "message") {
+               let str = `${templateStart}: <msg id = "msg${m.id}"></msg>${templateEnd}`;
+               complex(m, str);
+            } else if (m.type === "registration") {
+               let str = `${templateStart} теперь в чате!${templateEnd}`;
+               complex(m, str);
+            }
+         }).catch(err => errorChatPage(err, "gm"));
       }
-   }
-   xhr.send();
+   }).catch(err => errorChatPage(err, "gm"));
 }
 
+function complex(m, str) {
+   addToChat(str, m.scroll);
+   if (m.type === "message") {
+      document.getElementById(`msg${m.id}`).innerText = m.text;
+   }
+   subscribe();
+   if (login != m.login) {
+      audio[m.type].play();
+   }
+}
 
 
 
 function getMsg(scroll) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/get/message", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onload = () => {
-         parsMsg(JSON.parse(xhr.responseText));
-         if (scroll){
-            chat.scrollTop = chat.scrollHeight;
-         } else {
-            chat.scrollTop = 0;
-         }
+   fetch("/get/message", {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+         id: minId
+      })
+   }).then(res => {
+      if (!res.ok) {
+         errorChatPage(res.status, "gm");
+      } else {
+         res.json()
+            .then(data => parseMessages(data))
+            .catch(err => errorChatPage(err, "gm"));
       }
-      xhr.onerror = xhr.onabort = ()=>{
-        alert("Ошибка при получении сообщений");
-      }
-      xhr.send(JSON.stringify({
-        id : minId
-      }));
+   }).catch(err => errorChatPage(err, "gm"));
 }
 
 
-function parsMsg(msgObj) {
-   if (msgObj.length === 0) return;
-   minId = msgObj[msgObj.length-1].id;
-   msgObj.forEach((m) => {
+function parseMessages(msgArr) {
+   if (msgArr.length === 0) return;
+   minId = msgArr[msgArr.length - 1].id;
+   msgArr.forEach(m => {
+      let templateStart = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
+      let templateEnd = `<span class="messageTime">${m.time}</span></span><br>`;
       if (m.type === "message") {
-         chat.innerHTML = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>: <msg id = "msg${m.id}"></msg><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
+         chat.innerHTML = `${templateStart}: <msg id = "msg${m.id}"></msg>${templateEnd}` + chat.innerHTML;
          document.getElementById(`msg${m.id}`).innerText = m.text;
-      } else if (m.type === "enter") {
-         chat.innerHTML = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a><b> вошел(ла) в чат</b><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
-      } else if (m.type === "exit") {
-         chat.innerHTML = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a><b> покинул(а) в чат</b><span class="messageTime">${m.time}</span></span><br>` + chat.innerHTML;
+      } else if (m.type === "registration") {
+         chat.innerHTML = `${templateStart} теперь в чате!${templateEnd}` + chat.innerHTML;
       }
    })
 }
@@ -134,4 +125,14 @@ function addToChat(str, scroll) {
    if (scroll) {
       chat.scrollTop = chat.scrollHeight;
    }
+}
+
+
+function errorChatPage(text, type = "e") { // sm - sendMessage, gm - getMessage, e - standart error
+   let prevText = type === "e" ? "Ошибка: " : (type === "sm" ? "Ошибка при отправке сообщения: " : "Ошибка при получении сообщений: ");
+   VanillaToasts.create({
+      title: "Ошибка",
+      text: prevText + text,
+      type: "error"
+   });
 }

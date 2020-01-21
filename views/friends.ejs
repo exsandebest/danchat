@@ -28,7 +28,7 @@
                <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
                <p class="friend-fullname"><%=elem.firstname%> <%=elem.lastname%></p>
                <div class="friend-funcblock">
-                  <btn class="small" onclick="delFriend('<%=elem.login%>')">Удалить</btn>
+                  <btn class="small" onclick="friendsChanges('<%=elem.login%>', 'friend')">Удалить</btn>
                </div>
             </div>
          </div>
@@ -36,7 +36,7 @@
          <%})%>
       </div>
    </center>
-   <script src="/js/pages/friends.js"></script>
+   <script src="/js/friendsFunctions.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 

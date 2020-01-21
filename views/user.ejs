@@ -17,15 +17,20 @@
       <img class="user-img" src="/images/default.jpg"><br>
       <%}%>
       <br><br>
-      <%if (userStatus === "default"){%>
-      <btn class="standart" onclick="addFriend('<%=userLogin%>')">Добавить в друзья</btn>
-      <%} else if (userStatus === "subscriber"){%>
-      <btn class="standart" onclick="acceptIncomingRequest('<%=userLogin%>')">Принять заявку</btn>
-      <%} else if (userStatus === "request sent"){%>
-      <btn class="standart" onclick="cancelOutcomingRequest('<%=userLogin%>')">Отменить заявку</btn>
-      <%} else if (userStatus === "friend"){%>
-      <btn class="standart" onclick="delFriend('<%=userLogin%>')">Удалить из друзей</btn>
+      <%if (userStatus !== "self"){%>
+         <btn class="standart" onclick="friendsChanges('<%=userLogin%>','<%=userStatus%>')">
+         <%if (userStatus === "default"){%>
+            Добавить в друзья
+         <%} else if (userStatus === "subscriber"){%>
+            Принять заявку
+         <%} else if (userStatus === "request sent"){%>
+            Отменить заявку
+         <%} else if (userStatus === "friend"){%>
+            Удалить из друзей
+         <%}%>
+         </btn>
       <%}%>
+
       <br><br>
       <span class="user-login" style="color: <%=color%>;"> <%=userLogin%> </span><br><br>
       <span class="purple">Статуc: </span>
@@ -56,7 +61,7 @@
          <%}%>
       </div>
    </center>
-   <script src="/js/pages/user.js"></script>
+   <script src="/js/friendsFunctions.js"></script>
    <%- include('partials/footer.ejs') %>
 </body>
 

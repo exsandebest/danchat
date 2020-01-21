@@ -4,7 +4,7 @@ const std = require("../standart");
 
 
 exports.validate = (req, res, isAdmin = false) => {
-   var p = new Promise((resolve, reject) => {
+   return new Promise((resolve, reject) => {
       var token = std.getCookie(req, "danchat.token");
       if (token) {
          sql.query(`select id from tokens where token = '${token}'`, (err, result) => {
@@ -48,6 +48,5 @@ exports.validate = (req, res, isAdmin = false) => {
          resolve(false);
       }
    });
-   return p;
 }
 console.timeEnd("Module => work-with-token");

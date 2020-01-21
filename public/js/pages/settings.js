@@ -1,28 +1,29 @@
 function save() {
-   var colorValue = document.getElementById("color").value;
-   var scrollValue = document.getElementById("scroll").checked;
-   var xhr = new XMLHttpRequest();
-   xhr.open("POST", "/user/change/settings", true);
-   xhr.setRequestHeader("Content-Type", "application/json");
-   xhr.onload = () => {
-      var elem = document.getElementById("notif");
-      elem.setAttribute("style", "opacity:0");
-      var res = JSON.parse(xhr.responseText);
-      if (xhr.status == 200 && res.status) {
-         elem.innerHTML = `<span class='notificationGood'>${res.text}</span>`;
+   fetch("/user/change/settings", {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify({
+         color: document.getElementById("color").value,
+         scroll: document.getElementById("scroll").checked
+      })
+   }).then(res => {
+      if (!res.ok) {
+         error(res.status);
       } else {
-         elem.innerHTML = `<span class='notificationBad'>${res.text}</span>`;
+         res.json().then(data => {
+            if (data.status) {
+               VanillaToasts.create({
+                  title: "Успешно!",
+                  text: "Настройки успешно сохранены",
+                  timeout: 10000,
+                  type: "success"
+               })
+            } else {
+               error(data.text || data);
+            }
+         }).catch(err => error(err));
       }
-      elem.setAttribute("style", "opacity:1");
-      setTimeout(() => {
-         elem.setAttribute("style", "opacity:0");
-      }, 10000);
-   }
-   xhr.onerror = xhr.onabort = () => {
-      alert("Проблема при отправке запроса");
-   }
-   xhr.send(JSON.stringify({
-      color : colorValue,
-      scroll : scrollValue
-   }))
+   }).catch(err => error(err));
 }
