@@ -97,13 +97,15 @@ function getMsg(scroll) {
          errorChatPage(res.status, "gm");
       } else {
          res.json()
-            .then(data => parseMessages(data))
+            .then(data => {
+               parseMessages(data);
+               if (scroll) {
+                  chat.scrollTop = chat.scrollHeight;
+               }
+            })
             .catch(err => errorChatPage(err, "gm"));
       }
    }).catch(err => errorChatPage(err, "gm"));
-   if (scroll) {
-      chat.scrollTop = chat.scrollHeight;
-   }
 }
 
 
