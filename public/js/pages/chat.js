@@ -1,5 +1,6 @@
 var login = document.getElementById("prof").innerText;
 var chat = document.getElementById("chat");
+var symbolsCounter = document.getElementById("symbolsCounter");
 var minId = -1;
 var isPending = 0;
 sessionStorage.setItem("counter", 0);
@@ -30,7 +31,13 @@ document.querySelector('textarea').addEventListener('keydown', function() {
    setTimeout(() => {
       this.style.cssText = `height:auto; padding: 3px`;
       this.style.cssText = `height: ${(this.scrollHeight + 3)}px`;
-      document.getElementById("symbolsCounter").innerText = `${(1000 - this.value.length)}/1000`;
+      if (this.value.length > 699){
+         symbolsCounter.innerText = `${(1000 - this.value.length)}/1000`;
+         symbolsCounter.style.opacity = 1;
+      } else {
+         symbolsCounter.style.opacity = 0;
+      }
+
    }, 0);
 });
 
