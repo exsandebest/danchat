@@ -25,9 +25,19 @@ socket.on("ADMINMESSAGE", serverData => {
    alert(serverData);
 });
 
+
 function sendMessage() {
    let elem = document.getElementById("message");
    let message = elem.value;
+   if (message.length > 500){
+      VanillaToasts.create({
+         type : "warning",
+         title : "Ограничение",
+         text : "Длина сообщения не должна превышать 500 символов",
+         timeout : 10000
+      })
+      return;
+   }
    if (!message) return;
    fetch("/addnewmessage", {
       method: "POST",

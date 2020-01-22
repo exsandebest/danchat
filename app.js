@@ -174,6 +174,10 @@ app.get("/subscribe", (req, res) => {
 app.post("/addnewmessage", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
+         if (decodeURIComponent(req.body.message).length > 500){
+            res.json(new ResponseObject(false, "Длина сообщения не должна превышать 500 символов"));
+            return;
+         }
          sql.query(`select color from users where id = ${u.id}`, (err, result) => {
             if (err) console.error(err);
             sql.query(`select max(id) from chat`, (err, data) => {
