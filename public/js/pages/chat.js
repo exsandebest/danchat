@@ -4,9 +4,10 @@ var minId = -1;
 var isPending = 0;
 sessionStorage.setItem("counter", 0);
 getMsg(1);
-chat.addEventListener('scroll', ()=>{
+
+chat.addEventListener('scroll', () => {
    if (minId === 1 || isPending) return;
-   if (chat.scrollTop === 0){
+   if (chat.scrollTop === 0) {
       getMsg();
    }
 })
@@ -25,19 +26,19 @@ socket.on("ADMINMESSAGE", serverData => {
    alert(serverData);
 });
 
+document.querySelector('textarea').addEventListener('keydown', function() {
+   setTimeout(() => {
+      this.style.cssText = `height:auto; padding: 3px`;
+      this.style.cssText = `height: ${(this.scrollHeight + 3)}px`;
+      document.getElementById("symbolsCounter").innerText = `${(1000 - this.value.length)}/1000`;
+   }, 0);
+});
+
+
 
 function sendMessage() {
    let elem = document.getElementById("message");
-   let message = elem.value;
-   if (message.length > 500){
-      VanillaToasts.create({
-         type : "warning",
-         title : "Ограничение",
-         text : "Длина сообщения не должна превышать 500 символов",
-         timeout : 10000
-      })
-      return;
-   }
+   let message = elem.value.trim();
    if (!message) return;
    fetch("/addnewmessage", {
       method: "POST",

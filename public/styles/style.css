@@ -461,13 +461,17 @@ div#chat {
 
 textarea#message {
    min-height: 75px;
-   max-height: 150px;
-   min-width: 70%;
-   max-width: 80%;
+   max-height: 175px;
+   width: 75%;
    border-radius: 15px;
    background-color: rgba(254, 254, 254, 0.8);
    font: normal 15px 'arial';
    padding: 3px;
+   resize: none;
+}
+textarea#message::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }
 
 span.messageTime {
@@ -481,6 +485,12 @@ span#onlineCounterCover {
    position: fixed;
    bottom: 30px;
    right: 20px;
+}
+
+span#symbolsCounter {
+    color: white;
+    display: block;
+    font-size: 13px;
 }
 
 b.login {

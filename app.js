@@ -174,8 +174,13 @@ app.get("/subscribe", (req, res) => {
 app.post("/addnewmessage", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         if (decodeURIComponent(req.body.message).length > 500){
-            res.json(new ResponseObject(false, "Длина сообщения не должна превышать 500 символов"));
+         let message = decodeURIComponent(req.body.message).trim();
+         if (message.length > 1000){
+            res.json(new ResponseObject(false, "Длина сообщения не должна превышать 1000 символов"));
+            return;
+         }
+         if (message.length === 0 || !message){
+            res.json(new ResponseObject(false, "Пустое сообщение"));
             return;
          }
          sql.query(`select color from users where id = ${u.id}`, (err, result) => {
@@ -189,7 +194,7 @@ app.post("/addnewmessage", parserJSON, (req, res) => {
                msg.color = result[0].color;
                msg.time = new Date().toTimeString().substring(0, 5);
                msg.id = data[0]["max(id)"] + 1;
-               msg.text = decodeURIComponent(req.body.message);
+               msg.text = message;
                chat.addnewmessage(msg);
                res.json(new ResponseObject(true));
             })
