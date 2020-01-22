@@ -1,8 +1,15 @@
 var login = document.getElementById("prof").innerText;
 var chat = document.getElementById("chat");
 var minId = -1;
+var isPending = 0;
 sessionStorage.setItem("counter", 0);
 getMsg(1);
+chat.addEventListener('scroll', ()=>{
+   if (minId === 1 || isPending) return;
+   if (chat.scrollTop === 0){
+      getMsg();
+   }
+})
 
 var audio = {};
 var audioTypes = ["message", "registration"];
@@ -84,6 +91,8 @@ function complex(m, str) {
 
 
 function getMsg(scroll) {
+   isPending = true;
+   let prevHeight = chat.scrollHeight;
    fetch("/get/message", {
       method: "POST",
       headers: {
@@ -101,7 +110,10 @@ function getMsg(scroll) {
                parseMessages(data);
                if (scroll) {
                   chat.scrollTop = chat.scrollHeight;
+               } else {
+                  chat.scrollTop = chat.scrollHeight - prevHeight;
                }
+               isPending = false;
             })
             .catch(err => errorChatPage(err, "gm"));
       }

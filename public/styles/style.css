@@ -447,9 +447,26 @@ div#chat {
    font-size: 17px;
    white-space: pre-wrap;
    text-align:left;
-   border-radius: 30px;
+   border-radius: 30px 0px 0px 30px;
    padding: 1.5%;
 }
+
+#chat::-webkit-scrollbar-track {
+   	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+   	background-color: #F5F5F5;
+   	border-radius: 10px;
+   }
+
+#chat::-webkit-scrollbar {
+   	width: 10px;
+   	background-color: #F5F5F5;
+   }
+
+#chat::-webkit-scrollbar-thumb {
+   	border-radius: 10px;
+   	background-color: #FFF;
+   	background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#4D9C41), to(#19911D), color-stop(.6,#54DE5D))
+   }
 
 
 textarea#message{
@@ -459,18 +476,6 @@ textarea#message{
    background-color:rgba(254, 254, 254, 0.8);
    resize:none;
    font: normal 15px 'arial';
-}
-
-div#btnGetMsg{
-   background-color: rgba(92, 203, 94, 0.89);
-   bottom: 0;
-   width: 45%;
-   height: auto;
-   border-radius: 25px 25px 0px 0px;
-   color: rgba(236, 238, 238, 0.88);
-   padding: 5px;
-   cursor: pointer;
-   font-family: "Trebuchet MS";
 }
 
 

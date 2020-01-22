@@ -10,9 +10,6 @@
 <body background="/images/bg.jpg">
    <%- include('partials/navbar.ejs') %>
    <center>
-      <div onclick="getMsg();" id="btnGetMsg">
-         <span>Просмотреть предыдущие сообщения</span>
-      </div>
       <div id="chat"></div><br>
       <div style="width:779px; display:inline-block">
          <textarea placeholder="Напишите сообщение..." onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
