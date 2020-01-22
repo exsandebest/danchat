@@ -158,22 +158,36 @@ btn:not(:hover) {
 }
 
 /* Footer */
-footer div {
+footer {
    background-color: rgba(70, 230, 72, 0.49);
-   margin-top: 30px;
    position: fixed;
    bottom: 0;
    width: 100%;
-   height: 30px;
+   height: auto;
    border-radius: 25px 25px 0px 0px;
+   display: inline-block;
+   padding: 5px;
 }
 
-footer div p {
+footer p#footerLabel {
    margin-left: 25px;
-   margin-top: 8px;
    color: rgba(240, 240, 240, 0.9);
    font-weight: bold;
    font-family: "Trebuchet MS";
+   display: inline-block;
+   margin-top: 0px;
+   margin-bottom: 0px;
+}
+
+footer span#githubButtons {
+   margin-right: 30px;
+   float: right;
+   display: flex;
+}
+
+footer span#githubButtons span {
+   margin-left: 5px;
+   margin-left: 5px;
 }
 
 /* People-page */
@@ -468,9 +482,10 @@ textarea#message {
    padding: 3px;
    resize: none;
 }
+
 textarea#message::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
+   width: 0px;
+   background: transparent;
 }
 
 span.messageTime {
@@ -487,10 +502,10 @@ span#onlineCounterCover {
 }
 
 span#symbolsCounter {
-    color: white;
-    display: block;
-    font-size: 13px;
-    transition: 0.5s;
+   color: white;
+   display: block;
+   font-size: 13px;
+   transition: 0.5s;
 }
 
 b.login {
