@@ -166,9 +166,11 @@ function addToChat(str, scroll) {
 
 function errorChatPage(text, type = "e") { // sm - sendMessage, gm - getMessage, e - standart error
    let prevText = type === "e" ? "Ошибка: " : (type === "sm" ? "Ошибка при отправке сообщения: " : "Ошибка при получении сообщений: ");
-   VanillaToasts.create({
-      title: "Ошибка",
-      text: prevText + text,
-      type: "error"
-   });
+   setTimeout(()=>{
+      VanillaToasts.create({
+         title: "Ошибка",
+         text: prevText + text,
+         type: "error"
+      });
+   }, 2000);
 }
