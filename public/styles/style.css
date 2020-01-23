@@ -488,10 +488,7 @@ textarea#message::-webkit-scrollbar {
    background: transparent;
 }
 
-span.messageTime {
-   float: right;
-   color: rgba(248, 249, 255, 1);
-}
+
 
 span#onlineCounterCover {
    cursor: default;
@@ -508,18 +505,35 @@ span#symbolsCounter {
    transition: 0.5s;
 }
 
-b.login {
-   font-size: 1em;
-   cursor: pointer;
-}
+
 
 a.login {
+   font-size: 0.9em;
+   cursor: pointer;
    text-decoration: none;
+   font-family: "Trebuchet MS";
 }
 
 .msgText {
-   bottom: 0;
+   font-family: "calibri";
    cursor: default;
+   background-color: rgb(255, 255, 255);
+   max-width: 70%;
+   width: auto;
+   border-radius: 8px;
+   margin: 3px;
+   padding: 3px 10px 3px 10px;
+   display: inline-block;
+   word-break: break-all;
+   white-space: pre-wrap;
+   -moz-hyphens: auto;
+   -webkit-hyphens: auto;
+   -ms-hyphens: auto;
+}
+
+.messageTime {
+   color: rgba(128, 128, 128, 1);
+   font-size: 12px;
 }
 
 h1.mainLabel {

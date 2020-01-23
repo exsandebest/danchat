@@ -82,13 +82,13 @@ function subscribe() {
          }
       } else {
          res.json().then(m => {
-            let templateStart = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
-            let templateEnd = `<span class="messageTime">${m.time}</span></span><br>`;
+            let templateStart = `<p class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
+            let templateEnd = `</p><br>`;
             if (m.type === "message") {
-               let str = `${templateStart}: <msg id = "msg${m.id}"></msg>${templateEnd}`;
+               let str = `${templateStart} <span class="messageTime">${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}`;
                complex(m, str);
             } else if (m.type === "registration") {
-               let str = `${templateStart} теперь в чате!${templateEnd}`;
+               let str = `${templateStart} теперь в чате! <span class="messageTime">${m.time}</span>${templateEnd}`;
                complex(m, str);
             }
          }).catch(err => errorChatPage(err, "gm"));
@@ -144,13 +144,13 @@ function parseMessages(msgArr) {
    if (msgArr.length === 0) return;
    minId = msgArr[msgArr.length - 1].id;
    msgArr.forEach(m => {
-      let templateStart = `<span class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
-      let templateEnd = `<span class="messageTime">${m.time}</span></span><br>`;
+      let templateStart = `<p class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
+      let templateEnd = `</p><br>`;
       if (m.type === "message") {
-         chat.innerHTML = `${templateStart}: <msg id = "msg${m.id}"></msg>${templateEnd}` + chat.innerHTML;
+         chat.innerHTML = `${templateStart} <span class="messageTime">${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}` + chat.innerHTML;
          document.getElementById(`msg${m.id}`).innerText = m.text;
       } else if (m.type === "registration") {
-         chat.innerHTML = `${templateStart} теперь в чате!${templateEnd}` + chat.innerHTML;
+         chat.innerHTML = `${templateStart} теперь в чате! <span class="messageTime">${m.time}</span>${templateEnd}` + chat.innerHTML;
       }
    })
 }
