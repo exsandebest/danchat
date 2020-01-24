@@ -64,7 +64,7 @@ function sendMessage() {
                errorChatPage(data.text || data, "sm");
             } else {
                elem.value = "";
-               document.getElementById("symbolsCounter").innerText = "1000/1000";
+               document.getElementById("symbolsCounter").style.opacity = 0;
             }
          }).catch(err => errorChatPage(err, "sm"));
       }

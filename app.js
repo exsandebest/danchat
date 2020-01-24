@@ -24,6 +24,9 @@ const parserURLEncoded = pars.urlencoded({
    extended: false
 });
 const parserJSON = pars.json();
+if (!fs.existsSync("public/userImages")){
+    fs.mkdirSync("public/userImages");
+}
 
 app.use(express.static(__dirname + "/public", {
    maxAge: "1h"
@@ -777,7 +780,6 @@ app.get("/logout", (req, res) => {
       res.end("DB ERROR");
    });
 })
-
 
 
 app.get("/console/sql", (req, res) => {
