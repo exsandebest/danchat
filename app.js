@@ -5,6 +5,7 @@ if (!process.env.USING_HEROKU) {
       path: "config/.env"
    });
 }
+const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
