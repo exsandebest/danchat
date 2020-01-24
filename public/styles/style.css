@@ -193,7 +193,7 @@ footer span#githubButtons span {
 /* People-page */
 img.people {
    float: left;
-   margin: 10px;
+   margin: 7px;
    border-radius: 70px;
    width: 85px;
    height: 85px;
@@ -450,7 +450,7 @@ div#chat {
    height: 45%;
    font-size: 17px;
    white-space: pre-wrap;
-   text-align: left;
+   text-align-last: left;
    border-radius: 30px 0px 0px 30px;
    padding: 1.5%;
 }
@@ -488,8 +488,6 @@ textarea#message::-webkit-scrollbar {
    background: transparent;
 }
 
-
-
 span#onlineCounterCover {
    cursor: default;
    font-size: 20px;
@@ -504,8 +502,6 @@ span#symbolsCounter {
    font-size: 13px;
    transition: 0.5s;
 }
-
-
 
 a.login {
    font-size: 0.9em;
@@ -534,6 +530,26 @@ a.login {
 .messageTime {
    color: rgba(128, 128, 128, 1);
    font-size: 12px;
+}
+
+div#spinner {
+   height: 24px;
+   width: 24px;
+   color: rgba(90, 90, 90, 0.2);
+   border: 5px solid;
+   border-radius: 50%;
+   border-right-color: #5a5a5a;
+   animation: rotate 0.9s linear infinite;
+}
+
+@keyframes rotate {
+   0% {
+      transform: rotate(0);
+   }
+
+   100% {
+      transform: rotate(360deg);
+   }
 }
 
 h1.mainLabel {

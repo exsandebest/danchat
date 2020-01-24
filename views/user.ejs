@@ -12,53 +12,55 @@
    <%- include('partials/scripts.ejs') %>
    <center>
       <%if (imgStatus) {%>
-         <img class="user-img" src="">
+      <img class="user-img" src="">
       <%} else {%>
-         <img class="user-img" src="/userImages/<%=userLogin%>.png">
+      <img class="user-img" src="/userImages/<%=userLogin%>.png">
       <%}%>
       <br><br><br>
       <%if (userStatus !== "self"){%>
-         <btn class="standart" onclick="friendsChanges('<%=userLogin%>','<%=userStatus%>')">
+      <btn class="standart" onclick="friendsChanges('<%=userLogin%>','<%=userStatus%>')">
          <%if (userStatus === "default"){%>
-            Добавить в друзья
+         Добавить в друзья
          <%} else if (userStatus === "subscriber"){%>
-            Принять заявку
+         Принять заявку
          <%} else if (userStatus === "request sent"){%>
-            Отменить заявку
+         Отменить заявку
          <%} else if (userStatus === "friend"){%>
-            Удалить из друзей
+         Удалить из друзей
          <%}%>
          </btn>
       <%}%>
 
-      <br><br>
-      <span class="user-login" style="color: <%=color%>;"> <%=userLogin%> </span><br><br>
-      <span class="purple">Статуc: </span>
-      <% if (userOnlineStatus === "online") {%>
+         <br><br>
+         <span class="user-login" style="color: <%=color%>;"> <%=userLogin%> </span><br><br>
+         <span class="purple">Статуc: </span>
+         <% if (userOnlineStatus === "online") {%>
          <span class="green">Онлайн</span>
-      <% } else if (userOnlineStatus === "offline") {%>
+         <% } else if (userOnlineStatus === "offline") {%>
          <span class="red">Не в сети</span>
-      <% }%>
-      <br><br>
-      <span class="green"><%=firstname%> <%=lastname%></span><br><br>
-      <span class="purple">Возраст: </span><span class="green"><%=age%></span><br><br>
-      <span class="purple">Пол: </span><span class="green"><%=sex%></span><br><br>
-      <span class="purple">Друзья:</span><br><br>
-      <div id="user-friends">
-         <%if (friends.length !== 0) {%>
-         <%friends.forEach((elem)=>{%>
-         <a class="user-friendLink" href="/u/<%=elem.login%>">
-            <%if (elem.imgStatus) {%>
-            <img class="user-friend" src="/userImages/<%=elem.login%>.png" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
-            <% } else { %>
-            <img class="user-friend" src="/images/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
-            <% } %>
-            <span style="font-size: 0.8em"><%=elem.login%></span>
-         </a>
-         <%})%>
+         <% }%>
+         <br><br>
+         <span class="green"><%=firstname%> <%=lastname%></span><br><br>
+         <span class="purple">Возраст: </span><span class="green"><%=age%></span><br><br>
+         <span class="purple">Пол: </span><span class="green"><%=sex%></span><br><br>
+         <span class="purple">Друзья: </span><span class="green"><%=friends.length%></span><br><br>
+         <div id="user-friends">
+            <%if (friends.length !== 0) {%>
+            <% for (let i = 0; i < Math.min(6, friends.length); ++i) {%>
+            <%let elem = friends[i];%>
+            <a class="user-friendLink" href="/u/<%=elem.login%>">
+               <%if (elem.imgStatus) {%>
+               <img class="user-friend" src="" title="<%=elem.firstname%> <%=elem.lastname%>">
+               <% } else { %>
+               <img class="user-friend" src="/userImages/<%=elem.login%>.png" title="<%=elem.firstname%> <%=elem.lastname%>">
+               <% } %>
+               <br>
+               <span style="font-size: 0.8em"><%=elem.login%></span>
+            </a>
+            <%}%>
          <%} else {%>
-         <span style="margin: 10px" class="red">Друзей нет</span>
-         <%}%>
+            <span style="margin: 10px" class="red">Друзей нет</span>
+            <%}%>
       </div>
    </center>
    <script src="/js/friendsFunctions.js"></script>

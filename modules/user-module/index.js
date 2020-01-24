@@ -74,11 +74,18 @@ exports.registrationValidate = (req, res) => {
 
 
 exports.validateSetting = (data) => {
-   if (!regColor.test(data.color)){
+   if (!regColor.test(data.color)) {
       return new Verdict("Incorrect values: color");
    }
-   if (data.scroll !== false && data.scroll!== true){
+   if (data.scroll !== false && data.scroll !== true) {
       return new Verdict("Incorrect values: scroll");
+   }
+   let c = data.color;
+   let v1 = parseInt(c[1] + c[2], 16),
+      v2 = parseInt(c[3] + c[4], 16),
+      v3 = parseInt(c[5] + c[6], 16);
+   if (v1 > 204 && v2 > 204 && v3 > 204) {
+      return new Verdict("Слишком светлый цвет<br>Пожалуйста, сделайте его темнее");
    }
    return new Verdict("", "", true);
 }

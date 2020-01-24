@@ -37,7 +37,6 @@ document.querySelector('textarea').addEventListener('keydown', function() {
       } else {
          symbolsCounter.style.opacity = 0;
       }
-
    }, 0);
 });
 
@@ -97,14 +96,11 @@ function subscribe() {
 }
 
 function complex(m, str) {
-   addToChat(str, m.scroll);
-   if (m.type === "message") {
-      document.getElementById(`msg${m.id}`).innerText = m.text;
-   }
+   chat.innerHTML += str;
+   if (m.type === "message") document.getElementById(`msg${m.id}`).innerText = m.text;
+   if (scroll) chat.scrollTop = chat.scrollHeight;
    subscribe();
-   if (login != m.login) {
-      audio[m.type].play();
-   }
+   if (login !== m.login) audio[m.type].play();
 }
 
 
@@ -112,6 +108,7 @@ function complex(m, str) {
 function getMsg(scroll) {
    isPending = true;
    let prevHeight = chat.scrollHeight;
+   chat.innerHTML = `<div id = "spinner"></div>` + chat.innerHTML;
    fetch("/get/message", {
       method: "POST",
       headers: {
@@ -126,11 +123,13 @@ function getMsg(scroll) {
       } else {
          res.json()
             .then(data => {
+               let elem = document.getElementById("spinner");
+               elem.parentNode.removeChild(elem);
                parseMessages(data);
                if (scroll) {
                   chat.scrollTop = chat.scrollHeight;
                } else {
-                  chat.scrollTop = chat.scrollHeight - prevHeight;
+                  chat.scrollTop = chat.scrollHeight - prevHeight - 34; 
                }
                isPending = false;
             })
@@ -155,13 +154,6 @@ function parseMessages(msgArr) {
    })
 }
 
-
-function addToChat(str, scroll) {
-   chat.innerHTML += str;
-   if (scroll) {
-      chat.scrollTop = chat.scrollHeight;
-   }
-}
 
 
 function errorChatPage(text, type = "e") { // sm - sendMessage, gm - getMessage, e - standart error
