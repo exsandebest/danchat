@@ -8,6 +8,8 @@ if (!process.env.USING_HEROKU) {
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
 const md5 = require("md5");
+const avatarGenerator = require('avatar-generator');
+const avatar = new avatarGenerator();
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -60,7 +62,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
               ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
-               sql.query(`select login, color, id from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
+               sql.query(`select login, color, id, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
                   if (err) console.error(err);
                   sql.query(`select max(id) as maxId from chat`, (err, result) => {
                      var msg = {};
@@ -105,6 +107,12 @@ function enter(res, user) { //login, color, id
             path: "/"
          });
          res.redirect("/");
+         avatar.generate(user.login, (user.sex ? "male" : "female")).then((image)=>{
+            image.png().toFile(`public/userImages/${user.login}.png`);
+         });
+         sql.query(`update users set imgStatus = 1 where id = ${user.id}`, (err)=>{
+            if (err) console.error();
+         })
       })
    })
 }
@@ -120,7 +128,7 @@ app.post("/login", parserURLEncoded, (req, res) => {
       })
       return;
    }
-   sql.query(`select id, login, color from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
+   sql.query(`select id, login, color, sex from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
       if (err) console.error(err);
       if (data === undefined || data.length === 0) {
          res.render("login.ejs", {

@@ -3,7 +3,7 @@ var chat = document.getElementById("chat");
 var symbolsCounter = document.getElementById("symbolsCounter");
 var minId = -1;
 var isPending = 0;
-sessionStorage.setItem("counter", 0);
+sessionStorage.setItem("danchat.counter", 0);
 getMsg(1);
 
 chat.addEventListener('scroll', () => {

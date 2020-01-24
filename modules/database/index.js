@@ -51,7 +51,10 @@ sql.query(`create table if not exists users
                time datetime NOT NULL)
                DEFAULT CHARSET=utf8;`, (err) => {
                   if (err) console.error(err);
-                  console.timeEnd("Module => database");
+                  sql.query("update users set imgStatus = 0", (err) => {
+                     if (err) console.error(err);
+                     console.timeEnd("Module => database");
+                  })
                })
             })
          })

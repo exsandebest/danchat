@@ -12,7 +12,7 @@
    <%- include('partials/scripts.ejs') %>
    <center>
       <%if (imgStatus) {%>
-      <img class="user-img" src="/<%=userLogin%>.jpg"><br>
+      <img class="user-img" src="/userImages/<%=userLogin%>.png"><br>
       <%} else {%>
       <img class="user-img" src="/images/default.jpg"><br>
       <%}%>
@@ -49,7 +49,7 @@
          <%friends.forEach((elem)=>{%>
          <a class="user-friendLink" href="/u/<%=elem.login%>">
             <%if (elem.imgStatus) {%>
-            <img class="user-friend" src="<%=elem.login%>.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
+            <img class="user-friend" src="/userImages/<%=elem.login%>.png" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
             <% } else { %>
             <img class="user-friend" src="/images/default.jpg" title="<%=elem.firstname%> <%=elem.lastname%>"><br>
             <% } %>
