@@ -11,9 +11,9 @@
    <%- include('partials/scripts.ejs') %>
    <center>
       <% if (imgStatus) {%>
-      <img src="/userImages/<%=login%>.png" class="user-img" />
+         <img class="user-img" src="" />
       <%} else {%>
-      <img src="/images/default.jpg" class="user-img" />
+         <img class="user-img" src="/userImages/<%=login%>.png" />
       <%}%>
       <br><br>
       <span style="color: <%=color%>;" class="user-login"> <%=login%> </span><br><br>

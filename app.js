@@ -76,6 +76,13 @@ app.post("/registration", parserURLEncoded, (req, res) => {
                      msg.time = new Date().toTimeString().substring(0, 5);
                      msg.id = result[0].maxId + 1;
                      chat.addnewmessage(msg);
+                     fs.exists(`public/userImages/${data[0].login}.png`, (ex) => {
+                        if (!ex){
+                           avatar.generate(data[0].login, (data[0].sex ? "male" : "female")).then((image)=>{
+                              image.png().toFile(`public/userImages/${data[0].login}.png`);
+                           });
+                        }
+                     })
                      enter(res, data[0]);
                   })
 
@@ -109,16 +116,6 @@ function enter(res, user) { //login, color, id
             path: "/"
          });
          res.redirect("/");
-         fs.exists(`public/userImages/${user.login}.png`, (ex) => {
-            if (!ex){
-               avatar.generate(user.login, (user.sex ? "male" : "female")).then((image)=>{
-                  image.png().toFile(`public/userImages/${user.login}.png`);
-               });
-            }
-         })
-         sql.query(`update users set imgStatus = 1 where id = ${user.id}`, (err)=>{
-            if (err) console.error();
-         })
       })
    })
 }

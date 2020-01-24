@@ -20,9 +20,9 @@
          <%outreqs.forEach((elem)=>{%>
          <div class="friend-block">
             <%if (elem.imgStatus) {%>
-            <img class="friend-img" src="/userImages/<%=elem.login%>.png">
-            <% }else { %>
-            <img class="friend-img" src="/images/default.jpg">
+               <img class="friend-img" src="">
+            <% } else { %>
+               <img class="friend-img" src="/userImages/<%=elem.login%>.png">
             <% } %>
             <div class="friend-datablock">
                <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>

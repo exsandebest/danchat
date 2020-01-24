@@ -12,11 +12,11 @@
    <%- include('partials/scripts.ejs') %>
    <center>
       <%if (imgStatus) {%>
-      <img class="user-img" src="/userImages/<%=userLogin%>.png"><br>
+         <img class="user-img" src="">
       <%} else {%>
-      <img class="user-img" src="/images/default.jpg"><br>
+         <img class="user-img" src="/userImages/<%=userLogin%>.png">
       <%}%>
-      <br><br>
+      <br><br><br>
       <%if (userStatus !== "self"){%>
          <btn class="standart" onclick="friendsChanges('<%=userLogin%>','<%=userStatus%>')">
          <%if (userStatus === "default"){%>
