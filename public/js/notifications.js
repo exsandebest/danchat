@@ -28,7 +28,7 @@ socket.on(getCookie("danchat.token"), function(update) {
          text: `${template}(${update.name}) удалил${update.sex?"":"а"} вас из друзей`,
          type: "error",
          callback: ()=>{
-            location = "/friends"
+            location = "/outcoming"
          },
          timeout
       });

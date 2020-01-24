@@ -185,7 +185,7 @@ app.get("/subscribe", (req, res) => {
 app.post("/addnewmessage", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
-         let message = decodeURIComponent(req.body.message).trim();
+         let message = req.body.message.trim();
          if (message.length > 1000){
             res.json(new ResponseObject(false, "Длина сообщения не должна превышать 1000 символов"));
             return;

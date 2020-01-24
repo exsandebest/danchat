@@ -43,7 +43,9 @@
          <span class="green"><%=firstname%> <%=lastname%></span><br><br>
          <span class="purple">Возраст: </span><span class="green"><%=age%></span><br><br>
          <span class="purple">Пол: </span><span class="green"><%=sex%></span><br><br>
+         <%if (friends.length !== 0) {%>
          <span class="purple">Друзья: </span><span class="green"><%=friends.length%></span><br><br>
+         <%}%>
          <div id="user-friends">
             <%if (friends.length !== 0) {%>
             <% for (let i = 0; i < Math.min(6, friends.length); ++i) {%>
