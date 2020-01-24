@@ -5,6 +5,7 @@ if (!process.env.USING_HEROKU) {
       path: "config/.env"
    });
 }
+const pre = require("./pre");
 const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
@@ -25,9 +26,6 @@ const parserURLEncoded = pars.urlencoded({
    extended: false
 });
 const parserJSON = pars.json();
-if (!fs.existsSync("public/userImages")){
-    fs.mkdirSync("public/userImages");
-}
 
 app.use(express.static(__dirname + "/public", {
    maxAge: "1h"
@@ -111,9 +109,13 @@ function enter(res, user) { //login, color, id
             path: "/"
          });
          res.redirect("/");
-         avatar.generate(user.login, (user.sex ? "male" : "female")).then((image)=>{
-            image.png().toFile(`public/userImages/${user.login}.png`);
-         });
+         fs.exists(`public/userImages/${user.login}.png`, (ex) => {
+            if (!ex){
+               avatar.generate(user.login, (user.sex ? "male" : "female")).then((image)=>{
+                  image.png().toFile(`public/userImages/${user.login}.png`);
+               });
+            }
+         })
          sql.query(`update users set imgStatus = 1 where id = ${user.id}`, (err)=>{
             if (err) console.error();
          })
