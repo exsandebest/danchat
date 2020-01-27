@@ -20,6 +20,5 @@ public/sounds/message.mp3 //sound of message
 ### Structure of images
 ```
 public/images/bg.jpg //main background
-public/images/default.jpg //default user photo
 public/images/favicon.ico //favicon
 ```
