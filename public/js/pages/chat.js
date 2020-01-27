@@ -46,7 +46,7 @@ function sendMessage() {
    let elem = document.getElementById("message");
    let message = elem.value.trim();
    if (!message) return;
-   fetch("/addnewmessage", {
+   fetch("/message", {
       method: "POST",
       headers: {
          "Content-Type": "application/json;charset=utf-8"
@@ -129,7 +129,7 @@ function getMsg(scroll) {
                if (scroll) {
                   chat.scrollTop = chat.scrollHeight;
                } else {
-                  chat.scrollTop = chat.scrollHeight - prevHeight - 34; 
+                  chat.scrollTop = chat.scrollHeight - prevHeight - 34;
                }
                isPending = false;
             })

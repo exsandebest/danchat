@@ -77,8 +77,8 @@ app.post("/registration", parserURLEncoded, (req, res) => {
                      msg.id = result[0].maxId + 1;
                      chat.addnewmessage(msg);
                      fs.exists(`public/userImages/${data[0].login}.png`, (ex) => {
-                        if (!ex){
-                           avatar.generate(data[0].login, (data[0].sex ? "male" : "female")).then((image)=>{
+                        if (!ex) {
+                           avatar.generate(data[0].login, (data[0].sex ? "male" : "female")).then((image) => {
                               image.png().toFile(`public/userImages/${data[0].login}.png`);
                            });
                         }
@@ -182,34 +182,43 @@ app.get("/subscribe", (req, res) => {
 
 
 
-app.post("/addnewmessage", parserJSON, (req, res) => {
+app.post("/message", parserJSON, (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          let message = req.body.message.trim();
-         if (message.length > 1000){
+         if (message.length > 1000) {
             res.json(new ResponseObject(false, "Длина сообщения не должна превышать 1000 символов"));
             return;
          }
-         if (message.length === 0 || !message){
+         if (message.length === 0 || !message) {
             res.json(new ResponseObject(false, "Пустое сообщение"));
             return;
          }
-         sql.query(`select color from users where id = ${u.id}`, (err, result) => {
+         sql.query(`select COUNT(id) as k1 from chat where user_id = ${u.id} and time >= (NOW() - INTERVAL 5 SECOND)
+         union select COUNT(id) as k2 from chat where user_id = ${u.id} and time >= (NOW() - INTERVAL 1 MINUTE)`, (err, rp) => {
             if (err) console.error(err);
-            sql.query(`select max(id) from chat`, (err, data) => {
-               var msg = {};
-               msg.type = "message";
-               io.emit("chatMessage", msg);
-               msg.user_id = u.id;
-               msg.login = u.login;
-               msg.color = result[0].color;
-               msg.time = new Date().toTimeString().substring(0, 5);
-               msg.id = data[0]["max(id)"] + 1;
-               msg.text = message;
-               chat.addnewmessage(msg);
-               res.json(new ResponseObject(true));
+            if (rp !== undefined && (rp[0].k1 > 10 || rp[0].k2 > 60)) {
+               res.json(new ResponseObject(false, "Не спамить!"));
+               return;
+            }
+            sql.query(`select color from users where id = ${u.id}`, (err, result) => {
+               if (err) console.error(err);
+               sql.query(`select max(id) as maxId from chat`, (err, data) => {
+                  var msg = {};
+                  msg.type = "message";
+                  io.emit("chatMessage", msg);
+                  msg.user_id = u.id;
+                  msg.login = u.login;
+                  msg.color = result[0].color;
+                  msg.time = new Date().toTimeString().substring(0, 5);
+                  msg.id = data[0].maxId + 1;
+                  msg.text = message;
+                  chat.addnewmessage(msg);
+                  res.json(new ResponseObject(true));
+               })
             })
          })
+
       }
    }, (err) => {
       res.end("DB ERROR");
