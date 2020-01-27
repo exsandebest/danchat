@@ -162,9 +162,9 @@ footer {
    background-color: rgba(70, 230, 72, 0.49);
    position: fixed;
    bottom: 0;
+   left: 0;
    width: 100%;
    height: auto;
-   border-radius: 25px 25px 0px 0px;
    display: inline-block;
    padding: 5px;
 }
