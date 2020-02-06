@@ -14,12 +14,14 @@ new Promise(function(resolve, reject) {
       resolve();
    })
 }).then(() => {
-   sql.query("select login, sex from users", (err, data)=>{
+   sql.query("select login, sex from users", (err, data) => {
       if (err) console.error(err);
-      data.forEach((item) => {
-         avatar.generate(item.login, (item.sex ? "male" : "female")).then((image)=>{
-            image.png().toFile(`public/userImages/${item.login}.png`);
+      if (data) {
+         data.forEach((item) => {
+            avatar.generate(item.login, (item.sex ? "male" : "female")).then((image) => {
+               image.png().toFile(`public/userImages/${item.login}.png`);
+            });
          });
-      });
+      }
    })
 })

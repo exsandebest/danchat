@@ -4,7 +4,7 @@ const md5 = require("md5");
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
 const regName = /^[a-zA-ZА-Яа-яЁё]{2,24}$/;
-const regAge = /^[0-9]{1,3}$/;
+const regBirthdate = /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$/;
 const regSex = /[01]/;
 const regColor = /^#[a-fA-F0-9]{3,8}$/;
 
@@ -48,7 +48,7 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname; ln - lastname
 
 exports.registrationValidate = (req, res) => {
    var data = req.body;
-   if (!data.age || !data.firstname || !data.lastname || !data.login || !data.sex || !data.password) {
+   if (!data.birthdate || !data.firstname || !data.lastname || !data.login || !data.sex || !data.password) {
       return new Verdict("Заполните все поля");
    }
    if (!regLogin.test(data.login)) {
@@ -63,11 +63,13 @@ exports.registrationValidate = (req, res) => {
    if (!regName.test(data.lastname)) {
       return new Verdict("Некорректная фамилия", "От 2-х до 24-х символов из русского или латинского алфавита");
    }
-   if (!regAge.test(data.age) || parseInt(data.age) > 217 || parseInt(data.age) < 1) {
-      return new Verdict("Некорректный возраст", "Положительное число [1-217]");
-   }
    if (!regSex.test(data.sex)) {
-      return new Verdict("Некорректный пол", "Что-то пошло не так...");
+      return new Verdict("Некорректный пол", "Формат: male | female");
+   }
+   let v = data.birthdate.split(".");
+   let dt = new Date(`${v[2]}/${v[1]}/${v[0]}`);
+   if (!regBirthdate.test(data.birthdate) || dt.getDate() !== parseInt(v[0]) || dt.getMonth() + 1 !== parseInt(v[1]) || dt.getFullYear() !== parseInt(v[2])){
+      return new Verdict("Некорректная дата рождения", "Формат: ДД.ММ.ГГГГ");
    }
    return new Verdict("", "", true);
 }

@@ -59,9 +59,10 @@ app.post("/registration", parserURLEncoded, (req, res) => {
       if (result === undefined || result.length === 0) {
          var validation = usMod.registrationValidate(req, res);
          if (validation.status) {
-            sql.query(`insert into users (login,password,age,sex,firstname,lastname) values
+            let v = req.body.birthdate.split(".");
+            sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
             (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-              ${sql.escape(parseInt(req.body.age))}, ${sql.escape(parseInt(req.body.sex))},
+              ${sql.escape(`${v[2]}-${v[1]}-${v[0]}`)}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                if (err) console.error(err);
                sql.query(`select login, color, id, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
@@ -405,7 +406,7 @@ app.get("/u/:userLogin", (req, res) => {
    wwt.validate(req, res).then((u) => {
       if (u) {
          var userLogin = req.params.userLogin;
-         sql.query(`select id, login, firstname, lastname, color, age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
+         sql.query(`select id, login, firstname, lastname, color, DATE_FORMAT(birthdate, '%d.%m.%Y') as birthdate, (DATE_FORMAT(FROM_DAYS(TO_DAYS(now()) - TO_DAYS(birthdate)), '%Y') + 0) as age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
             if (err) console.error(err);
             if (data === undefined || data.length === 0) {
                res.render("404.ejs", {
@@ -421,6 +422,7 @@ app.get("/u/:userLogin", (req, res) => {
                   lastname: data[0].lastname,
                   color: data[0].color,
                   age: data[0].age,
+                  birthdate: data[0].birthdate,
                   login: u.login,
                   sex: (data[0].sex ? "Мужской" : "Женский")
                }

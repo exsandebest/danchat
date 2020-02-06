@@ -13,7 +13,7 @@ sql.query(`create table if not exists users
    (id int(11) NOT NULL auto_increment primary key,
    login varchar(255) unique NOT NULL,
    password varchar(512) NOT NULL,
-   age int(4) default NULL,
+   birthdate datetime NOT NULL,
    sex bool default NULL,
    firstname varchar(255) NOT NULL,
    lastname varchar(255) default NULL,
@@ -23,8 +23,8 @@ sql.query(`create table if not exists users
    imgStatus bool default 0)
    DEFAULT CHARSET=utf8;`, (err, result) => {
    if (err) console.error(err);
-   sql.query(`insert ignore into users (login, password, age, sex, firstname, lastname, admin)
-   values ("admin","${md5("admin")}", 18, 1, "Даниил", "Богданов", 1);`, (err, result) => {
+   sql.query(`insert ignore into users (login, password, birthdate, sex, firstname, lastname, admin)
+   values ("admin","${md5("admin")}", NOW() - INTERVAL 18 YEAR , 1, "Администратор", "", 1);`, (err, result) => {
       if (err) console.error(err);
       sql.query(`create table if not exists friends
          (id_1 int(11) not null, id_2 int(11) not null)
