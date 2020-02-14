@@ -2,9 +2,8 @@
 > Chat, friends and communication with danchat and [Node.js](https://nodejs.org)
 
 # Getting started
-`npm start`  
-or  
-`npm run demon` - runs [nodemon npm package](https://www.npmjs.com/package/nodemon)
+You have to run ``npm install`` or ``npm i`` to install all necessary node modules.  
+Then you can use `npm start` or `npm run demon` (runs [nodemon npm package](https://www.npmjs.com/package/nodemon)) to start.
 
 # Structure of main directories
 * **You have to fill these directories with necessary files to correct work**  
