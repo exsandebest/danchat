@@ -1,42 +1,42 @@
 <html>
 
 <head>
-   <%- include('partials/header.ejs') %>
-   <title>Входящие заявки</title>
+    <%- include('partials/header.ejs') %>
+    <title>Входящие заявки</title>
 </head>
 
 <body background="/images/bg.jpg">
-   <%- include('partials/navbar.ejs') %>
-   <%- include('partials/scripts.ejs') %>
-   <center>
-      <div style="margin-bottom: 20px">
-         <a class="friend-nav-btn friend-nav-btn-active" href="/incoming">Входящие заявки</a>
-         <a class="friend-nav-btn" href="/friends">Мои друзья</a>
-         <a class="friend-nav-btn" href="/outcoming">Исходящие заявки
-            <span class="reqsCounter"><%=outreqsCounter%></span></a>
-      </div>
-      <div id="friend-list">
-         <%inreqs.forEach((elem)=>{%>
-         <div class="friend-block">
-            <%if (elem.imgStatus) {%>
-               <img class="friend-img" src="">
-            <% } else { %>
-               <img class="friend-img" src="/userImages/<%=elem.login%>.png">
-            <% } %>
-            <div class="friend-datablock">
-               <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
-               <p class="friend-fullname"><%=elem.firstname%> <%=elem.lastname%></p>
-               <div class="friend-funcblock">
-                  <btn class="small" onclick="friendsChanges('<%=elem.login%>', 'subscriber')">Принять</btn>
-               </div>
+    <%- include('partials/navbar.ejs') %>
+    <%- include('partials/scripts.ejs') %>
+    <center>
+        <div style="margin-bottom: 20px">
+            <a class="friend-nav-btn friend-nav-btn-active" href="/incoming">Входящие заявки</a>
+            <a class="friend-nav-btn" href="/friends">Мои друзья</a>
+            <a class="friend-nav-btn" href="/outcoming">Исходящие заявки
+                <span class="reqsCounter"><%=outreqsCounter%></span></a>
+        </div>
+        <div id="friend-list">
+            <%inreqs.forEach((elem)=>{%>
+            <div class="friend-block">
+                <%if (elem.imgStatus) {%>
+                <img class="friend-img" src="">
+                <% } else { %>
+                <img class="friend-img" src="/userImages/<%=elem.login%>.png">
+                <% } %>
+                <div class="friend-datablock">
+                    <br><a class="friend-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>;"><%=elem.login%></a>
+                    <p class="friend-fullname"><%=elem.firstname%> <%=elem.lastname%></p>
+                    <div class="friend-funcblock">
+                        <btn class="small" onclick="friendsChanges('<%=elem.login%>', 'subscriber')">Принять</btn>
+                    </div>
+                </div>
             </div>
-         </div>
-         <br>
-         <%})%>
-      </div>
-   </center>
-   <script src="/js/friendsFunctions.js"></script>
-   <%- include('partials/footer.ejs') %>
+            <br>
+            <%})%>
+        </div>
+    </center>
+    <script src="/js/friendsFunctions.js"></script>
+    <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

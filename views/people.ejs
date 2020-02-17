@@ -1,33 +1,33 @@
 <html>
 
 <head>
-   <%- include('partials/header.ejs') %>
-   <title>Люди</title>
+    <%- include('partials/header.ejs') %>
+    <title>Люди</title>
 </head>
 
 <body background="/images/bg.jpg">
-   <%- include('partials/navbar.ejs') %>
-   <%- include('partials/scripts.ejs') %>
-   <center>
-      <div id="people-list">
-         <% people.forEach((elem)=>{%>
-         <div class="people-block">
-            <% if (elem.imgStatus) {%>
-               <img class="people" src="">
-            <%} else {%>
-               <img class="people" src="/userImages/<%=elem.login%>.png">
-            <%}%>
+    <%- include('partials/navbar.ejs') %>
+    <%- include('partials/scripts.ejs') %>
+    <center>
+        <div id="people-list">
+            <% people.forEach((elem)=>{%>
+            <div class="people-block">
+                <% if (elem.imgStatus) {%>
+                <img class="people" src="">
+                <%} else {%>
+                <img class="people" src="/userImages/<%=elem.login%>.png">
+                <%}%>
                <div class="people-datablock">
                   <br>
                   <a class="people-login" href="/u/<%=elem.login%>" style="color:<%=elem.color%>"><%=elem.login%></a><br>
-            <p></p>
-            <span class="green people-fullname" style="font-size: 1.2em;"><%=elem.firstname%> <%=elem.lastname%></span>
-         </div>
-      </div>
-      <%})%>
-      </div>
-   </center>
-   <%- include('partials/footer.ejs') %>
+                <p></p>
+                <span class="green people-fullname" style="font-size: 1.2em;"><%=elem.firstname%> <%=elem.lastname%></span>
+            </div>
+        </div>
+        <%})%>
+        </div>
+    </center>
+    <%- include('partials/footer.ejs') %>
 </body>
 
 </html>

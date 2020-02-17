@@ -57,7 +57,7 @@ app.get("/registration", (req, res) => {
 app.post("/registration", parserURLEncoded, (req, res) => {
     sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
         if (result === undefined || result.length === 0) {
-            var validation = usMod.registrationValidate(req, res);
+            let validation = usMod.registrationValidate(req, res);
             if (validation.status) {
                 let v = req.body.birthdate.split(".");
                 sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
@@ -68,7 +68,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
                     sql.query(`select login, color, id, scroll, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
                         if (err) console.error(err);
                         sql.query(`select max(id) as maxId from chat`, (err, result) => {
-                            var msg = {};
+                            let msg = {};
                             msg.type = "registration";
                             io.emit("chatMessage", msg);
                             msg.user_id = data[0].id;
@@ -108,7 +108,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 
 function enter(res, user) { //login, color, id
-    var token = std.genToken();
+    let token = std.genToken();
     sql.query(`delete from tokens where id = ${user.id}`, (err) => {
         if (err) console.error(err);
         sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
@@ -130,8 +130,8 @@ function enter(res, user) { //login, color, id
 
 
 app.post("/login", parserURLEncoded, (req, res) => {
-    var Rlogin = decodeURIComponent(req.body.login);
-    var Rpassword = decodeURIComponent(req.body.password);
+    let Rlogin = decodeURIComponent(req.body.login);
+    let Rpassword = decodeURIComponent(req.body.password);
     if (!Rlogin || !Rpassword) {
         res.render("login.ejs", {
             notification: "Заполните все поля"
@@ -204,7 +204,7 @@ app.post("/message", parserJSON, (req, res) => {
                 sql.query(`select color from users where id = ${u.id}`, (err, result) => {
                     if (err) console.error(err);
                     sql.query(`select max(id) as maxId from chat`, (err, data) => {
-                        var msg = {};
+                        let msg = {};
                         msg.type = "message";
                         io.emit("chatMessage", msg);
                         msg.user_id = u.id;
@@ -230,8 +230,8 @@ app.post("/message", parserJSON, (req, res) => {
 app.post("/get/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var portion = 50;
-            var msgId = parseInt(req.body.id);
+            const portion = 50;
+            let msgId = parseInt(req.body.id);
             if (msgId === -1) {
                 sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat
             where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
@@ -239,8 +239,8 @@ app.post("/get/message", parserJSON, (req, res) => {
                     res.json(data);
                 })
             } else {
-                var msgStart = msgId - portion;
-                var msgEnd = msgId - 1;
+                let msgStart = msgId - portion;
+                let msgEnd = msgId - 1;
                 sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time
             from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                     if (err) console.error(err);
@@ -277,7 +277,7 @@ app.get("/settings", (req, res) => {
 app.get("/friends", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var obj = {
+            let obj = {
                 login: u.login
             };
             sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union
@@ -303,7 +303,7 @@ app.get("/friends", (req, res) => {
 app.get("/incoming", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var obj = {
+            let obj = {
                 login: u.login
             };
             sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
@@ -327,7 +327,7 @@ app.get("/incoming", (req, res) => {
 app.get("/outcoming", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var obj = {
+            let obj = {
                 login: u.login
             };
             sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
@@ -404,7 +404,7 @@ app.get("/people", parserJSON, (req, res) => {
 app.get("/u/:userLogin", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var userLogin = req.params.userLogin;
+            let userLogin = req.params.userLogin;
             sql.query(`select id, login, firstname, lastname, color, DATE_FORMAT(birthdate, '%d.%m.%Y') as birthdate, (DATE_FORMAT(FROM_DAYS(TO_DAYS(now()) - TO_DAYS(birthdate)), '%Y') + 0) as age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
                 if (err) console.error(err);
                 if (data === undefined || data.length === 0) {
@@ -414,7 +414,7 @@ app.get("/u/:userLogin", (req, res) => {
                     })
                     return;
                 } else {
-                    var obj = {
+                    let obj = {
                         imgStatus: data[0].imgStatus,
                         userLogin: data[0].login,
                         firstname: data[0].firstname,
@@ -551,7 +551,7 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
                     res.send("Incorrect login");
                     return;
                 }
-                var userId = dt1[0].id;
+                let userId = dt1[0].id;
                 sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
                     if (err) console.error(err);
                     sql.query(`select token from tokens where id = ${userId}`, (err, data) => {
@@ -591,7 +591,7 @@ app.post("/user/cancel/outcomingrequest", parserJSON, (req, res) => {
                     res.send("Incorrect login");
                     return;
                 }
-                var userId = dt1[0].id;
+                let userId = dt1[0].id;
                 sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt2) => {
                     if (err) console.error(err);
                     if (dt2 === undefined || dt2.length === 0) {
@@ -621,7 +621,7 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                     res.send("Incorrect login");
                     return;
                 }
-                var userId = dt1[0].id;
+                let userId = dt1[0].id;
                 sql.query(`select * from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err, dt2) => {
                     if (err) console.error(err);
                     if (dt2 === undefined || dt2.length === 0) {
@@ -671,7 +671,7 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
                     res.send("Incorrect login");
                     return;
                 }
-                var friendId = dt1[0].id;
+                let friendId = dt1[0].id;
                 sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`, (err) => {
                     if (err) console.error(err);
                     sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err) => {
@@ -713,7 +713,7 @@ app.post("/user/change/password", parserJSON, (req, res) => {
         if (u) {
             sql.query(`select password from users where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
-                var validation = usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword)
+                let validation = usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword)
                 if (validation.status) {
                     sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${u.id}`, (err) => {
                         if (err) console.error(err);
@@ -737,7 +737,7 @@ app.post("/user/change/name", parserJSON, (req, res) => {
     }
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var validation = usMod.nameValidate(res, req.body.firstname, req.body.lastname)
+            let validation = usMod.nameValidate(res, req.body.firstname, req.body.lastname)
             if (validation.status) {
                 sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)}
             where id = ${u.id}`, (err) => {
@@ -758,7 +758,7 @@ app.post("/user/change/name", parserJSON, (req, res) => {
 app.post("/user/change/settings", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            var validation = usMod.validateSetting(req.body);
+            let validation = usMod.validateSetting(req.body);
             if (!validation.status) {
                 res.json(new ResponseObject(false, validation.text1, validation.text2));
                 return;
@@ -767,7 +767,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
          where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.cookie("danchat.user.scroll", req.body.scroll ? 1 : 0, {
-                    path : "/"
+                    path: "/"
                 });
                 res.json(new ResponseObject(true, "Настройки успешно обновлены"));
             })
@@ -797,15 +797,6 @@ app.get("/logout", (req, res) => {
 })
 
 
-app.get("/console/sql", (req, res) => {
-    wwt.validate(req, res, true).then((u) => {
-        if (u) {
-            res.render("consoleSql.ejs");
-        }
-    }, (err) => {
-        res.end("DB ERROR");
-    });
-})
 
 
 

@@ -1,27 +1,27 @@
 <html>
 
 <head>
-   <%- include('partials/header.ejs') %>
-   <title>ADMIN PANEL</title>
+    <%- include('partials/header.ejs') %>
+    <title>ADMIN PANEL</title>
 </head>
 
 <body background="/images/bg.jpg">
-   <%- include('partials/navbar.ejs') %>
-   <%- include('partials/scripts.ejs') %>
-   <center>
-      <div>
-         <input type="text" class="inputSmall" id="inputLogin" placeholder="Логин">
-         <br><br>
-         <btn class="standart" onclick="makeAdmin()">Make admin</btn>   <btn class="standart" onclick="makeUser()">Make user</btn>
-      </div>
-      <br><br>
-      <div style="margin-bottom: 80px;">
-         <input type="text" class="inputSmall" id="message" placeholder="Сообщение"><br><br>
-         <btn class="standart" onclick="sendMessage()">Send to all</btn>
-      </div>
-   </center>
-   <script src="/js/pages/adminpanel.js"></script>
-   <%- include('partials/footer.ejs') %>
+    <%- include('partials/navbar.ejs') %>
+    <%- include('partials/scripts.ejs') %>
+    <center>
+        <div>
+            <input type="text" class="inputSmall" id="inputLogin" placeholder="Логин">
+            <br><br>
+            <btn class="standart" onclick="makeAdmin()">Make admin</btn>   <btn class="standart" onclick="makeUser()">Make user</btn>
+        </div>
+        <br><br>
+        <div style="margin-bottom: 80px;">
+            <input type="text" class="inputSmall" id="message" placeholder="Сообщение"><br><br>
+            <btn class="standart" onclick="sendMessage()">Send to all</btn>
+        </div>
+    </center>
+    <script src="/js/pages/adminpanel.js"></script>
+    <%- include('partials/footer.ejs') %>
 </body>
 
 </html>
