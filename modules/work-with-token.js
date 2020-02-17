@@ -1,6 +1,6 @@
 console.time("Module => work-with-token");
-const sql = require("../database");
-const std = require("../standart");
+const sql = require("./database");
+const std = require("./standart");
 
 
 exports.validate = (req, res, isAdmin = false) => {
