@@ -107,7 +107,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 });
 
 
-function enter(res, user) { //login, color, id
+function enter(res, user) { //login, color, id, scroll
     let token = std.genToken();
     sql.query(`delete from tokens where id = ${user.id}`, (err) => {
         if (err) console.error(err);
