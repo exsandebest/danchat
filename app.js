@@ -1,6 +1,6 @@
 console.time("Loading");
 console.log("Loading...");
-if (!process.env.USING_HEROKU) {
+if (!process.env.USING_SERVER) {
     require('dotenv').config({
         path: "config/.env"
     });
