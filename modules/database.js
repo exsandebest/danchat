@@ -1,3 +1,4 @@
+'use strict';
 console.time("Module => database");
 const mysql = require("mysql2");
 const md5 = require("md5");

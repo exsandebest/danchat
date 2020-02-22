@@ -1,3 +1,4 @@
+'use strict';
 socket.on(getCookie("danchat.token"), function(update) {
     let title = "Уведомление";
     let timeout = 20000; // 20 sec

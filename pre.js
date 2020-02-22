@@ -1,3 +1,4 @@
+'use strict';
 const fs = require("fs");
 const sql = require("./modules/database");
 const avatarGenerator = require('avatar-generator');

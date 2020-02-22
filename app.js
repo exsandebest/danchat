@@ -1,3 +1,4 @@
+'use strict';
 console.time("Loading");
 console.log("Loading...");
 if (!process.env.USING_SERVER) {

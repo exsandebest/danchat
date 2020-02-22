@@ -1,3 +1,4 @@
+'use strict';
 console.time("Module => chat");
 const sql = require("./database");
 let clients = [];

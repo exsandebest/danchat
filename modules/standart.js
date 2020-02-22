@@ -1,3 +1,4 @@
+'use strict';
 console.time("Module => standart");
 exports.getCookie = (req, name) => {
     try {

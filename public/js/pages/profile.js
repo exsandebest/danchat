@@ -1,3 +1,4 @@
+'use strict';
 function changePasword() {
     fetch("/user/change/password", {
         method: "POST",

@@ -1,3 +1,4 @@
+'use strict';
 sessionStorage.clear();
 setTimeout(() => {
     document.getElementById("notification").setAttribute("style", "opacity:0");

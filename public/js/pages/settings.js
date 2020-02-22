@@ -1,3 +1,4 @@
+'use strict';
 function save() {
     fetch("/user/change/settings", {
         method: "POST",

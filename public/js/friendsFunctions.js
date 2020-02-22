@@ -1,3 +1,4 @@
+'use strict';
 function friendsChanges(login, status) {
     let url = "";
     if (status === "subscriber") {

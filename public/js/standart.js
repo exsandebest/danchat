@@ -1,3 +1,4 @@
+'use strict';
 if (sessionStorage.getItem("danchat.counter") === null) {
     sessionStorage.setItem("danchat.counter", 0);
 } else {

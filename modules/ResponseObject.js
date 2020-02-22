@@ -1,3 +1,4 @@
+'use strict';
 console.time("Module => ResponseObject");
 
 const ResponseObject = function(status = true, text = "", text2 = "") {

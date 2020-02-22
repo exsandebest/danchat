@@ -1,3 +1,4 @@
+'use strict';
 console.time("Module => user-module");
 const md5 = require("md5");
 

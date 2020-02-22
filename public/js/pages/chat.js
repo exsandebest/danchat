@@ -1,3 +1,4 @@
+'use strict';
 const login = document.getElementById("prof").innerText;
 const chat = document.getElementById("chat");
 const symbolsCounter = document.getElementById("symbolsCounter");
