@@ -60,10 +60,9 @@ app.post("/registration", parserURLEncoded, (req, res) => {
         if (result === undefined || result.length === 0) {
             let validation = usMod.registrationValidate(req, res);
             if (validation.status) {
-                let v = req.body.birthdate.split(".");
                 sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
             (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
-              ${sql.escape(`${v[2]}-${v[1]}-${v[0]}`)}, ${sql.escape(parseInt(req.body.sex))},
+              ${sql.escape(req.body.birthdate.split(".").reverse().join("-"))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                     if (err) console.error(err);
                     sql.query(`select login, color, id, scroll, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
@@ -108,7 +107,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 });
 
 
-function enter(res, user) { //login, color, id, scroll
+function enter(res, user) { //user: login, color, id, scroll
     let token = std.genToken();
     sql.query(`delete from tokens where id = ${user.id}`, (err) => {
         if (err) console.error(err);
