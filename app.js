@@ -74,7 +74,6 @@ app.post("/registration", parserURLEncoded, (req, res) => {
                             msg.user_id = data[0].id;
                             msg.login = data[0].login;
                             msg.color = data[0].color;
-                            msg.time = new Date().toTimeString().substring(0, 5);
                             msg.id = result[0].maxId + 1;
                             chat.addnewmessage(msg);
                             fs.exists(`public/userImages/${data[0].login}.png`, (ex) => {
@@ -210,7 +209,6 @@ app.post("/message", parserJSON, (req, res) => {
                         msg.user_id = u.id;
                         msg.login = u.login;
                         msg.color = result[0].color;
-                        msg.time = new Date().toTimeString().substring(0, 5);
                         msg.id = data[0].maxId + 1;
                         msg.text = message;
                         chat.addnewmessage(msg);
@@ -233,7 +231,7 @@ app.post("/get/message", parserJSON, (req, res) => {
             const portion = 50;
             let msgId = parseInt(req.body.id);
             if (msgId === -1) {
-                sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i') as time, type, text from chat
+                sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i:%S') as time, DATE_FORMAT(time, '%d.%m.%Y') as date, type, text from chat
             where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
                     if (err) console.error(err);
                     res.json(data);
@@ -241,7 +239,7 @@ app.post("/get/message", parserJSON, (req, res) => {
             } else {
                 let msgStart = msgId - portion;
                 let msgEnd = msgId - 1;
-                sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i') as time
+                sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i:%S') as time, DATE_FORMAT(time, '%d.%m.%Y') as date
             from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
                     if (err) console.error(err);
                     res.json(data);

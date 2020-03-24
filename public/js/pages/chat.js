@@ -58,18 +58,18 @@ function sendMessage() {
         })
     }).then(res => {
         if (!res.ok) {
-            errorChatPage(res.status, "sm");
+            errorChatPage(res.status);
         } else {
             res.json().then(data => {
                 if (!data.status) {
-                    errorChatPage(data.text || data, "sm");
+                    errorChatPage(data.text || data);
                 } else {
                     elem.value = "";
                     document.getElementById("symbolsCounter").style.opacity = 0;
                 }
-            }).catch(err => errorChatPage(err, "sm"));
+            }).catch(err => errorChatPage(err));
         }
-    }).catch(err => errorChatPage(err, "sm"));
+    }).catch(err => errorChatPage(err));
 }
 
 
@@ -79,22 +79,24 @@ function subscribe() {
             if (res.status === 503 || res.status === 324) {
                 subscribe();
             } else {
-                errorChatPage(res.status, "gm");
+                errorChatPage(res.status);
             }
         } else {
             res.json().then(m => {
+                m.time = m.time.substring(0, m.time.length - 3);
+                m.date = m.date.substring(0, m.date.length - 5);
                 let templateStart = `<p class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
                 let templateEnd = `</p><br>`;
                 if (m.type === "message") {
-                    let str = `${templateStart} <span class="messageTime">${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}`;
+                    let str = `${templateStart} <span class="messageTime">${m.date} ${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}`;
                     complex(m, str);
                 } else if (m.type === "registration") {
-                    let str = `${templateStart} теперь в чате! <span class="messageTime">${m.time}</span>${templateEnd}`;
+                    let str = `${templateStart} теперь в чате! <span class="messageTime">${m.date} ${m.time}</span>${templateEnd}`;
                     complex(m, str);
                 }
-            }).catch(err => errorChatPage(err, "gm"));
+            }).catch(err => errorChatPage(err));
         }
-    }).catch(err => errorChatPage(err, "gm"));
+    }).catch(err => errorChatPage(err));
 }
 
 function complex(m, str) {
@@ -121,7 +123,7 @@ function getMsg(scroll) {
         })
     }).then(res => {
         if (!res.ok) {
-            errorChatPage(res.status, "gm");
+            errorChatPage(res.status);
         } else {
             res.json()
                 .then(data => {
@@ -135,9 +137,9 @@ function getMsg(scroll) {
                     }
                     isPending = false;
                 })
-                .catch(err => errorChatPage(err, "gm"));
+                .catch(err => errorChatPage(err));
         }
-    }).catch(err => errorChatPage(err, "gm"));
+    }).catch(err => errorChatPage(err));
 }
 
 
@@ -145,25 +147,26 @@ function parseMessages(msgArr) {
     if (msgArr.length === 0) return;
     minId = msgArr[msgArr.length - 1].id;
     msgArr.forEach(m => {
+        m.time = m.time.substring(0, m.time.length - 3);
+        m.date = m.date.substring(0, m.date.length - 5);
         let templateStart = `<p class="msgText" idx="${m.id}"><a class="login" href="/u/${m.login}"><b style="color: ${m.color};">${m.login}</b></a>`;
         let templateEnd = `</p><br>`;
         if (m.type === "message") {
-            chat.innerHTML = `${templateStart} <span class="messageTime">${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}` + chat.innerHTML;
+            chat.innerHTML = `${templateStart} <span class="messageTime">${m.date} ${m.time}</span><br><msg id = "msg${m.id}"></msg>${templateEnd}` + chat.innerHTML;
             document.getElementById(`msg${m.id}`).innerText = m.text;
         } else if (m.type === "registration") {
-            chat.innerHTML = `${templateStart} теперь в чате! <span class="messageTime">${m.time}</span>${templateEnd}` + chat.innerHTML;
+            chat.innerHTML = `${templateStart} теперь в чате! <span class="messageTime">${m.date} ${m.time}</span>${templateEnd}` + chat.innerHTML;
         }
     })
 }
 
 
 
-function errorChatPage(text, type = "e") { // sm - sendMessage, gm - getMessage, e - standart error
-    let prevText = type === "e" ? "Ошибка: " : (type === "sm" ? "Ошибка при отправке сообщения: " : "Ошибка при получении сообщений: ");
+function errorChatPage(text) {
     setTimeout(() => {
         VanillaToasts.create({
             title: "Ошибка",
-            text: prevText + text,
+            text,
             type: "error"
         });
     }, 2000);
