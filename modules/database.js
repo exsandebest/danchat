@@ -64,8 +64,8 @@ sql.query(`create table if not exists users
 })
 
 
-exports.query = (a, b) => {
-    sql.query(a, b);
+exports.query = (query, callback) => {
+    sql.query(query, callback);
 }
 
 exports.escape = (s) => {
