@@ -4,13 +4,13 @@
   "dependencies": {
     "avatar-generator": "^2.0.3",
     "body-parser": "*",
-    "cookie-parser": "*",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
-    "ejs": "^3.0.1",
+    "ejs": "^3.0.2",
     "express": "*",
     "md5": "^2.2.1",
-    "mysql2": "^2.0.2",
-    "nodemon": "*",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.2",
     "socket.io": "*"
   },
   "main": "app.js",
