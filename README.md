@@ -1,4 +1,4 @@
-# [danchat](https://danchat.herokuapp.com)
+# danchat
 > Chat, friends and communication with danchat and [Node.js](https://nodejs.org)
 
 # Getting started
