@@ -21,11 +21,11 @@
         <span class="green"><%=firstname%> <%=lastname%></span>
         <br><br><br>
         <%if (isAdmin) {%>
-        <btn class="standart" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</btn>
+        <btn class="standard" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</btn>
         <br><br><br><br>
         <%}%>
-      <btn class="standart" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИ</btn><br><br><br><br>
-      <btn class="standart" onClick="getElementById('winChangePassword').removeAttribute('style');">Сменить пароль</btn>
+      <btn class="standard" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИ</btn><br><br><br><br>
+      <btn class="standard" onClick="getElementById('winChangePassword').removeAttribute('style');">Сменить пароль</btn>
       <br><br><br>
    </center>
    <%- include('partials/footer.ejs') %>
@@ -41,7 +41,7 @@
                         <input id="newPassword" type="password" class="inputSmall" autocomplete="new-password" placeholder="Новый пароль" /><br><br>
                         <input id="repeatNewPassword" type="password" class="inputSmall" autocomplete="new-password" placeholder="Повторите новый пароль" /><br><br>
                         <span class="red notification" id="notif"></span><br><br>
-                        <btn class="standart" onclick="changePasword()">Сменить</btn>
+                        <btn class="standard" onclick="changePasword()">Сменить</btn>
                         <br><br>
                     </center>
                 </div>
@@ -58,7 +58,7 @@
                         <input id="firstname" type="text" class="inputSmall" placeholder="Имя" value="<%=firstname%>" /><br><br>
                         <input id="lastname" type="text" class="inputSmall" placeholder="Фамилия" value="<%=lastname%>" /><br><br>
                         <span class="red notification" id="notif2"></span><br><br>
-                        <btn class="standart" onclick="changeName()">Сохранить</btn>
+                        <btn class="standard" onclick="changeName()">Сохранить</btn>
                         <br><br>
                     </center>
                 </div>

@@ -21,7 +21,7 @@ const chat = require('./modules/chat');
 const wwt = require('./modules/work-with-token');
 const sql = require("./modules/database");
 const usMod = require('./modules/user-module');
-const std = require("./modules/standart");
+const std = require("./modules/standard");
 const ResponseObject = require("./modules/ResponseObject");
 const parserURLEncoded = pars.urlencoded({
     extended: false

@@ -1,5 +1,5 @@
 'use strict';
-console.time("Module => standart");
+console.time("Module => standard");
 exports.getCookie = (req, name) => {
     try {
         let matches = req.headers.cookie.match(new RegExp(
@@ -22,4 +22,4 @@ exports.genToken = () => {
     return text;
 }
 
-console.timeEnd("Module => standart");
+console.timeEnd("Module => standard");

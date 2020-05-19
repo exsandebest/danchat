@@ -1,7 +1,7 @@
 'use strict';
 console.time("Module => work-with-token");
 const sql = require("./database");
-const std = require("./standart");
+const std = require("./standard");
 
 
 exports.validate = (req, res, isAdmin = false) => {
