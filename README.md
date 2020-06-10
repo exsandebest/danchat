@@ -1,11 +1,20 @@
 # danchat
-> Chat, friends and communication with danchat and [Node.js](https://nodejs.org)
+> Chat, friends and communication with **danchat** and [Node.js](https://nodejs.org)
 
-# Getting started
+# Features
+* **Obligatory** registration
+* **Auto-genering avatars**
+* Ability to select **color** of your nickname in chat
+* User's **profiles**
+* Section "People"
+* **Friends** section
+* Beautiful **notifications** 
+
+# Installation
 You have to run ``npm install`` or ``npm i`` to install all necessary node modules.  
 Then you can use `npm start` or `npm run demon` (runs [nodemon npm package](https://www.npmjs.com/package/nodemon)) to start.
 
-# Structure of main directories
+### Structure of main directories
 * **You have to fill these directories with necessary files to correct work**  
 * **You also have to create and fill `config/.env` with necessary data, see [`config/.env.example`](https://github.com/exsandebest/danchat/blob/master/config/.env.example) as example**  
 
