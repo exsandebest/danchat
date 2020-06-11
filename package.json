@@ -1,6 +1,6 @@
 {
   "name": "danchat",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "dependencies": {
     "avatar-generator": "^2.0.4",
     "body-parser": "*",
