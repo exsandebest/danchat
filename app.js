@@ -410,7 +410,6 @@ app.get("/u/:userLogin", (req, res) => {
                         message: "This user does not exist",
                         login: u.login
                     })
-                    return;
                 } else {
                     let obj = {
                         imgStatus: data[0].imgStatus,
@@ -467,7 +466,6 @@ app.get("/u/:userLogin", (req, res) => {
                                 res.render("user.ejs", obj);
                             }
                         })
-
                     })
                 }
             })
@@ -626,7 +624,7 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                         res.send("No requests to accept");
                         return;
                     }
-                    sql.query(`delete from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err, dt3) => {
+                    sql.query(`delete from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err) => {
                         if (err) console.error(err);
                         sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
                             if (err) console.error(err);
@@ -704,7 +702,7 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
 
 
 app.post("/user/change/password", parserJSON, (req, res) => {
-    for (key in req.body) {
+    for (let key in req.body) {
         req.body[key] = decodeURIComponent(req.body[key]);
     }
     wwt.validate(req, res).then((u) => {
@@ -730,7 +728,7 @@ app.post("/user/change/password", parserJSON, (req, res) => {
 
 
 app.post("/user/change/name", parserJSON, (req, res) => {
-    for (key in req.body) {
+    for (let key in req.body) {
         req.body[key] = decodeURIComponent(req.body[key]);
     }
     wwt.validate(req, res).then((u) => {
@@ -796,26 +794,8 @@ app.get("/logout", (req, res) => {
 
 
 
-
-
-app.post("/console/sql/query", parserJSON, (req, res) => {
-    wwt.validate(req, res, true).then((u) => {
-        if (u) {
-            console.log(req.body.q);
-            sql.query(req.body.q, (err, result, fields) => {
-                if (err) console.error(err);
-                console.log(result);
-                res.json(result);
-            })
-        }
-    }, (err) => {
-        res.end("DB ERROR");
-    });
-})
-
-
-
 http.listen(process.env.PORT || 5000, (err) => {
+    if (err) console.log(err);
     console.timeEnd("Loading");
     console.log(`Started on :${process.env.PORT || 5000}`);
 });

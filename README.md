@@ -1,5 +1,6 @@
 # danchat
 > Chat, friends and communication with **danchat** and [Node.js](https://nodejs.org)
+### Try it right now: [danchat](https://danchat.herokuapp.com)
 
 # Features
 * **Obligatory** registration
@@ -8,7 +9,7 @@
 * User's **profiles**
 * Section "People"
 * **Friends** section
-* Beautiful **notifications** 
+* Beautiful **notifications**
 
 # Installation
 You have to run ``npm install`` or ``npm i`` to install all necessary node modules.  
