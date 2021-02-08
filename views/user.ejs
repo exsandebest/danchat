@@ -42,7 +42,7 @@
             <br><br>
             <span class="green"><%=firstname%> <%=lastname%></span><br><br>
             <span class="purple">Дата рождения: </span><span class="green"><%=birthdate%> (<%=age%>
-                <%if (age%10 == 0 || age%10 >=5) { %>
+                <%if (age%10 == 0 || age%10 >=5 || (age >= 11 && age <= 14)) { %>
                 <%=" лет"%>)
                 <%} else if (age%10 == 1) {%>
                 <%= " год"%>)
