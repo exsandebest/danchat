@@ -1,30 +1,30 @@
-<html>
+<html lang="ru">
 
 <head>
     <%- include('partials/header.ejs') %>
     <title>Настройки</title>
 </head>
 
-<body background="/images/bg.jpg">
-    <%- include('partials/navbar.ejs') %>
-    <%- include('partials/scripts.ejs') %>
-    <center>
-        <span class="purple">Цвет логина в чате</span><br><br>
-        <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
-        <label>
-            <%if (scroll) {%>
+<body>
+<%- include('partials/navbar.ejs') %>
+<%- include('partials/scripts.ejs') %>
+<center>
+    <span class="purple">Цвет логина в чате</span><br><br>
+    <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
+    <label>
+        <%if (scroll) {%>
             <input type="checkbox" id="scroll" checked />
-            <%} else {%>
+        <%} else {%>
             <input type="checkbox" id="scroll" />
-            <%}%>
-      <span class="purple">Автоматически прокручивать чат</span>
-      </label>
-      <br><br><br>
-      <btn class="standard" onclick="save()">Сохранить</btn>
-   </center>
-   <script src="/js/pages/settings.js"></script>
-   <%- include('partials/footer.ejs') %>
+        <%}%>
+        <span class="purple">Автоматически прокручивать чат</span>
+    </label>
+    <br><br><br>
+    <btn class="standard" onclick="save()">Сохранить</btn>
+</center>
+<script src="/js/pages/settings.js"></script>
+<%- include('partials/footer.ejs') %>
 
-            <body>
+</body>
 
 </html>

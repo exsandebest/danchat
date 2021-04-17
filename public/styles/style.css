@@ -1,3 +1,7 @@
+body {
+    background-image: url("/images/bg.jpg");
+}
+
 /* Navigation bar */
 nav {
     margin-left: 20%;
@@ -5,7 +9,7 @@ nav {
     background-color: #000000;
     margin-bottom: 65px;
     border-radius: 50px;
-    top: 0px;
+    top: 0;
 }
 
 nav ul {
@@ -31,13 +35,12 @@ nav a {
     font-size: 1.2em;
     line-height: 3em;
     text-decoration: none;
-    color: #FFF;
 }
 
 nav a#prof:hover {
     cursor: default;
     background-color: #39c63e;
-    border-radius: 100px 100px 0px 0px;
+    border-radius: 100px 100px 0 0;
 }
 
 nav a:hover {
@@ -73,7 +76,7 @@ nav ul li a span#counter {
     border-radius: 10px;
     background-color: rgba(230, 103, 0, 1);
     color: #ffe86f;
-    border: solid 0px orange;
+    border: solid 0 orange;
 }
 
 nav ul li ul li a {
@@ -88,7 +91,7 @@ btn {
     text-align: center;
     cursor: pointer;
     font-style: normal;
-    font-family: "Arial";
+    font-family: "Arial", sans-serif;
 }
 
 btn.standard {
@@ -108,7 +111,7 @@ btn.small {
 }
 
 btn:not(.active) {
-    box-shadow: inset 0 1px 1px rgba(111, 55, 125, 0.8), inset 0 -1px 0px rgba(63, 59, 113, 0.2), 0 9px 16px 0 rgba(0, 0, 0, 0.3), 0 4px 3px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px #150a1e;
+    box-shadow: inset 0 1px 1px rgba(111, 55, 125, 0.8), inset 0 -1px 0 rgba(63, 59, 113, 0.2), 0 9px 16px 0 rgba(0, 0, 0, 0.3), 0 4px 3px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px #150a1e;
     background-image: linear-gradient(#3b2751, #271739);
     text-shadow: 0 0 21px rgba(223, 206, 228, 0.5), 0 -1px 0 #311d47;
 }
@@ -126,7 +129,7 @@ btn:not(:hover) {
 /* Inputs */
 .inputBig {
     font-style: normal;
-    font-family: "Arial";
+    font-family: "Arial", sans-serif;
     font-size: 1em;
     color: #4B0082;
     opacity: 0.85;
@@ -173,10 +176,10 @@ footer p#footerLabel {
     margin-left: 25px;
     color: rgba(240, 240, 240, 0.9);
     font-weight: bold;
-    font-family: "Trebuchet MS";
+    font-family: "Trebuchet MS", sans-serif;
     display: inline-block;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 footer span#githubButtons {
@@ -186,7 +189,6 @@ footer span#githubButtons {
 }
 
 footer span#githubButtons span {
-    margin-left: 5px;
     margin-left: 5px;
 }
 
@@ -203,8 +205,7 @@ div.people-block {
     height: 100px;
     width: 275px;
     background: rgba(254, 254, 254, 0.6);
-    margin: 10px;
-    margin-bottom: 20px;
+    margin: 10px 10px 20px;
     border: outset 4px #20ccff;
     border-radius: 20px;
 }
@@ -298,7 +299,7 @@ img.user-img {
     overflow: hidden;
     z-index: 2000;
     width: 500px;
-    padding: 0px;
+    padding: 0;
     margin-left: -250px;
 }
 
@@ -390,28 +391,28 @@ a.friend-login {
 
 /* Span colors */
 span.purple {
-    font-family: Garamond;
+    font-family: Garamond, sans-serif;
     font-size: 1.4em;
     color: #ffffff;
     text-shadow: 0 0 10px #6A5ACD, 0 0 20px #6A5ACD, 0 0 30px #6A5ACD, 0 0 40px #6A5ACD, 0 0 50px #6A5ACD, 0 0 60px #6A5ACD, 0 0 70px #6A5ACD, 0 0 80px #6A5ACD;
 }
 
 span.red {
-    font-family: Garamond;
+    font-family: Garamond, sans-serif;
     font-size: 1.4em;
     color: #DC143C;
     text-shadow: 0 0 10px #DC143C, 0 0 20px #FA8072, 0 0 30px #DC143C, 0 0 40px #DC143C, 0 0 70px #DC143C, 0 0 80px #DC143C, 0 0 100px #DC143C, 0 0 150px #DC143C;
 }
 
 span.green {
-    font-family: Garamond;
+    font-family: Garamond, sans-serif;
     font-size: 1.4em;
     color: #00FF7F;
     text-shadow: 0 0 10px #00FF7F, 0 0 20px #00FF7F, 0 0 30px #00FF7F, 0 0 40px #00FF7F, 0 0 70px #00FF7F, 0 0 80px #00FF7F, 0 0 100px #00FF7F, 0 0 150px #00FF7F;
 }
 
 span.orange {
-    font-family: Garamond;
+    font-family: Garamond, sans-serif;
     font-size: 1em;
     color: #fff;
     text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF8C00, 0 0 40px #FF8C00, 0 0 70px #FF8C00, 0 0 80px #FF8C00;
@@ -451,7 +452,7 @@ div#chat {
     font-size: 17px;
     white-space: pre-wrap;
     text-align-last: left;
-    border-radius: 30px 0px 0px 30px;
+    border-radius: 30px 0 0 30px;
     padding: 1.5%;
 }
 
@@ -484,7 +485,7 @@ textarea#message {
 }
 
 textarea#message::-webkit-scrollbar {
-    width: 0px;
+    width: 0;
     background: transparent;
 }
 
@@ -507,11 +508,11 @@ a.login {
     font-size: 0.9em;
     cursor: pointer;
     text-decoration: none;
-    font-family: "Trebuchet MS";
+    font-family: "Trebuchet MS", sans-serif;
 }
 
 .msgText {
-    font-family: "calibri";
+    font-family: "calibri", sans-serif;
     cursor: default;
     background-color: rgb(255, 255, 255);
     max-width: 70%;

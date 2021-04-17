@@ -58,7 +58,7 @@ app.get("/registration", (req, res) => {
 app.post("/registration", parserURLEncoded, (req, res) => {
     sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
         if (result === undefined || result.length === 0) {
-            let validation = usMod.registrationValidate(req, res);
+            let validation = usMod.registrationValidate(req.body);
             if (validation.status) {
                 sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
             (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
@@ -760,7 +760,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
                 return;
             }
             sql.query(`update users set scroll = ${req.body.scroll}, color = ${sql.escape(req.body.color)}
-         where id = ${u.id}`, (err, data) => {
+         where id = ${u.id}`, (err) => {
                 if (err) console.error(err);
                 res.cookie("danchat.user.scroll", req.body.scroll ? 1 : 0, {
                     path: "/"

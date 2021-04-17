@@ -3,7 +3,7 @@
   top: 0;
   right: 0;
   width: 320px;
-  font-family: 'Helvetica';
+  font-family: 'Helvetica', sans-serif;
 }
 
 .vanillatoasts-toast {

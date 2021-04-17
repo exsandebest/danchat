@@ -1,16 +1,16 @@
-﻿<html>
+﻿<html lang="ru">
 
 <head>
     <%- include('partials/header.ejs') %>
     <title>Вход</title>
 </head>
 
-<body background="/images/bg.jpg">
+<body>
     <h1 class="mainLabel">Вход</h1>
     <center>
         <form action="/login" method="post" enctype="application/x-www-form-urlencoded" name="authorizationForm">
             <input class='inputBig' type="text" required name="login" autofocus title="Логин" autocomplete="username" placeholder="Введите логин"><br><br>
-            <input class='inputBig' type="password" required name="password" title="Пароль" autocomplete="current-password" onkeypress="if(event.keyCode == 13) document.forms.authorizationForm.submit()" placeholder="Введите пароль"><br><br>
+            <input class='inputBig' type="password" required name="password" title="Пароль" autocomplete="current-password" onkeypress="if(event.keyCode === 13) document.forms.authorizationForm.submit()" placeholder="Введите пароль"><br><br>
         </form>
         <div class="notification" id="notification">
             <span class="notificationBad"><%=notification%></span>

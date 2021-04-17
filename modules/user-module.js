@@ -47,8 +47,8 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname; ln - lastname
 
 
 
-exports.registrationValidate = (req, res) => {
-    let data = req.body;
+exports.registrationValidate = (body) => {
+    let data = body;
     if (!data.birthdate || !data.firstname || !data.lastname || !data.login || !data.sex || !data.password) {
         return new Verdict("Заполните все поля");
     }

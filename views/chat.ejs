@@ -7,12 +7,12 @@
     </title>
 </head>
 
-<body background="/images/bg.jpg">
+<body>
     <%- include('partials/navbar.ejs') %>
     <center>
         <div id="chat"></div><br>
         <div style="width:779px; display:inline-block">
-            <textarea placeholder="Напишите сообщение..." maxlength="1000" onkeypress="if(event.keyCode == 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
+            <textarea placeholder="Напишите сообщение..." maxlength="1000" onkeypress="if(event.keyCode === 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
             <span id="symbolsCounter"></span>
             <br><br>
             <br>

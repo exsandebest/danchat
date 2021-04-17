@@ -3,7 +3,7 @@ console.time("Module => standard");
 exports.getCookie = (req, name) => {
     try {
         let matches = req.headers.cookie.match(new RegExp(
-            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            "(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, '\\$1') + "=([^;]*)"
         ));
         return matches ? decodeURIComponent(matches[1]) : false;
     } catch (e) {
