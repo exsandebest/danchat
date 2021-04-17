@@ -8,7 +8,7 @@ exports.validate = (req, res, isAdmin = false) => {
     return new Promise((resolve, reject) => {
         let token = std.getCookie(req, "danchat.token");
         if (token) {
-            sql.query(`select id from tokens where token = '${token}'`, (err, result) => {
+            sql.query(`select id from tokens where token = ${sql.escape(token)}`, (err, result) => {
                 if (err) {
                     console.error(err);
                     reject("db");

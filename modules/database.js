@@ -1,7 +1,8 @@
 'use strict';
 console.time("Module => database");
 const mysql = require("mysql2");
-const md5 = require("md5");
+const bcrypt = require('bcrypt');
+const saltRounds = 3;
 
 const sql = mysql.createPool({
     host: process.env.DB_HOST,
@@ -18,14 +19,14 @@ sql.query(`create table if not exists users
    sex bool default NULL,
    firstname varchar(255) NOT NULL,
    lastname varchar(255) default NULL,
-   color varchar(8) default "#000000",
+   color varchar(8) default '#000000',
    scroll bool default 1,
    admin bool default 0,
    imgStatus bool default 0)
    DEFAULT CHARSET=utf8;`, (err, result) => {
     if (err) console.error(err);
     sql.query(`insert ignore into users (login, password, birthdate, sex, firstname, lastname, admin)
-   values ("admin","${md5("admin")}", NOW() - INTERVAL 18 YEAR , 1, "Администратор", "", 1);`, (err, result) => {
+   values ("admin", ${sql.escape(bcrypt.hashSync("admin", saltRounds))}, NOW() - INTERVAL 18 YEAR , 1, 'Администратор', '', 1);`, (err, result) => {
         if (err) console.error(err);
         sql.query(`create table if not exists friends
          (id_1 int(11) not null, id_2 int(11) not null)

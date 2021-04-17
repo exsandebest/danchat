@@ -3,12 +3,12 @@
   "version": "1.2.1",
   "dependencies": {
     "avatar-generator": "^2.0.4",
+    "bcrypt": "^5.0.1",
     "body-parser": "*",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.3",
     "express": "*",
-    "md5": "^2.2.1",
     "mysql2": "^2.1.0",
     "nodemon": "^2.0.4",
     "socket.io": "*"
@@ -19,7 +19,6 @@
     "demon": "nodemon app.js"
   },
   "description": "Chat, friends and communication with danchat and Node.js",
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/exsandebest/danchat.git"

@@ -1,6 +1,6 @@
 'use strict';
 console.time("Module => user-module");
-const md5 = require("md5");
+const bcrypt = require('bcrypt');
 
 const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
@@ -15,13 +15,13 @@ exports.passwordValidate = (res, password, oldPassword, newPassword, repeatNewPa
     if (!oldPassword || !newPassword || !repeatNewPassword) {
         return new Verdict("Заполните все поля");
     }
-    if (md5(oldPassword) !== password) {
+    if (!bcrypt.compareSync(oldPassword, password)) {
         return new Verdict("Неверный старый пароль");
     }
     if (!regPassword.test(newPassword)) {
         return new Verdict("Некорректный пароль", "От 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_");
     }
-    if (password === md5(newPassword)) {
+    if (bcrypt.compareSync(newPassword, password)) {
         return new Verdict("Пароль не может быть изменен на старый");
     }
     if (newPassword !== repeatNewPassword) {

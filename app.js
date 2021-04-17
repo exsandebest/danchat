@@ -10,7 +10,7 @@ const pre = require("./pre");
 const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
-const md5 = require("md5");
+const bcrypt = require('bcrypt');
 const avatarGenerator = require('avatar-generator');
 const avatar = new avatarGenerator();
 const express = require('express');
@@ -27,6 +27,7 @@ const parserURLEncoded = pars.urlencoded({
     extended: false
 });
 const parserJSON = pars.json();
+const saltRounds = 3;
 
 app.use(express.static(__dirname + "/public", {
     maxAge: "1h"
@@ -61,7 +62,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
             let validation = usMod.registrationValidate(req.body);
             if (validation.status) {
                 sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
-            (${sql.escape(req.body.login)}, ${sql.escape(md5(req.body.password))},
+            (${sql.escape(req.body.login)}, ${sql.escape(bcrypt.hashSync(req.body.password, saltRounds))},
               ${sql.escape(req.body.birthdate.split(".").reverse().join("-"))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                     if (err) console.error(err);
@@ -137,14 +138,15 @@ app.post("/login", parserURLEncoded, (req, res) => {
         })
         return;
     }
-    sql.query(`select id, login, color, sex, scroll from users where login= ${sql.escape(Rlogin)} and password = ${sql.escape(md5(Rpassword))}`, (err, data) => {
+    sql.query(`select id, login, password, color, sex, scroll from users where login = ${sql.escape(Rlogin)}`, (err, data) => {
         if (err) console.error(err);
-        if (data === undefined || data.length === 0) {
+        if (data === undefined || data.length === 0 || !bcrypt.compareSync(Rpassword, data[0].password)) {
             res.render("login.ejs", {
                 notification: "Неверный логин или пароль"
             })
             return;
         }
+        delete data[0].password;
         enter(res, data[0]);
     })
 })
@@ -711,7 +713,7 @@ app.post("/user/change/password", parserJSON, (req, res) => {
                 if (err) console.error(err);
                 let validation = usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword)
                 if (validation.status) {
-                    sql.query(`update users set password = ${sql.escape(md5(req.body.newPassword))} where id = ${u.id}`, (err) => {
+                    sql.query(`update users set password = ${sql.escape(bcrypt.hashSync(req.body.newPassword, saltRounds))} where id = ${u.id}`, (err) => {
                         if (err) console.error(err);
                         res.json(new ResponseObject(true, "Пароль успешно изменён!"));
                     })
@@ -759,7 +761,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
                 res.json(new ResponseObject(false, validation.text1, validation.text2));
                 return;
             }
-            sql.query(`update users set scroll = ${req.body.scroll}, color = ${sql.escape(req.body.color)}
+            sql.query(`update users set scroll = ${sql.escape(Boolean(req.body.scroll))}, color = ${sql.escape(req.body.color)}
          where id = ${u.id}`, (err) => {
                 if (err) console.error(err);
                 res.cookie("danchat.user.scroll", req.body.scroll ? 1 : 0, {
