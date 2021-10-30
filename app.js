@@ -6,7 +6,7 @@ if (!process.env.USING_SERVER) {
         path: "config/.env"
     });
 }
-const pre = require("./pre");
+require("./pre");
 const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
@@ -16,7 +16,7 @@ const avatar = new avatarGenerator();
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {allowEIO3: true});
 const chat = require('./modules/chat');
 const wwt = require('./modules/work-with-token');
 const sql = require("./modules/database");
@@ -61,7 +61,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
         if (result === undefined || result.length === 0) {
             let validation = usMod.registrationValidate(req.body);
             if (validation.status) {
-                sql.query(`insert into users (login,password,birthdate,sex,firstname,lastname) values
+                sql.query(`insert into users (login, password, birthdate, sex, firstname, lastname) values
             (${sql.escape(req.body.login)}, ${sql.escape(bcrypt.hashSync(req.body.password, saltRounds))},
               ${sql.escape(req.body.birthdate.split(".").reverse().join("-"))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
@@ -109,9 +109,9 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 
 function enter(res, user) { //user: login, color, id, scroll
     let token = std.genToken();
-    sql.query(`delete from tokens where id = ${user.id}`, (err) => {
+    sql.query(`delete from tokens where user_id = ${user.id}`, (err) => {
         if (err) console.error(err);
-        sql.query(`insert into tokens (id, login, token, time) values (${user.id}, ${sql.escape(user.login)}, ${sql.escape(token)}, NOW());`, (err) => {
+        sql.query(`insert into tokens (user_id, token, time) values (${user.id}, ${sql.escape(token)}, NOW());`, (err) => {
             if (err) console.error(err);
             res.cookie("danchat.token", token, {
                 path: "/"
@@ -156,7 +156,7 @@ app.post("/login", parserURLEncoded, (req, res) => {
 app.get("/", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
+            sql.query(`select users.login from tokens left join users on tokens.user_id = users.id where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
                 if (err) console.error(err);
                 res.render("chat.ejs", {
                     login: u.login,
@@ -280,12 +280,12 @@ app.get("/friends", (req, res) => {
             let obj = {
                 login: u.login
             };
-            sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id} union
-         all select COUNT(to_id) from friends_requests where from_id = ${u.id}`, (err, data) => {
+            sql.query(`select COUNT(id_from) as reqs from friends_requests where id_to = ${u.id} union
+         all select COUNT(id_to) from friends_requests where id_from = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 obj.inreqsCounter = data[0].reqs ? ` ${data[0].reqs} ` : "";
                 obj.outreqsCounter = data[1].reqs ? ` ${data[1].reqs} ` : "";
-                sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+                sql.query(`select login, color, img_status, firstname, lastname from users where id in
                      (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
                     if (err) console.error(err);
                     obj.friends = (dt === undefined ? [] : dt);
@@ -306,11 +306,11 @@ app.get("/incoming", (req, res) => {
             let obj = {
                 login: u.login
             };
-            sql.query(`select COUNT(to_id) as reqs from friends_requests where from_id = ${u.id}`, (err, result) => {
+            sql.query(`select COUNT(id_to) as reqs from friends_requests where id_from = ${u.id}`, (err, result) => {
                 if (err) console.error(err);
                 obj.outreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
-                sql.query(`select login, color, imgStatus, firstname, lastname from users
-               where id in (select from_id from friends_requests where to_id = ${u.id})`, (err, data) => {
+                sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users
+               where id in (select id_from from friends_requests where id_to = ${u.id})`, (err, data) => {
                     if (err) console.error(err);
                     obj.inreqs = (data === undefined ? [] : data);
                     res.render("incoming.ejs", obj);
@@ -330,11 +330,11 @@ app.get("/outcoming", (req, res) => {
             let obj = {
                 login: u.login
             };
-            sql.query(`select COUNT(from_id) as reqs from friends_requests where to_id = ${u.id}`, (err, result) => {
+            sql.query(`select COUNT(id_from) as reqs from friends_requests where id_to = ${u.id}`, (err, result) => {
                 if (err) console.error(err);
                 obj.inreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
-                sql.query(`select login, color, imgStatus, firstname, lastname from users
-               where id in (select to_id from friends_requests where from_id = ${u.id})`, (err, data) => {
+                sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users
+               where id in (select id_to from friends_requests where id_from = ${u.id})`, (err, data) => {
                     if (err) console.error(err);
                     obj.outreqs = (data === undefined ? [] : data);
                     res.render("outcoming.ejs", obj);
@@ -351,7 +351,7 @@ app.get("/outcoming", (req, res) => {
 app.get("/profile", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login, admin as isAdmin, color, firstname, lastname, imgStatus from users where id = ${u.id}`, (err, data) => {
+            sql.query(`select login, admin as isAdmin, color, firstname, lastname, img_status as imgStatus from users where id = ${u.id}`, (err, data) => {
                 res.render("profile.ejs", data[0]);
             })
         }
@@ -373,7 +373,7 @@ setInterval(() => {
 app.get("/onlineCounter", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
+            sql.query(`select users.login from tokens left join users on tokens.user_id = users.id where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
                 if (err) console.error(err);
                 res.json(data);
             })
@@ -386,7 +386,7 @@ app.get("/onlineCounter", (req, res) => {
 app.get("/people", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login, firstname, lastname, color, imgStatus from users`, (err, data) => {
+            sql.query(`select login, firstname, lastname, color, img_status as imgStatus from users`, (err, data) => {
                 if (err) console.error(err);
                 res.render("people.ejs", {
                     login: u.login,
@@ -405,7 +405,7 @@ app.get("/u/:userLogin", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
             let userLogin = req.params.userLogin;
-            sql.query(`select id, login, firstname, lastname, color, DATE_FORMAT(birthdate, '%d.%m.%Y') as birthdate, (DATE_FORMAT(FROM_DAYS(TO_DAYS(now()) - TO_DAYS(birthdate)), '%Y') + 0) as age, sex, imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
+            sql.query(`select id, login, firstname, lastname, color, DATE_FORMAT(birthdate, '%d.%m.%Y') as birthdate, (DATE_FORMAT(FROM_DAYS(TO_DAYS(now()) - TO_DAYS(birthdate)), '%Y') + 0) as age, sex, img_status as imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
                 if (err) console.error(err);
                 if (data === undefined || data.length === 0) {
                     res.render("404.ejs", {
@@ -424,14 +424,14 @@ app.get("/u/:userLogin", (req, res) => {
                         login: u.login,
                         sex: (data[0].sex ? "Мужской" : "Женский")
                     }
-                    sql.query(`select login from tokens where time >= (NOW() - INTERVAL 5 MINUTE) and id = ${data[0].id}`, (err, respose) => {
+                    sql.query(`select users.login from tokens left join users on users.id = tokens.user_id where time >= (NOW() - INTERVAL 5 MINUTE) and user_id = ${data[0].id}`, (err, respose) => {
                         if (err) console.error(err);
                         if (respose === undefined || respose.length === 0) {
                             obj.userOnlineStatus = "offline";
                         } else {
                             obj.userOnlineStatus = "online";
                         }
-                        sql.query(`select login, color, imgStatus, firstname, lastname from users where id in
+                        sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users where id in
                   (select id_1 as ids from friends where id_2 = ${data[0].id} union
                   select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
                             if (err) console.error(err);
@@ -441,10 +441,10 @@ app.get("/u/:userLogin", (req, res) => {
                      (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
                                     if (err) console.error(err);
                                     if (r1 === undefined || r1.length === 0) {
-                                        sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${data[0].id}`, (err, r2) => {
+                                        sql.query(`select * from friends_requests where id_from = ${u.id} and id_to = ${data[0].id}`, (err, r2) => {
                                             if (err) console.error(err);
                                             if (r2 === undefined || r2.length === 0) {
-                                                sql.query(`select * from friends_requests where to_id = ${u.id} and from_id = ${data[0].id}`, (err, r3) => {
+                                                sql.query(`select * from friends_requests where id_to = ${u.id} and id_from = ${data[0].id}`, (err, r3) => {
                                                     if (err) console.error(err);
                                                     if (r3 !== undefined && r3.length !== 0) {
                                                         obj.userStatus = "subscriber";
@@ -550,9 +550,9 @@ app.post("/user/add/friend", parserJSON, (req, res) => {
                     return;
                 }
                 let userId = dt1[0].id;
-                sql.query(`insert into friends_requests(from_id, to_id) values (${u.id}, ${userId})`, (err) => {
+                sql.query(`insert into friends_requests(id_from, id_to) values (${u.id}, ${userId})`, (err) => {
                     if (err) console.error(err);
-                    sql.query(`select token from tokens where id = ${userId}`, (err, data) => {
+                    sql.query(`select token from tokens where user_id = ${userId}`, (err, data) => {
                         if (err) console.error(err);
                         if (data === undefined || data.length === 0) {
                             res.json(new ResponseObject(true));
@@ -590,13 +590,13 @@ app.post("/user/cancel/outcomingrequest", parserJSON, (req, res) => {
                     return;
                 }
                 let userId = dt1[0].id;
-                sql.query(`select * from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt2) => {
+                sql.query(`select * from friends_requests where id_from = ${u.id} and id_to = ${userId}`, (err, dt2) => {
                     if (err) console.error(err);
                     if (dt2 === undefined || dt2.length === 0) {
                         res.send("No requests to cancel");
                         return;
                     }
-                    sql.query(`delete from friends_requests where from_id = ${u.id} and to_id = ${userId}`, (err, dt3) => {
+                    sql.query(`delete from friends_requests where id_from = ${u.id} and id_to = ${userId}`, (err, dt3) => {
                         if (err) console.error(err);
                         res.json(new ResponseObject(true));
                     })
@@ -620,17 +620,17 @@ app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
                     return;
                 }
                 let userId = dt1[0].id;
-                sql.query(`select * from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err, dt2) => {
+                sql.query(`select * from friends_requests where id_from = ${userId} and id_to = ${u.id}`, (err, dt2) => {
                     if (err) console.error(err);
                     if (dt2 === undefined || dt2.length === 0) {
                         res.send("No requests to accept");
                         return;
                     }
-                    sql.query(`delete from friends_requests where from_id = ${userId} and to_id = ${u.id}`, (err) => {
+                    sql.query(`delete from friends_requests where id_from = ${userId} and id_to = ${u.id}`, (err) => {
                         if (err) console.error(err);
                         sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
                             if (err) console.error(err);
-                            sql.query(`select token from tokens where id = ${userId}`, (err, data) => {
+                            sql.query(`select token from tokens where user_id = ${userId}`, (err, data) => {
                                 if (err) console.error(err);
                                 if (data === undefined || data.length === 0) {
                                     res.json(new ResponseObject(true));
@@ -672,9 +672,9 @@ app.post("/user/delete/friend", parserJSON, (req, res) => {
                 let friendId = dt1[0].id;
                 sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`, (err) => {
                     if (err) console.error(err);
-                    sql.query(`insert into friends_requests (from_id, to_id) values (${friendId}, ${u.id})`, (err) => {
+                    sql.query(`insert into friends_requests (id_from, id_to) values (${friendId}, ${u.id})`, (err) => {
                         if (err) console.error(err);
-                        sql.query(`select token from tokens where id = ${friendId}`, (err, data) => {
+                        sql.query(`select token from tokens where user_id = ${friendId}`, (err, data) => {
                             if (err) console.error(err);
                             if (data === undefined || data.length === 0) {
                                 res.json(new ResponseObject(true));
@@ -780,7 +780,7 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
 app.get("/logout", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`delete from tokens where id = ${u.id}`, (err) => {
+            sql.query(`delete from tokens where user_id = ${u.id}`, (err) => {
                 if (err) console.error(err);
                 res.clearCookie("danchat.token");
                 res.clearCookie("danchat.user.color");

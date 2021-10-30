@@ -8,7 +8,7 @@ exports.validate = (req, res, isAdmin = false) => {
     return new Promise((resolve, reject) => {
         let token = std.getCookie(req, "danchat.token");
         if (token) {
-            sql.query(`select id from tokens where token = ${sql.escape(token)}`, (err, result) => {
+            sql.query(`select user_id from tokens where token = ${sql.escape(token)}`, (err, result) => {
                 if (err) {
                     console.error(err);
                     reject("db");
@@ -18,7 +18,7 @@ exports.validate = (req, res, isAdmin = false) => {
                     res.redirect("/login");
                     resolve(false);
                 } else {
-                    sql.query(`select login from users where id = ${result[0].id}${isAdmin ? " and admin = 1" : ""}`, (err, data) => {
+                    sql.query(`select login from users where id = ${result[0].user_id}${isAdmin ? " and admin = 1" : ""}`, (err, data) => {
                         if (err) {
                             console.error(err);
                             reject("db");
@@ -29,10 +29,10 @@ exports.validate = (req, res, isAdmin = false) => {
                             resolve(false);
                         } else {
                             let obj = {
-                                id: result[0].id,
+                                id: result[0].user_id,
                                 login: data[0].login
                             }
-                            sql.query(`update tokens set time = NOW() where id = ${obj.id}`, (err) => {
+                            sql.query(`update tokens set time = NOW() where user_id = ${obj.id}`, (err) => {
                                 if (err) {
                                     console.error(err);
                                     reject("db");
