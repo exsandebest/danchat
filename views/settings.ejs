@@ -10,15 +10,7 @@
 <%- include('partials/scripts.ejs') %>
 <center>
     <span class="purple">Цвет логина в чате</span><br><br>
-    <input type="color" id="color" value="<%=color%>" style="height: 44px"><br><br>
-    <label>
-        <%if (scroll) {%>
-            <input type="checkbox" id="scroll" checked />
-        <%} else {%>
-            <input type="checkbox" id="scroll" />
-        <%}%>
-        <span class="purple">Автоматически прокручивать чат</span>
-    </label>
+    <input type="color" id="color" value="<%=color%>" style="height: 44px">
     <br><br><br>
     <btn class="standard" onclick="save()">Сохранить</btn>
 </center>

@@ -2,7 +2,7 @@
 const login = document.getElementById("prof").innerText;
 const chat = document.getElementById("chat");
 const symbolsCounter = document.getElementById("symbolsCounter");
-const scroll = parseInt(getCookie("danchat.user.scroll"));
+const scroll = 1;
 let minId = -1;
 let isPending = 0;
 sessionStorage.setItem("danchat.counter", 0);

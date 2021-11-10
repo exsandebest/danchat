@@ -20,7 +20,6 @@ sql.query(`create table if not exists users
    firstname varchar(255) NOT NULL,
    lastname varchar(255) default NULL,
    color varchar(8) default '#000000',
-   scroll bool default 1,
    admin bool default 0,
    img_status bool default 0)
    DEFAULT CHARSET=utf8;`, (err, result) => {

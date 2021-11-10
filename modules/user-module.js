@@ -2,11 +2,11 @@
 console.time("Module => user-module");
 const bcrypt = require('bcrypt');
 
-const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_@]{4,24}$/;
+const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_]{4,24}$/;
 const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
-const regName = /^[a-zA-ZА-Яа-яЁё]{2,24}$/;
+const regName = /^[a-zA-ZА-Яа-яЁё]{1,24}$/;
 const regBirthdate = /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$/;
-const regSex = /[01]/;
+const regSex = /^[01]$/;
 const regColor = /^#[a-fA-F0-9]{3,8}$/;
 
 
@@ -79,9 +79,6 @@ exports.registrationValidate = (body) => {
 exports.validateSetting = (data) => {
     if (!regColor.test(data.color)) {
         return new Verdict("Incorrect values: color");
-    }
-    if (data.scroll !== false && data.scroll !== true) {
-        return new Verdict("Incorrect values: scroll");
     }
     let c = data.color;
     let v1 = parseInt(c[1] + c[2], 16),

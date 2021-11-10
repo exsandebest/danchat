@@ -40,7 +40,6 @@ app.set("view engine", "ejs");
 app.get("/login", (req, res) => {
     res.clearCookie("danchat.token");
     res.clearCookie("danchat.user.color");
-    res.clearCookie("danchat.user.scroll");
     res.render("login.ejs", {
         notification: ""
     });
@@ -66,7 +65,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
               ${sql.escape(req.body.birthdate.split(".").reverse().join("-"))}, ${sql.escape(parseInt(req.body.sex))},
               ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
                     if (err) console.error(err);
-                    sql.query(`select login, color, id, scroll, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
+                    sql.query(`select login, color, id, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
                         if (err) console.error(err);
                         sql.query(`select max(id) as maxId from chat`, (err, result) => {
                             let msg = {};
@@ -107,7 +106,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 });
 
 
-function enter(res, user) { //user: login, color, id, scroll
+function enter(res, user) { //user: login, color, id
     let token = std.genToken();
     sql.query(`delete from tokens where user_id = ${user.id}`, (err) => {
         if (err) console.error(err);
@@ -118,10 +117,7 @@ function enter(res, user) { //user: login, color, id, scroll
             });
             res.cookie("danchat.user.color", user.color, {
                 path: "/"
-            })
-            res.cookie("danchat.user.scroll", user.scroll, {
-                path: "/"
-            })
+            });
             res.redirect("/");
         })
     })
@@ -138,7 +134,7 @@ app.post("/login", parserURLEncoded, (req, res) => {
         })
         return;
     }
-    sql.query(`select id, login, password, color, sex, scroll from users where login = ${sql.escape(Rlogin)}`, (err, data) => {
+    sql.query(`select id, login, password, color, sex from users where login = ${sql.escape(Rlogin)}`, (err, data) => {
         if (err) console.error(err);
         if (data === undefined || data.length === 0 || !bcrypt.compareSync(Rpassword, data[0].password)) {
             res.render("login.ejs", {
@@ -258,10 +254,9 @@ app.post("/get/message", parserJSON, (req, res) => {
 app.get("/settings", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select scroll, color from users where id = ${u.id}`, (err, data) => {
+            sql.query(`select color from users where id = ${u.id}`, (err, data) => {
                 if (err) console.error(err);
                 res.render("settings.ejs", {
-                    scroll: data[0].scroll,
                     color: data[0].color,
                     login: u.login
                 })
@@ -761,12 +756,9 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
                 res.json(new ResponseObject(false, validation.text1, validation.text2));
                 return;
             }
-            sql.query(`update users set scroll = ${sql.escape(Boolean(req.body.scroll))}, color = ${sql.escape(req.body.color)}
+            sql.query(`update users set color = ${sql.escape(req.body.color)}
          where id = ${u.id}`, (err) => {
                 if (err) console.error(err);
-                res.cookie("danchat.user.scroll", req.body.scroll ? 1 : 0, {
-                    path: "/"
-                });
                 res.json(new ResponseObject(true, "Настройки успешно обновлены"));
             })
         }
@@ -784,7 +776,6 @@ app.get("/logout", (req, res) => {
                 if (err) console.error(err);
                 res.clearCookie("danchat.token");
                 res.clearCookie("danchat.user.color");
-                res.clearCookie("danchat.user.scroll");
                 res.redirect("/login");
                 res.end();
             })

@@ -6,8 +6,7 @@ function save() {
             "Content-Type": "application/json;charset=utf-8"
         },
         body: JSON.stringify({
-            color: document.getElementById("color").value,
-            scroll: document.getElementById("scroll").checked
+            color: document.getElementById("color").value
         })
     }).then(res => {
         if (!res.ok) {
