@@ -1,5 +1,5 @@
 'use strict';
-socket.on(getCookie("danchat.token"), function(update) {
+socket.on(getCookie("danchat.token"), function (update) {
     let title = "Уведомление";
     let timeout = 20000; // 20 sec
     let template = `<a class="login" href="/u/${update.login}"><b style="color:${update.color}">${update.login}</b></a> `;
@@ -16,7 +16,7 @@ socket.on(getCookie("danchat.token"), function(update) {
     } else if (update.type === "acceptOutcomingRequest") {
         VanillaToasts.create({
             title,
-            text: `${template}(${update.name}) принял${update.sex?"":"а"} вашу заявку`,
+            text: `${template}(${update.name}) принял${update.sex ? "" : "а"} вашу заявку`,
             type: "success",
             callback: () => {
                 location = "/friends"
@@ -26,7 +26,7 @@ socket.on(getCookie("danchat.token"), function(update) {
     } else if (update.type === "deletingFromFriends") {
         VanillaToasts.create({
             title,
-            text: `${template}(${update.name}) удалил${update.sex?"":"а"} вас из друзей`,
+            text: `${template}(${update.name}) удалил${update.sex ? "" : "а"} вас из друзей`,
             type: "error",
             callback: () => {
                 location = "/outcoming"

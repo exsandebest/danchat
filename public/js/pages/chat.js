@@ -5,7 +5,12 @@ const symbolsCounter = document.getElementById("symbolsCounter");
 const scroll = 1;
 let minId = -1;
 let isPending = 0;
-sessionStorage.setItem("danchat.counter", 0);
+let messagesElements = document.getElementsByClassName('msgText');
+Array.from(messagesElements).forEach((element) => {
+    element.removeEventListener('dblclick', deleteMessage);
+    element.addEventListener('dblclick', deleteMessage);
+});
+sessionStorage.setItem("danchat.counter", "0");
 getMsg(1);
 
 chat.addEventListener('scroll', () => {
@@ -29,7 +34,7 @@ socket.on("ADMINMESSAGE", serverData => {
     alert(serverData);
 });
 
-document.querySelector('textarea').addEventListener('keydown', function() {
+document.querySelector('textarea').addEventListener('keydown', function () {
     setTimeout(() => {
         this.style.cssText = `height:auto; padding: 3px`;
         this.style.cssText = `height: ${(this.scrollHeight + 3)}px`;
@@ -41,7 +46,6 @@ document.querySelector('textarea').addEventListener('keydown', function() {
         }
     }, 0);
 });
-
 
 
 function sendMessage() {
@@ -103,10 +107,14 @@ function complex(m, str) {
     chat.innerHTML += str;
     if (m.type === "message") document.getElementById(`msg${m.id}`).innerText = m.text;
     if (scroll) chat.scrollTop = chat.scrollHeight;
+    messagesElements = document.getElementsByClassName('msgText');
+    Array.from(messagesElements).forEach((element) => {
+        element.removeEventListener('dblclick', deleteMessage);
+        element.addEventListener('dblclick', deleteMessage);
+    });
     subscribe();
     if (login !== m.login) audio[m.type].play();
 }
-
 
 
 function getMsg(scroll) {
@@ -158,8 +166,12 @@ function parseMessages(msgArr) {
             chat.innerHTML = `${templateStart} теперь в чате! <span class="messageTime">${m.date} ${m.time}</span>${templateEnd}` + chat.innerHTML;
         }
     })
+    messagesElements = document.getElementsByClassName('msgText');
+    Array.from(messagesElements).forEach((element) => {
+        element.removeEventListener('dblclick', deleteMessage);
+        element.addEventListener('dblclick', deleteMessage);
+    });
 }
-
 
 
 function errorChatPage(text) {

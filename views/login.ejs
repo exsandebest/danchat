@@ -6,25 +6,30 @@
 </head>
 
 <body>
-    <h1 class="mainLabel">Вход</h1>
-    <center>
-        <form action="/login" method="post" enctype="application/x-www-form-urlencoded" name="authorizationForm">
-            <input class='inputBig' type="text" required name="login" autofocus title="Логин" autocomplete="username" placeholder="Введите логин"><br><br>
-            <input class='inputBig' type="password" required name="password" title="Пароль" autocomplete="current-password" onkeypress="if(event.keyCode === 13) document.forms.authorizationForm.submit()" placeholder="Введите пароль"><br><br>
-        </form>
-        <div class="notification" id="notification">
-            <span class="notificationBad"><%=notification%></span>
-        </div><br>
-        <btn class="standard" type="button" onclick="document.forms.authorizationForm.submit()">Войти</btn><br><br>
-        <span class="purple">или</span><br><br>
-        <a href="/registration" style="text-decoration: none;">
-            <btn class="standard" type="button">Зарегистрироваться</btn>
-        </a>
-    </center>
-    <script src="/js/pages/login.js">
+<h1 class="mainLabel">Вход</h1>
+<center>
+    <form action="/login" method="post" enctype="application/x-www-form-urlencoded" name="authorizationForm">
+        <input class='inputBig' type="text" required name="login" autofocus title="Логин" autocomplete="username"
+               placeholder="Введите логин"><br><br>
+        <input class='inputBig' type="password" required name="password" title="Пароль" autocomplete="current-password"
+               onkeypress="if(event.keyCode === 13) document.forms.authorizationForm.submit()"
+               placeholder="Введите пароль"><br><br>
+    </form>
+    <div class="notification" id="notification">
+        <span class="notificationBad"><%= notification %></span>
+    </div>
+    <br>
+    <btn class="standard" type="button" onclick="document.forms.authorizationForm.submit()">Войти</btn>
+    <br><br>
+    <span class="purple">или</span><br><br>
+    <a href="/registration" style="text-decoration: none;">
+        <btn class="standard" type="button">Зарегистрироваться</btn>
+    </a>
+</center>
+<script src="/js/pages/login.js">
 
-    </script>
-    <%- include('partials/footer.ejs') %>
+</script>
+<%- include('partials/footer.ejs') %>
 </body>
 
 </html>

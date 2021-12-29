@@ -13,11 +13,10 @@ exports.getCookie = (req, name) => {
 }
 
 
-
 exports.genToken = () => {
     let text = "";
     let possible = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890__";
-    for (let i = 0; i < 30; i++)
+    for (let i = 0; i < 30; ++i)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }

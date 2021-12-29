@@ -19,7 +19,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http, {allowEIO3: true});
 const chat = require('./modules/chat');
 const wwt = require('./modules/work-with-token');
-const sql = require("./modules/database");
+const db = require("./modules/database");
 const usMod = require('./modules/user-module');
 const std = require("./modules/standard");
 const ResponseObject = require("./modules/ResponseObject");
@@ -34,7 +34,6 @@ app.use(express.static(__dirname + "/public", {
 }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
-
 
 
 app.get("/login", (req, res) => {
@@ -56,115 +55,121 @@ app.get("/registration", (req, res) => {
 
 
 app.post("/registration", parserURLEncoded, (req, res) => {
-    sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, result) => {
-        if (result === undefined || result.length === 0) {
-            let validation = usMod.registrationValidate(req.body);
-            if (validation.status) {
-                sql.query(`insert into users (login, password, birthdate, sex, firstname, lastname) values
-            (${sql.escape(req.body.login)}, ${sql.escape(bcrypt.hashSync(req.body.password, saltRounds))},
-              ${sql.escape(req.body.birthdate.split(".").reverse().join("-"))}, ${sql.escape(parseInt(req.body.sex))},
-              ${sql.escape(req.body.firstname)}, ${sql.escape(req.body.lastname)})`, (err) => {
-                    if (err) console.error(err);
-                    sql.query(`select login, color, id, sex from users where login = ${sql.escape(req.body.login)}`, (err, data) => {
-                        if (err) console.error(err);
-                        sql.query(`select max(id) as maxId from chat`, (err, result) => {
-                            let msg = {};
-                            msg.type = "registration";
-                            io.emit("chatMessage", msg);
-                            msg.user_id = data[0].id;
-                            msg.login = data[0].login;
-                            msg.color = data[0].color;
-                            msg.id = result[0].maxId + 1;
-                            chat.addnewmessage(msg);
-                            fs.exists(`public/userImages/${data[0].login}.png`, (ex) => {
-                                if (!ex) {
-                                    avatar.generate(data[0].login, (data[0].sex ? "male" : "female")).then((image) => {
-                                        image.png().toFile(`public/userImages/${data[0].login}.png`);
-                                    });
-                                }
-                            })
-                            enter(res, data[0]);
-                        })
-
-                    })
-                })
-            } else {
-                res.render("registration.ejs", {
-                    notificationType: "Bad",
-                    notificationText1: validation.text1,
-                    notificationText2: validation.text2
-                })
-            }
-        } else {
+    let validation = usMod.registrationValidate(req.body);
+    if (!validation.status) {
+        res.render("registration.ejs", {
+            notificationType: "Bad",
+            notificationText1: validation.text1,
+            notificationText2: validation.text2
+        })
+        return;
+    }
+    let login = req.body.login;
+    db.isLoginUsed(login).then((result) => {
+        if (result) {
             res.render("registration.ejs", {
                 notificationType: "Bad",
                 notificationText1: "Данный логин уже занят",
                 notificationText2: ""
             });
+            return;
         }
+        let user = req.body;
+        user.birthdate = user.birthdate.split(".").reverse().join("-");
+        user.sex = parseInt(user.sex);
+        user.password = bcrypt.hashSync(user.password, saltRounds);
+        db.registerUser(user).then((userId) => {
+            let msg = {};
+            msg.type = "registration";
+            msg.user_id = userId;
+            msg.login = user.login;
+            msg.color = user.color;
+            chat.addNewMessage(msg);
+            io.emit("chatMessage", {type: "registration"});
+            fs.exists(`public/userImages/${user.login}.png`, (ex) => {
+                if (!ex) {
+                    avatar.generate(user.login, (user.sex ? "male" : "female")).then((image) => {
+                        image.png().toFile(`public/userImages/${user.login}.png`);
+                    }, (err) => {
+                        console.error(err);
+                    });
+                }
+            })
+            enter(res, {
+                id: userId,
+                color: user.color
+            });
+        }, (err) => {
+            console.error(err);
+        })
+    }, (err) => {
+        console.error(err);
     })
 });
 
 
-function enter(res, user) { //user: login, color, id
+function enter(res, user) { //user: color, id
     let token = std.genToken();
-    sql.query(`delete from tokens where user_id = ${user.id}`, (err) => {
-        if (err) console.error(err);
-        sql.query(`insert into tokens (user_id, token, time) values (${user.id}, ${sql.escape(token)}, NOW());`, (err) => {
-            if (err) console.error(err);
-            res.cookie("danchat.token", token, {
-                path: "/"
-            });
-            res.cookie("danchat.user.color", user.color, {
-                path: "/"
-            });
-            res.redirect("/");
-        })
+    db.enter(user.id, token).then(() => {
+        res.cookie("danchat.token", token, {
+            path: "/"
+        });
+        res.cookie("danchat.user.color", user.color, {
+            path: "/"
+        });
+        res.redirect("/");
+    }, (err) => {
+        console.error(err);
     })
 }
 
 
-
 app.post("/login", parserURLEncoded, (req, res) => {
-    let Rlogin = decodeURIComponent(req.body.login);
-    let Rpassword = decodeURIComponent(req.body.password);
-    if (!Rlogin || !Rpassword) {
+    let userLogin = decodeURIComponent(req.body.login);
+    let userPassword = decodeURIComponent(req.body.password);
+    if (!userLogin || !userPassword) {
         res.render("login.ejs", {
             notification: "Заполните все поля"
         })
         return;
     }
-    sql.query(`select id, login, password, color, sex from users where login = ${sql.escape(Rlogin)}`, (err, data) => {
-        if (err) console.error(err);
-        if (data === undefined || data.length === 0 || !bcrypt.compareSync(Rpassword, data[0].password)) {
+    db.authorizeUser(userLogin, userPassword).then((user) => {
+        if (!user.valid) {
             res.render("login.ejs", {
                 notification: "Неверный логин или пароль"
             })
             return;
         }
-        delete data[0].password;
-        enter(res, data[0]);
+        enter(res, user);
+    }, (error) => {
+        console.error(error);
     })
 })
-
 
 
 app.get("/", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select users.login from tokens left join users on tokens.user_id = users.id where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
-                if (err) console.error(err);
+            db.getOnlineUsersCount().then((onlineCounter) => {
                 res.render("chat.ejs", {
                     login: u.login,
-                    onlineCounter: data.length
+                    isAdmin: u.isAdmin,
+                    onlineCounter: onlineCounter
+                })
+            }, (error) => {
+                console.error(error);
+                res.render("chat.ejs", {
+                    login: u.login,
+                    isAdmin: u.isAdmin,
+                    onlineCounter: "#"
                 })
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.get("/subscribe", (req, res) => {
@@ -173,10 +178,10 @@ app.get("/subscribe", (req, res) => {
             chat.subscribe(req, res);
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
-
 
 
 app.post("/message", parserJSON, (req, res) => {
@@ -191,36 +196,25 @@ app.post("/message", parserJSON, (req, res) => {
                 res.json(new ResponseObject(false, "Пустое сообщение"));
                 return;
             }
-            sql.query(`select COUNT(id) as k1 from chat where user_id = ${u.id} and time >= (NOW() - INTERVAL 5 SECOND)
-         union select COUNT(id) as k2 from chat where user_id = ${u.id} and time >= (NOW() - INTERVAL 1 MINUTE)`, (err, rp) => {
-                if (err) console.error(err);
-                if (rp !== undefined && (rp[0].k1 > 10 || rp[0].k2 > 60)) {
-                    res.json(new ResponseObject(false, "Не спамить!"));
-                    return;
-                }
-                sql.query(`select color from users where id = ${u.id}`, (err, result) => {
-                    if (err) console.error(err);
-                    sql.query(`select max(id) as maxId from chat`, (err, data) => {
-                        let msg = {};
-                        msg.type = "message";
-                        io.emit("chatMessage", msg);
-                        msg.user_id = u.id;
-                        msg.login = u.login;
-                        msg.color = result[0].color;
-                        msg.id = data[0].maxId + 1;
-                        msg.text = message;
-                        chat.addnewmessage(msg);
-                        res.json(new ResponseObject(true));
-                    })
-                })
+            db.getUserColor(u.id).then((color) => {
+                let msg = {};
+                msg.type = "message";
+                msg.user_id = u.id;
+                msg.login = u.login;
+                msg.color = color;
+                msg.text = message;
+                chat.addNewMessage(msg);
+                io.emit("chatMessage", {type: "message"});
+                res.json(new ResponseObject());
+            }, (err) => {
+                console.error(err);
             })
-
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
-
 
 
 app.post("/get/message", parserJSON, (req, res) => {
@@ -228,68 +222,58 @@ app.post("/get/message", parserJSON, (req, res) => {
         if (u) {
             const portion = 50;
             let msgId = parseInt(req.body.id);
-            if (msgId === -1) {
-                sql.query(`select login, color, id, DATE_FORMAT(time, '%H:%i:%S') as time, DATE_FORMAT(time, '%d.%m.%Y') as date, type, text from chat
-            where id >= ((select max(id) from chat)-${portion-1}) order by id desc limit ${portion}`, (err, data) => {
-                    if (err) console.error(err);
-                    res.json(data);
-                })
-            } else {
-                let msgStart = msgId - portion;
-                let msgEnd = msgId - 1;
-                sql.query(`select login, color, id, type, text, DATE_FORMAT(time, '%H:%i:%S') as time, DATE_FORMAT(time, '%d.%m.%Y') as date
-            from chat where id between ${msgStart} and ${msgEnd} order by id desc limit ${portion}`, (err, data) => {
-                    if (err) console.error(err);
-                    res.json(data);
-                })
-            }
+            db.getMessages(msgId, portion).then((messages) => {
+                res.json(messages);
+            }, (err) => {
+                console.error(err);
+            })
         }
     }, (err) => {
+        console.errror(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.get("/settings", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select color from users where id = ${u.id}`, (err, data) => {
-                if (err) console.error(err);
+            db.getSettings(u.id).then((user) => {
                 res.render("settings.ejs", {
-                    color: data[0].color,
+                    color: user.color,
                     login: u.login
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
 
 
-
 app.get("/friends", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            let obj = {
-                login: u.login
-            };
-            sql.query(`select COUNT(id_from) as reqs from friends_requests where id_to = ${u.id} union
-         all select COUNT(id_to) from friends_requests where id_from = ${u.id}`, (err, data) => {
-                if (err) console.error(err);
-                obj.inreqsCounter = data[0].reqs ? ` ${data[0].reqs} ` : "";
-                obj.outreqsCounter = data[1].reqs ? ` ${data[1].reqs} ` : "";
-                sql.query(`select login, color, img_status, firstname, lastname from users where id in
-                     (select id_1 as ids from friends where id_2 = ${u.id} union select id_2 as ids from friends where id_1 = ${u.id})`, (err, dt) => {
-                    if (err) console.error(err);
-                    obj.friends = (dt === undefined ? [] : dt);
-                    res.render("friends.ejs", obj);
+            db.getFriendsRequestsCount(u.id).then((result) => {
+                db.getFriends(u.id).then((friends) => {
+                    res.render("friends.ejs", {
+                        login: u.login,
+                        inreqsCounter: result.inReqsCount ? ` ${result.inReqsCount} ` : "",
+                        outreqsCounter: result.outReqsCount ? ` ${result.outReqsCount} ` : "",
+                        friends: friends
+                    });
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
-
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
@@ -298,214 +282,181 @@ app.get("/friends", (req, res) => {
 app.get("/incoming", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            let obj = {
-                login: u.login
-            };
-            sql.query(`select COUNT(id_to) as reqs from friends_requests where id_from = ${u.id}`, (err, result) => {
-                if (err) console.error(err);
-                obj.outreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
-                sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users
-               where id in (select id_from from friends_requests where id_to = ${u.id})`, (err, data) => {
-                    if (err) console.error(err);
-                    obj.inreqs = (data === undefined ? [] : data);
-                    res.render("incoming.ejs", obj);
+            db.getFriendsRequestsCount(u.id).then((result) => {
+                db.getIncomingRequests(u.id).then((inreqs) => {
+                    res.render("incoming.ejs", {
+                        login: u.login,
+                        outreqsCounter: result.outReqsCount ? ` ${result.outReqsCount} ` : "",
+                        inreqs: inreqs
+                    });
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
-
 
 
 app.get("/outcoming", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            let obj = {
-                login: u.login
-            };
-            sql.query(`select COUNT(id_from) as reqs from friends_requests where id_to = ${u.id}`, (err, result) => {
-                if (err) console.error(err);
-                obj.inreqsCounter = result[0].reqs ? ` ${result[0].reqs} ` : "";
-                sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users
-               where id in (select id_to from friends_requests where id_from = ${u.id})`, (err, data) => {
-                    if (err) console.error(err);
-                    obj.outreqs = (data === undefined ? [] : data);
-                    res.render("outcoming.ejs", obj);
+            db.getFriendsRequestsCount(u.id).then((result) => {
+                db.getOutcomingRequests(u.id).then((outreqs) => {
+                    res.render("outcoming.ejs", {
+                        login: u.login,
+                        inreqsCounter: result.inReqsCount ? ` ${result.inReqsCount} ` : "",
+                        outreqs: outreqs
+                    });
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
-
 
 
 app.get("/profile", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login, admin as isAdmin, color, firstname, lastname, img_status as imgStatus from users where id = ${u.id}`, (err, data) => {
-                res.render("profile.ejs", data[0]);
+            db.getUserProfile(u.id).then((data) => {
+                res.render("profile.ejs", data);
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
-
-
-setInterval(() => {
-    sql.query(`delete from tokens where time < (NOW() - INTERVAL 1 DAY)`, (err) => {
-        if (err) console.error(err);
-    })
-}, 3600000) // 1 hour
-
-
-
-app.get("/onlineCounter", (req, res) => {
-    wwt.validate(req, res).then((u) => {
-        if (u) {
-            sql.query(`select users.login from tokens left join users on tokens.user_id = users.id where time >= (NOW() - INTERVAL 5 MINUTE)`, (err, data) => {
-                if (err) console.error(err);
-                res.json(data);
-            })
-        }
-    })
-});
-
 
 
 app.get("/people", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select login, firstname, lastname, color, img_status as imgStatus from users`, (err, data) => {
-                if (err) console.error(err);
+            db.getPeople().then((users) => {
                 res.render("people.ejs", {
                     login: u.login,
-                    people: data
+                    people: users
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.get("/u/:userLogin", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            let userLogin = req.params.userLogin;
-            sql.query(`select id, login, firstname, lastname, color, DATE_FORMAT(birthdate, '%d.%m.%Y') as birthdate, (DATE_FORMAT(FROM_DAYS(TO_DAYS(now()) - TO_DAYS(birthdate)), '%Y') + 0) as age, sex, img_status as imgStatus from users where login = ${sql.escape(userLogin)}`, (err, data) => {
-                if (err) console.error(err);
-                if (data === undefined || data.length === 0) {
+            let userLogin = decodeURIComponent(req.params.userLogin);
+            console.log(userLogin);
+            db.getUser(userLogin).then((user) => {
+                if (!user.valid) {
                     res.render("404.ejs", {
-                        message: "This user does not exist",
-                        login: u.login
-                    })
-                } else {
-                    let obj = {
-                        imgStatus: data[0].imgStatus,
-                        userLogin: data[0].login,
-                        firstname: data[0].firstname,
-                        lastname: data[0].lastname,
-                        color: data[0].color,
-                        age: data[0].age,
-                        birthdate: data[0].birthdate,
                         login: u.login,
-                        sex: (data[0].sex ? "Мужской" : "Женский")
-                    }
-                    sql.query(`select users.login from tokens left join users on users.id = tokens.user_id where time >= (NOW() - INTERVAL 5 MINUTE) and user_id = ${data[0].id}`, (err, respose) => {
-                        if (err) console.error(err);
-                        if (respose === undefined || respose.length === 0) {
-                            obj.userOnlineStatus = "offline";
-                        } else {
-                            obj.userOnlineStatus = "online";
-                        }
-                        sql.query(`select login, color, img_status as imgStatus, firstname, lastname from users where id in
-                  (select id_1 as ids from friends where id_2 = ${data[0].id} union
-                  select id_2 as ids from friends where id_1 = ${data[0].id})`, (err, dt2) => {
-                            if (err) console.error(err);
-                            obj.friends = (dt2 === undefined ? [] : dt2);
-                            if (u.login !== data[0].login) {
-                                sql.query(`select * from friends where (id_1 = ${u.id} and id_2 = ${data[0].id}) or
-                     (id_2 = ${u.id} and id_1 = ${data[0].id})`, (err, r1) => {
-                                    if (err) console.error(err);
-                                    if (r1 === undefined || r1.length === 0) {
-                                        sql.query(`select * from friends_requests where id_from = ${u.id} and id_to = ${data[0].id}`, (err, r2) => {
-                                            if (err) console.error(err);
-                                            if (r2 === undefined || r2.length === 0) {
-                                                sql.query(`select * from friends_requests where id_to = ${u.id} and id_from = ${data[0].id}`, (err, r3) => {
-                                                    if (err) console.error(err);
-                                                    if (r3 !== undefined && r3.length !== 0) {
-                                                        obj.userStatus = "subscriber";
-                                                    } else {
-                                                        obj.userStatus = "default";
-                                                    }
-                                                    res.render("user.ejs", obj);
-                                                })
-                                            } else {
-                                                obj.userStatus = "request sent";
-                                                res.render("user.ejs", obj);
-                                            }
-                                        })
-                                    } else {
-                                        obj.userStatus = "friend";
-                                        res.render("user.ejs", obj);
-                                    }
-                                })
-                            } else {
-                                obj.userStatus = "self";
-                                res.render("user.ejs", obj);
-                            }
-                        })
+                        message: "Такого пользователя не существует"
                     })
+                    return;
                 }
+                db.getUserOnlineStatus(user.id).then((userOnlineStatus) => {
+                    db.getFriends(user.id, 6).then((friends) => {
+                        let renderObject = {
+                            login: u.login,
+                            imgStatus: user.imgStatus,
+                            userLogin: user.login,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            color: user.color,
+                            age: user.age,
+                            birthdate: user.birthdate,
+                            sex: user.sex,
+                            userOnlineStatus: userOnlineStatus,
+                            friends: friends
+                        }
+                        if (user.id === u.id) {
+                            renderObject.userStatus = "self";
+                            res.render("user.ejs", renderObject);
+                            return;
+                        }
+                        db.getUsersRelationship(u.id, user.id).then((relationship) => {
+                            console.log(relationship);
+                            renderObject.userStatus = relationship;
+                            res.render("user.ejs", renderObject);
+                        }, (err) => {
+                            console.error(err);
+                        })
+                    }, (err) => {
+                        console.error(err);
+                    })
+                }, (err) => {
+                    console.error(err);
+                })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
     wwt.validate(req, res, true).then((u) => {
         if (u) {
-            sql.query(`update users set admin = 1 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
-                if (err) console.error(err);
+            let login = decodeURIComponent(req.body.login);
+            db.changePermissions(login, 1).then(() => {
                 res.json(new ResponseObject(true));
+            }, (error) => {
+                console.error(error);
+                res.json(new ResponseObject(false, "DB Error"))
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/admin/make/user", parserJSON, (req, res) => {
     wwt.validate(req, res, true).then((u) => {
         if (u) {
-            if (decodeURIComponent(req.body.login) === "admin") {
-                res.end();
+            let login = decodeURIComponent(req.body.login);
+            if (login === "admin") {
+                res.json(new ResponseObject(false, "Cannot change admin's permission"));
                 return;
             }
-            sql.query(`update users set admin = 0 where login = ${sql.escape(decodeURIComponent(req.body.login))}`, (err) => {
-                if (err) console.error(err);
+            db.changePermissions(login, 0).then(() => {
                 res.json(new ResponseObject(true));
+            }, (error) => {
+                console.error(error);
+                res.json(new ResponseObject(false, "DB Error"))
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/admin/message", parserJSON, (req, res) => {
@@ -515,11 +466,31 @@ app.post("/admin/message", parserJSON, (req, res) => {
             res.json(new ResponseObject(true));
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
 
 
+app.post("/admin/delete/message", parserJSON, (req, res) => {
+    wwt.validate(req, res, true).then((u) => {
+        if (u) {
+            let msgId = parseInt(req.body.messageId);
+            if (msgId === undefined || isNaN(msgId)) {
+                res.json(new ResponseObject(false, "Incorrect Message Id"));
+                return;
+            }
+            db.deleteMessage(msgId).then(() => {
+                res.json(new ResponseObject());
+            }, (err) => {
+                console.error(err);
+            })
+        }
+    }, (err) => {
+        console.error(err);
+        res.end("DB ERROR");
+    });
+})
 
 app.get("/adminpanel", (req, res) => {
     wwt.validate(req, res, true).then((u) => {
@@ -529,223 +500,199 @@ app.get("/adminpanel", (req, res) => {
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/user/add/friend", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
-                if (err) console.error(err);
-                if (dt1 === undefined || dt1.length === 0) {
+
+            let userLogin = decodeURIComponent(req.body.login);
+            db.getUserIdByLogin(userLogin).then((user) => {
+                if (!user.valid) {
                     res.send("Incorrect login");
                     return;
                 }
-                let userId = dt1[0].id;
-                sql.query(`insert into friends_requests(id_from, id_to) values (${u.id}, ${userId})`, (err) => {
-                    if (err) console.error(err);
-                    sql.query(`select token from tokens where user_id = ${userId}`, (err, data) => {
-                        if (err) console.error(err);
-                        if (data === undefined || data.length === 0) {
-                            res.json(new ResponseObject(true));
-                        } else {
-                            sql.query(`select login, firstname, lastname, color, sex from users where id = ${u.id}`, (err, dt2) => {
-                                if (err) console.error(err);
-                                io.emit(data[0].token, {
-                                    type: "newIncomingRequest",
-                                    login: dt2[0].login,
-                                    name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                                    color: dt2[0].color,
-                                    sex: dt2[0].sex
-                                })
-                                res.json(new ResponseObject(true));
-                            })
-                        }
+                db.getUsersRelationship(u.id, user.id).then((relationship) => {
+                    if (relationship !== "default") {
+                        res.send("Request already sent or you have already friendship");
+                        return;
+                    }
+                    db.sendFriendsRequest(u.id, user.id).then(() => {
+                        res.json(new ResponseObject());
+                    }, (err) => {
+                        console.error(err);
                     })
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/user/cancel/outcomingrequest", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
-                if (err) console.error(err);
-                if (dt1 === undefined || dt1.length === 0) {
+            let userLogin = decodeURIComponent(req.body.login);
+            db.getUserIdByLogin(userLogin).then((user) => {
+                if (!user.valid) {
                     res.send("Incorrect login");
                     return;
                 }
-                let userId = dt1[0].id;
-                sql.query(`select * from friends_requests where id_from = ${u.id} and id_to = ${userId}`, (err, dt2) => {
-                    if (err) console.error(err);
-                    if (dt2 === undefined || dt2.length === 0) {
+                db.getUsersRelationship(u.id, user.id).then((relationship) => {
+                    if (relationship !== "request sent") {
                         res.send("No requests to cancel");
                         return;
                     }
-                    sql.query(`delete from friends_requests where id_from = ${u.id} and id_to = ${userId}`, (err, dt3) => {
-                        if (err) console.error(err);
-                        res.json(new ResponseObject(true));
+                    db.cancelOutcomingRequest(u.id, user.id).then(() => {
+                        res.json(new ResponseObject());
+                    }, (err) => {
+                        console.error(err);
                     })
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/user/accept/incomingrequest", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
-                if (err) console.error(err);
-                if (dt1 === undefined || dt1.length === 0) {
+            let userLogin = decodeURIComponent(req.body.login);
+            db.getUserIdByLogin(userLogin).then((user) => {
+                if (!user.valid) {
                     res.send("Incorrect login");
                     return;
                 }
-                let userId = dt1[0].id;
-                sql.query(`select * from friends_requests where id_from = ${userId} and id_to = ${u.id}`, (err, dt2) => {
-                    if (err) console.error(err);
-                    if (dt2 === undefined || dt2.length === 0) {
+                db.getUsersRelationship(u.id, user.id).then((relationship) => {
+                    if (relationship !== "subscriber") {
                         res.send("No requests to accept");
                         return;
                     }
-                    sql.query(`delete from friends_requests where id_from = ${userId} and id_to = ${u.id}`, (err) => {
-                        if (err) console.error(err);
-                        sql.query(`insert into friends (id_1, id_2) values (${userId}, ${u.id})`, (err) => {
-                            if (err) console.error(err);
-                            sql.query(`select token from tokens where user_id = ${userId}`, (err, data) => {
-                                if (err) console.error(err);
-                                if (data === undefined || data.length === 0) {
-                                    res.json(new ResponseObject(true));
-                                } else {
-                                    sql.query(`select login, firstname, lastname, sex, color from users where id = ${u.id}`, (err, dt2) => {
-                                        if (err) console.error(err);
-                                        io.emit(data[0].token, {
-                                            type: "acceptOutcomingRequest",
-                                            login: dt2[0].login,
-                                            name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                                            color: dt2[0].color,
-                                            sex: dt2[0].sex
-                                        })
-                                        res.json(new ResponseObject(true));
-                                    })
-                                }
-                            })
-                        })
+                    db.acceptIncomingRequest(user.id, u.id).then(() => {
+                        res.json(new ResponseObject());
+                    }, (err) => {
+                        console.error(err);
                     })
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 app.post("/user/delete/friend", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select id from users where login = ${sql.escape(req.body.login)}`, (err, dt1) => {
-                if (err) console.error(err);
-                if (dt1 === undefined || dt1.length === 0) {
+            let userLogin = decodeURIComponent(req.body.login);
+            db.getUserIdByLogin(userLogin).then((user) => {
+                if (!user.valid) {
                     res.send("Incorrect login");
                     return;
                 }
-                let friendId = dt1[0].id;
-                sql.query(`delete from friends where (id_1 = ${u.id} and id_2 = ${friendId}) or (id_2 = ${u.id} and id_1 = ${friendId})`, (err) => {
-                    if (err) console.error(err);
-                    sql.query(`insert into friends_requests (id_from, id_to) values (${friendId}, ${u.id})`, (err) => {
-                        if (err) console.error(err);
-                        sql.query(`select token from tokens where user_id = ${friendId}`, (err, data) => {
-                            if (err) console.error(err);
-                            if (data === undefined || data.length === 0) {
-                                res.json(new ResponseObject(true));
-                            } else {
-                                sql.query(`select login, firstname, lastname, sex, color from users where id = ${u.id}`, (err, dt2) => {
-                                    if (err) console.error(err);
-                                    io.emit(data[0].token, {
-                                        type: "deletingFromFriends",
-                                        login: dt2[0].login,
-                                        name: `${dt2[0].firstname} ${dt2[0].lastname}`,
-                                        color: dt2[0].color,
-                                        sex: dt2[0].sex
-                                    })
-                                    res.json(new ResponseObject(true));
-                                })
-                            }
-                        })
-                    })
+                db.deleteFriendship(u.id, user.id).then(() => {
+                    res.json(new ResponseObject());
+                }, (err) => {
+                    console.error(err);
                 })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
 
 
-
 app.post("/user/change/password", parserJSON, (req, res) => {
-    for (let key in req.body) {
-        req.body[key] = decodeURIComponent(req.body[key]);
-    }
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`select password from users where id = ${u.id}`, (err, data) => {
-                if (err) console.error(err);
-                let validation = usMod.passwordValidate(res, data[0].password, req.body.oldPassword, req.body.newPassword, req.body.repeatNewPassword)
-                if (validation.status) {
-                    sql.query(`update users set password = ${sql.escape(bcrypt.hashSync(req.body.newPassword, saltRounds))} where id = ${u.id}`, (err) => {
-                        if (err) console.error(err);
-                        res.json(new ResponseObject(true, "Пароль успешно изменён!"));
-                    })
-                } else {
-                    res.json(new ResponseObject(false, validation.text1, validation.text2));
+            let oldPassword = decodeURIComponent(req.body.oldPassword);
+            let newPassword = decodeURIComponent(req.body.newPassword);
+            let repeatNewPassword = decodeURIComponent(req.body.repeatNewPassword);
+
+            let validation = usMod.passwordValidate(oldPassword, newPassword, repeatNewPassword);
+            if (!validation.status) {
+                res.json(new ResponseObject(false, validation.text1, validation.text2));
+                return;
+            }
+            db.checkUserPassword(u.id, oldPassword).then((isPasswordCorrect) => {
+                if (!isPasswordCorrect) {
+                    res.json(new ResponseObject(false, "Неверный текущий пароль"));
+                    return;
                 }
+                db.checkUserPassword(u.id, newPassword).then((isPasswordTheSame) => {
+                    if (isPasswordTheSame) {
+                        res.json(new ResponseObject(false, "Новый пароль совпадает со старым"));
+                        return;
+                    }
+                    db.updateUserPassword(u.id, newPassword).then(() => {
+                        res.json(new ResponseObject(true, "Пароль успешно изменён!"));
+                    }, (err) => {
+                        console.error(err);
+                    })
+                }, (err) => {
+                    console.error(err);
+                })
+            }, (err) => {
+                console.error(err);
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
 
 
-
 app.post("/user/change/name", parserJSON, (req, res) => {
-    for (let key in req.body) {
-        req.body[key] = decodeURIComponent(req.body[key]);
-    }
     wwt.validate(req, res).then((u) => {
         if (u) {
-            let validation = usMod.nameValidate(res, req.body.firstname, req.body.lastname)
+            let firstname = decodeURIComponent(req.body.firstname);
+            let lastname = decodeURIComponent(req.body.lastname);
+            let validation = usMod.nameValidate(firstname, lastname);
             if (validation.status) {
-                sql.query(`update users set firstname = ${sql.escape(req.body.firstname)}, lastname = ${sql.escape(req.body.lastname)}
-            where id = ${u.id}`, (err) => {
-                    if (err) console.error(err);
+                db.changeName(u.id, firstname, lastname).then(() => {
                     res.json(new ResponseObject(true, "Данные успешно сохранены!"));
+                }, (error) => {
+                    res.json(new ResponseObject(false, "Error", error));
                 })
             } else {
                 res.json(new ResponseObject(false, validation.text1, validation.text2));
             }
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 });
-
 
 
 app.post("/user/change/settings", parserJSON, (req, res) => {
@@ -756,24 +703,23 @@ app.post("/user/change/settings", parserJSON, (req, res) => {
                 res.json(new ResponseObject(false, validation.text1, validation.text2));
                 return;
             }
-            sql.query(`update users set color = ${sql.escape(req.body.color)}
-         where id = ${u.id}`, (err) => {
-                if (err) console.error(err);
+            db.changeSettings(u.id, req.body.color).then(() => {
                 res.json(new ResponseObject(true, "Настройки успешно обновлены"));
+            }, (error) => {
+                res.json(new ResponseObject(false, "Error", error));
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
 
 
-
 app.get("/logout", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            sql.query(`delete from tokens where user_id = ${u.id}`, (err) => {
-                if (err) console.error(err);
+            db.logout(u.id).finally(() => {
                 res.clearCookie("danchat.token");
                 res.clearCookie("danchat.user.color");
                 res.redirect("/login");
@@ -781,10 +727,10 @@ app.get("/logout", (req, res) => {
             })
         }
     }, (err) => {
+        console.error(err);
         res.end("DB ERROR");
     });
 })
-
 
 
 http.listen(process.env.PORT || 5000, (err) => {

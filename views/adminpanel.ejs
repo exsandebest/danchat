@@ -6,22 +6,24 @@
 </head>
 
 <body>
-    <%- include('partials/navbar.ejs') %>
-    <%- include('partials/scripts.ejs') %>
-    <center>
-        <div>
-            <input type="text" class="inputSmall" id="inputLogin" placeholder="Логин">
-            <br><br>
-            <btn class="standard" onclick="makeAdmin()">Make admin</btn>   <btn class="standard" onclick="makeUser()">Make user</btn>
-        </div>
+<%- include('partials/navbar.ejs') %>
+<%- include('partials/scripts.ejs') %>
+<center>
+    <div>
+        <input type="text" class="inputSmall" id="inputLogin" placeholder="Логин">
         <br><br>
-        <div style="margin-bottom: 80px;">
-            <input type="text" class="inputSmall" id="message" placeholder="Сообщение"><br><br>
-            <btn class="standard" onclick="sendMessage()">Send to all</btn>
-        </div>
-    </center>
-    <script src="/public/js/pages/adminpanel.js"></script>
-    <%- include('partials/footer.ejs') %>
+        <btn class="standard" onclick="makeAdmin()">Make admin</btn>
+           
+        <btn class="standard" onclick="makeUser()">Make user</btn>
+    </div>
+    <br><br>
+    <div style="margin-bottom: 80px;">
+        <input type="text" class="inputSmall" id="message" placeholder="Сообщение"><br><br>
+        <btn class="standard" onclick="sendMessage()">Send to all</btn>
+    </div>
+</center>
+<script src="/js/pages/adminpanel.js"></script>
+<%- include('partials/footer.ejs') %>
 </body>
 
 </html>

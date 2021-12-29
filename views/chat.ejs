@@ -8,25 +8,33 @@
 </head>
 
 <body>
-    <%- include('partials/navbar.ejs') %>
-    <center>
-        <div id="chat"></div><br>
-        <div style="width:779px; display:inline-block">
-            <textarea placeholder="Напишите сообщение..." maxlength="1000" onkeypress="if(event.keyCode === 13) {sendMessage(); event.preventDefault();}" id="message"></textarea>
-            <span id="symbolsCounter"></span>
-            <br><br>
-            <br>
-            <btn class="standard" onclick="sendMessage()">Отправить</btn>
-        </div>
-        <br><br><br>
-    </center>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js" integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
-    <script src="/js/functions.js"></script>
-    <script src="/js/vanillatoasts.js"></script>
-    <script src="/js/pages/chat.js"></script>
-    <script src="/js/notifications.js"></script>
-    <span class="green" id="onlineCounterCover">Онлайн: <span class="red" id="onlineCounter"><%=onlineCounter%></span></span>
-    <%- include('partials/footer.ejs') %>
+<%- include('partials/navbar.ejs') %>
+<center>
+    <div id="chat"></div>
+    <br>
+    <div style="width:779px; display:inline-block">
+        <textarea placeholder="Напишите сообщение..." maxlength="1000"
+                  onkeypress="if(event.keyCode === 13) {sendMessage(); event.preventDefault();}"
+                  id="message"></textarea>
+        <span id="symbolsCounter"></span>
+        <br><br>
+        <br>
+        <btn class="standard" onclick="sendMessage()">Отправить</btn>
+    </div>
+    <br><br><br>
+</center>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"
+        integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
+<script src="/js/functions.js"></script>
+<script src="/js/vanillatoasts.js"></script>
+<script src="/js/pages/chat.js"></script>
+<script src="/js/notifications.js"></script>
+<% if (isAdmin) { %>
+    <script src="/js/deleteMessageFunction.js"></script>
+<% } %>
+<span class="green" id="onlineCounterCover">Онлайн: <span class="red"
+                                                          id="onlineCounter"><%= onlineCounter %></span></span>
+<%- include('partials/footer.ejs') %>
 </body>
 
 </html>

@@ -2,27 +2,20 @@
 console.time("Module => user-module");
 const bcrypt = require('bcrypt');
 
-const regLogin = /^[a-zA-Z0-9А-Яа-яЁё_]{4,24}$/;
-const regPassword = /^[a-zA-Z0-9А-Яа-яЁё_*@]{6,24}$/;
-const regName = /^[a-zA-ZА-Яа-яЁё]{1,24}$/;
+const regLogin = /^[a-zA-Z0-9А-яЁё_]{4,24}$/;
+const regPassword = /^[a-zA-Z0-9А-яЁё_*@]{6,24}$/;
+const regName = /^[a-zA-ZА-яЁё]{1,24}$/;
 const regBirthdate = /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$/;
 const regSex = /^[01]$/;
 const regColor = /^#[a-fA-F0-9]{3,8}$/;
 
 
-
-exports.passwordValidate = (res, password, oldPassword, newPassword, repeatNewPassword) => {
+exports.passwordValidate = (oldPassword, newPassword, repeatNewPassword) => {
     if (!oldPassword || !newPassword || !repeatNewPassword) {
         return new Verdict("Заполните все поля");
     }
-    if (!bcrypt.compareSync(oldPassword, password)) {
-        return new Verdict("Неверный старый пароль");
-    }
     if (!regPassword.test(newPassword)) {
         return new Verdict("Некорректный пароль", "От 6-ти до 24-х символов из русского, латинского алфавитов и цифр, а так же символы *@_");
-    }
-    if (bcrypt.compareSync(newPassword, password)) {
-        return new Verdict("Пароль не может быть изменен на старый");
     }
     if (newPassword !== repeatNewPassword) {
         return new Verdict("Новые пароли не совпадают");
@@ -31,8 +24,7 @@ exports.passwordValidate = (res, password, oldPassword, newPassword, repeatNewPa
 }
 
 
-
-exports.nameValidate = (res, fn, ln) => { //fn - firstname; ln - lastname
+exports.nameValidate = (fn, ln) => { //fn - firstname; ln - lastname
     if (!fn || !ln) {
         return new Verdict("Заполните все поля");
     }
@@ -44,7 +36,6 @@ exports.nameValidate = (res, fn, ln) => { //fn - firstname; ln - lastname
     }
     return new Verdict("", "", true);
 }
-
 
 
 exports.registrationValidate = (body) => {

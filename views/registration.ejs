@@ -10,38 +10,42 @@
 </head>
 
 <body>
-    <h1 class="mainLabel">Регистрация</h1>
-    <center>
-        <form name="registration" action="/registration" method="post" enctype="application/x-www-form-urlencoded">
-            <input class='inputSmall' type="text" autocomplete="username" required name="login" title="Логин" placeholder="Логин"><br><br>
-            <input class='inputSmall' type="password" autocomplete="new-password" required name="password" title="Пароль" placeholder="Пароль"><br><br>
-            <input class="inputSmall" type="text" required name="firstname" title="Имя" placeholder="Имя" /><br><br>
-            <input class="inputSmall" type="text" required name="lastname" title="Фамилия" placeholder="Фалимия" /><br><br>
-            <input class="inputSmall" type="text" name="birthdate" id="birthdate" title="Дата рождения" placeholder="Дата рождения" /><br><br>
-            <span class="green" style="bottom: 0;">Пол:</span>
-            <select name="sex" style="width:auto; font-size: 20px;">
-                <option value="1">
-                    Мужской
-                </option>
-                <option value="0">
-                    Женский
-                </option>
-            </select>
-            <br><br>
-        </form>
-        <div id="notification" class="notification">
-            <span class="notification<%=notificationType%>"><%=notificationText1%></span><br><br>
-            <span class="orange"><%=notificationText2%></span>
-        </div>
-        <br>
-        <btn class="standard" onclick="document.forms.registration.submit()">Зарегистрироваться</btn><br><br>
-        <span class="purple">или</span><br><br>
-        <a href="/login" style="text-decoration: none;">
-            <btn class="standard">Войти</btn>
-        </a>
-    </center>
-    <script src="/js/pages/registration.js"></script>
-    <%- include('partials/footer.ejs') %>
+<h1 class="mainLabel">Регистрация</h1>
+<center>
+    <form name="registration" action="/registration" method="post" enctype="application/x-www-form-urlencoded">
+        <input class='inputSmall' type="text" autocomplete="username" required name="login" title="Логин"
+               placeholder="Логин"><br><br>
+        <input class='inputSmall' type="password" autocomplete="new-password" required name="password" title="Пароль"
+               placeholder="Пароль"><br><br>
+        <input class="inputSmall" type="text" required name="firstname" title="Имя" placeholder="Имя"/><br><br>
+        <input class="inputSmall" type="text" required name="lastname" title="Фамилия" placeholder="Фамилия"/><br><br>
+        <input class="inputSmall" type="text" name="birthdate" id="birthdate" title="Дата рождения"
+               placeholder="Дата рождения"/><br><br>
+        <span class="green" style="bottom: 0;">Пол:</span>
+        <select name="sex" style="width:auto; font-size: 20px;">
+            <option value="1">
+                Мужской
+            </option>
+            <option value="0">
+                Женский
+            </option>
+        </select>
+        <br><br>
+    </form>
+    <div id="notification" class="notification">
+        <span class="notification<%= notificationType %>"><%= notificationText1 %></span><br><br>
+        <span class="orange"><%= notificationText2 %></span>
+    </div>
+    <br>
+    <btn class="standard" onclick="document.forms.registration.submit()">Зарегистрироваться</btn>
+    <br><br>
+    <span class="purple">или</span><br><br>
+    <a href="/login" style="text-decoration: none;">
+        <btn class="standard">Войти</btn>
+    </a>
+</center>
+<script src="/js/pages/registration.js"></script>
+<%- include('partials/footer.ejs') %>
 </body>
 
 </html>

@@ -4,7 +4,7 @@ const sql = require("./modules/database");
 const avatarGenerator = require('avatar-generator');
 const avatar = new avatarGenerator();
 
-new Promise(function(resolve, reject) {
+new Promise((resolve, reject) => {
     fs.exists("public/userImages", (ex) => {
         if (!ex) {
             fs.mkdir("public/userImages", (err) => {

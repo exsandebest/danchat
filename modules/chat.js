@@ -1,30 +1,31 @@
 'use strict';
 console.time("Module => chat");
-const sql = require("./database");
+const db = require("./database");
 let clients = [];
 
 
-exports.subscribe = function(req, res) {
+exports.subscribe = function (req, res) {
     clients.push(res);
-    res.on("close", function() {
+    res.on("close", function () {
         clients.splice(clients.indexOf(res), 1);
     });
 };
 
-exports.addnewmessage = function(msg) {
-    sql.query(`insert into chat (text, user_id, login, color, type, time) values (${sql.escape(msg.text)},
-    ${sql.escape(msg.user_id)}, ${sql.escape(msg.login)}, ${sql.escape(msg.color)} ,${sql.escape(msg.type)}, NOW())`, (err, data) => {
-        if (err) console.error(err);
-        sql.query(`select time from chat where id = ${sql.escape(data.insertId)}`, (err, dt) => {
-            delete msg["user_id"];
-            let date = new Date(dt[0].time);
-            msg.date = `${String(date.getDate()).padStart(2,"0")}.${String(date.getMonth() + 1).padStart(2,"0")}.${date.getFullYear()}`;
-            msg.time = `${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}:${String(date.getSeconds()).padStart(2,"0")}`;
-            clients.forEach((res) => {
-                res.send(JSON.stringify(msg));
-            });
-            clients = [];
-        })
+exports.addNewMessage = function (msg) {
+    db.addMessage(msg).then((messageId) => {
+        msg.id = messageId;
+        delete msg["user_id"];
+        let dateString = new Date().toLocaleString("ru-RU", {timeZone: "Europe/Moscow"});
+        msg.date = `${dateString.split(", ")[0]}`;
+        msg.time = `${dateString.split(", ")[1]}`;
+        clients.forEach((res) => {
+            res.send(JSON.stringify(msg));
+        });
+        clients = [];
+    }, (err) => {
+        console.error(err);
     })
+
+
 };
 console.timeEnd("Module => chat");

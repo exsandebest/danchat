@@ -6,64 +6,76 @@
 </head>
 
 <body>
-    <script src="/js/pages/profile.js"></script>
-    <%- include('partials/navbar.ejs') %>
-    <%- include('partials/scripts.ejs') %>
-    <center>
-        <% if (imgStatus) {%>
-        <img class="user-img" src="" />
-        <%} else {%>
-        <img class="user-img" src="/userImages/<%=login%>.png" />
-        <%}%>
-      <br><br>
-      <span style="color: <%=color%>;" class="user-login"> <%=login%> </span><br><br>
-        <br><br>
-        <span class="green"><%=firstname%> <%=lastname%></span>
-        <br><br><br>
-        <%if (isAdmin) {%>
-        <btn class="standard" onclick="location='/adminpanel'" style="display: inline-block; width:300px">Административная панель</btn>
+<script src="/js/pages/profile.js"></script>
+<%- include('partials/navbar.ejs') %>
+<%- include('partials/scripts.ejs') %>
+<center>
+    <% if (imgStatus) { %>
+        <img class="user-img" src=""/>
+    <% } else { %>
+    <img class="user-img" src="/userImages/<%= login %>.png"/>
+    <% } %>
+    <br><br>
+    <span style="color: <%= color %>;" class="user-login"> <%= login %> </span><br><br>
+    <br><br>
+    <span class="green"><%= firstname %> <%= lastname %></span>
+    <br><br><br>
+    <% if (isAdmin) { %>
+        <btn class="standard" onclick="location='/adminpanel'" style="display: inline-block; width:300px">
+            Административная панель
+        </btn>
         <br><br><br><br>
-        <%}%>
-      <btn class="standard" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИ</btn><br><br><br><br>
-      <btn class="standard" onClick="getElementById('winChangePassword').removeAttribute('style');">Сменить пароль</btn>
-      <br><br><br>
-   </center>
-   <%- include('partials/footer.ejs') %>
-        <div id="winChangePassword" style="display:none;">
-            <div class="overlay" onclick="getElementById('winChangePassword').style.display='none';"></div>
-            <div class="visible">
-                <span class="orange" style="margin: 20px">Смена пароля</span>
-                <btn class="small" type="button" style="float:right" onClick="getElementById('winChangePassword').style.display='none';">Закрыть</btn>
-                <div class="content">
-                    <br><br>
-                    <center>
-                        <input id="oldPassword" type="password" class="inputSmall" autocomplete="current-password" placeholder="Старый пароль" /><br><br>
-                        <input id="newPassword" type="password" class="inputSmall" autocomplete="new-password" placeholder="Новый пароль" /><br><br>
-                        <input id="repeatNewPassword" type="password" class="inputSmall" autocomplete="new-password" placeholder="Повторите новый пароль" /><br><br>
-                        <span class="red notification" id="notif"></span><br><br>
-                        <btn class="standard" onclick="changePasword()">Сменить</btn>
-                        <br><br>
-                    </center>
-                </div>
-            </div>
+    <% } %>
+    <btn class="standard" onclick="document.getElementById('winChangeName').removeAttribute('style');">Сменить ФИ</btn>
+    <br><br><br><br>
+    <btn class="standard" onClick="getElementById('winChangePassword').removeAttribute('style');">Сменить пароль</btn>
+    <br><br><br>
+</center>
+<%- include('partials/footer.ejs') %>
+<div id="winChangePassword" style="display:none;">
+    <div class="overlay" onclick="getElementById('winChangePassword').style.display='none';"></div>
+    <div class="visible">
+        <span class="orange" style="margin: 20px">Смена пароля</span>
+        <btn class="small" type="button" style="float:right"
+             onClick="getElementById('winChangePassword').style.display='none';">Закрыть
+        </btn>
+        <div class="content">
+            <br><br>
+            <center>
+                <input id="oldPassword" type="password" class="inputSmall" autocomplete="current-password"
+                       placeholder="Старый пароль"/><br><br>
+                <input id="newPassword" type="password" class="inputSmall" autocomplete="new-password"
+                       placeholder="Новый пароль"/><br><br>
+                <input id="repeatNewPassword" type="password" class="inputSmall" autocomplete="new-password"
+                       placeholder="Повторите новый пароль"/><br><br>
+                <span class="red notification" id="notif"></span><br><br>
+                <btn class="standard" onclick="changePasword()">Сменить</btn>
+                <br><br>
+            </center>
         </div>
-        <div id="winChangeName" style="display:none;">
-            <div class="overlay" onclick="getElementById('winChangeName').style.display='none';"></div>
-            <div class="visible">
-                <span class="orange" style="margin: 20px">Смена имени и фамилии</span>
-                <btn class="small" type="button" style="float:right" onClick="getElementById('winChangeName').style.display='none';">Закрыть</btn>
-                <div class="content">
-                    <br><br>
-                    <center>
-                        <input id="firstname" type="text" class="inputSmall" placeholder="Имя" value="<%=firstname%>" /><br><br>
-                        <input id="lastname" type="text" class="inputSmall" placeholder="Фамилия" value="<%=lastname%>" /><br><br>
-                        <span class="red notification" id="notif2"></span><br><br>
-                        <btn class="standard" onclick="changeName()">Сохранить</btn>
-                        <br><br>
-                    </center>
-                </div>
-            </div>
+    </div>
+</div>
+<div id="winChangeName" style="display:none;">
+    <div class="overlay" onclick="getElementById('winChangeName').style.display='none';"></div>
+    <div class="visible">
+        <span class="orange" style="margin: 20px">Смена имени и фамилии</span>
+        <btn class="small" type="button" style="float:right"
+             onClick="getElementById('winChangeName').style.display='none';">Закрыть
+        </btn>
+        <div class="content">
+            <br><br>
+            <center>
+                <input id="firstname" type="text" class="inputSmall" placeholder="Имя"
+                       value="<%= firstname %>"/><br><br>
+                <input id="lastname" type="text" class="inputSmall" placeholder="Фамилия"
+                       value="<%= lastname %>"/><br><br>
+                <span class="red notification" id="notif2"></span><br><br>
+                <btn class="standard" onclick="changeName()">Сохранить</btn>
+                <br><br>
+            </center>
         </div>
+    </div>
+</div>
 </body>
 
 </html>
