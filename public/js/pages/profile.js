@@ -69,3 +69,33 @@ function notif(num, type, msg1, msg2, time) {
 function val(id) {
     return document.getElementById(id).value;
 }
+
+function saveSettings() {
+    fetch("/user/change/settings", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json;charset=utf-8"
+        },
+        body: JSON.stringify({
+            color: document.getElementById("color").value
+        })
+    }).then(res => {
+        if (!res.ok) {
+            error(res.status);
+        } else {
+            res.json().then(data => {
+                if (data.status) {
+                    VanillaToasts.create({
+                        title: "Успешно!",
+                        text: "Настройки успешно сохранены",
+                        timeout: 10000,
+                        type: "success"
+                    })
+                    document.getElementsByClassName("user-login")[0].style.color = document.getElementById("color").value;
+                } else {
+                    error(data.text || data);
+                }
+            }).catch(err => error(err));
+        }
+    }).catch(err => error(err));
+}

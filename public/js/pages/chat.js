@@ -34,6 +34,14 @@ socket.on("ADMINMESSAGE", serverData => {
     alert(serverData);
 });
 
+socket.on("deleteMessage", (serverData) => {
+    console.log(serverData);
+    let elem = document.querySelector(`.msgText[idx='${serverData.messageId}']`);
+    console.log(elem);
+    elem.nextSibling.remove();
+    elem.remove();
+})
+
 document.querySelector('textarea').addEventListener('keydown', function () {
     setTimeout(() => {
         this.style.cssText = `height:auto; padding: 3px`;

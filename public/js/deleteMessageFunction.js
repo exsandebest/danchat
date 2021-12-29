@@ -4,7 +4,6 @@ Array.from(messagesElements).forEach((element) => {
 });
 
 function deleteMessage(event) {
-    if (!confirm(`Вы действительно хотите удалить это сообщение?`)) return;
     let messageId = event.target.getAttribute("idx");
     fetch("/admin/delete/message", {
         method: "POST",
@@ -19,10 +18,7 @@ function deleteMessage(event) {
             error(res.status);
         } else {
             res.json().then(data => {
-                if (data.status) {
-                    event.target.nextSibling.remove();
-                    event.target.remove();
-                } else {
+                if (!data.status) {
                     error(data.text || data);
                 }
             }).catch(err => error(err));

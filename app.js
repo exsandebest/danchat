@@ -23,6 +23,7 @@ const db = require("./modules/database");
 const usMod = require('./modules/user-module');
 const std = require("./modules/standard");
 const ResponseObject = require("./modules/ResponseObject");
+const {isAbsolute} = require("express/lib/utils");
 const parserURLEncoded = pars.urlencoded({
     extended: false
 });
@@ -230,25 +231,6 @@ app.post("/get/message", parserJSON, (req, res) => {
         }
     }, (err) => {
         console.errror(err);
-        res.end("DB ERROR");
-    });
-})
-
-
-app.get("/settings", (req, res) => {
-    wwt.validate(req, res).then((u) => {
-        if (u) {
-            db.getSettings(u.id).then((user) => {
-                res.render("settings.ejs", {
-                    color: user.color,
-                    login: u.login
-                })
-            }, (err) => {
-                console.error(err);
-            })
-        }
-    }, (err) => {
-        console.error(err);
         res.end("DB ERROR");
     });
 })
@@ -473,17 +455,26 @@ app.post("/admin/message", parserJSON, (req, res) => {
 
 
 app.post("/admin/delete/message", parserJSON, (req, res) => {
-    wwt.validate(req, res, true).then((u) => {
+    wwt.validate(req, res).then((u) => {
         if (u) {
-            let msgId = parseInt(req.body.messageId);
-            if (msgId === undefined || isNaN(msgId)) {
-                res.json(new ResponseObject(false, "Incorrect Message Id"));
-                return;
-            }
-            db.deleteMessage(msgId).then(() => {
-                res.json(new ResponseObject());
-            }, (err) => {
-                console.error(err);
+            db.getUserPermissions(u.id).then((isAdmin) => {
+                if (!isAdmin) {
+                    res.json(new ResponseObject());
+                    return;
+                }
+                let msgId = parseInt(req.body.messageId);
+                if (msgId === undefined || isNaN(msgId)) {
+                    res.json(new ResponseObject(false, "Incorrect Message Id"));
+                    return;
+                }
+                db.deleteMessage(msgId).then(() => {
+                    io.emit("deleteMessage", {
+                        messageId: msgId
+                    })
+                    res.json(new ResponseObject());
+                }, (err) => {
+                    console.error(err);
+                })
             })
         }
     }, (err) => {

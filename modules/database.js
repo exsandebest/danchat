@@ -680,3 +680,20 @@ exports.deleteMessage = (id) => {
         })
     });
 }
+
+exports.getUserPermissions = (id) => {
+    return new Promise((resolve, reject) => {
+        sql.query(queries.getUserPermissionsQuery(id), (err, data) => {
+            if (err) {
+                console.error(err);
+                reject("getUserPermissions: DB Error: " + err);
+                return;
+            }
+            if (data === undefined || data.length === 0) {
+                reject("getUserPermissions: Data undefined");
+                return;
+            }
+            resolve(data[0].isAdmin);
+        })
+    });
+}

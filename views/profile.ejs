@@ -30,6 +30,11 @@
     <br><br><br><br>
     <btn class="standard" onClick="getElementById('winChangePassword').removeAttribute('style');">Сменить пароль</btn>
     <br><br><br>
+    <span class="purple">Цвет логина в чате</span><br><br>
+    <input type="color" id="color" value="<%= color %>" style="height: 44px">
+    <br><br>
+    <btn class="small" onclick="saveSettings()">Сохранить</btn>
+    <br><br><br>
 </center>
 <%- include('partials/footer.ejs') %>
 <div id="winChangePassword" style="display:none;">

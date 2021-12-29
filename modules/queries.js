@@ -360,4 +360,11 @@ exports.getDeleteMessageQuery = (id) => {
         where id = ${sql.escape(id)}`;
 }
 
+exports.getUserPermissionsQuery = (id) => {
+    return `
+        select admin as isAdmin
+        from users
+        where id = ${sql.escape(id)}`;
+}
+
 console.timeEnd("Module => Queries");
