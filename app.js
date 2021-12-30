@@ -79,6 +79,7 @@ app.post("/registration", parserURLEncoded, (req, res) => {
         user.birthdate = user.birthdate.split(".").reverse().join("-");
         user.sex = parseInt(user.sex);
         user.password = bcrypt.hashSync(user.password, saltRounds);
+        user.color = "#000000";
         db.registerUser(user).then((userId) => {
             let msg = {};
             msg.type = "registration";
