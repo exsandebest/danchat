@@ -401,10 +401,11 @@ app.get("/u/:userLogin", (req, res) => {
 })
 
 
-app.post("/admin/make/admin", parserURLEncoded, (req, res) => {
+app.post("/admin/make/admin", parserJSON, (req, res) => {
     wwt.validate(req, res, true).then((u) => {
         if (u) {
             let login = decodeURIComponent(req.body.login);
+            console.log(login);
             db.changePermissions(login, 1).then(() => {
                 res.json(new ResponseObject(true));
             }, (error) => {
