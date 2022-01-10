@@ -13,11 +13,17 @@ exports.validate = (req, res, isAdmin = false) => {
             return;
         }
         db.getUserByToken(token).then((user) => {
+            if (!user.valid) {
+                clearCookieAndRedirect(res);
+                resolve(false);
+                return;
+            }
             if (isAdmin && !user.isAdmin) {
                 clearCookieAndRedirect(res);
                 resolve(false);
                 return;
             }
+            delete user.valid;
             resolve(user);
             db.updateTokenTime(token).catch((err) => {
                 console.error(err);

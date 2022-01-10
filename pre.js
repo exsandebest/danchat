@@ -1,6 +1,6 @@
 'use strict';
 const fs = require("fs");
-const sql = require("./modules/database");
+const db = require("./modules/database");
 const avatarGenerator = require('avatar-generator');
 const avatar = new avatarGenerator();
 
@@ -15,14 +15,13 @@ new Promise((resolve, reject) => {
         resolve();
     })
 }).then(() => {
-    sql.query("select login, sex from users", (err, data) => {
-        if (err) console.error(err);
-        if (data) {
-            data.forEach((item) => {
-                avatar.generate(item.login, (item.sex ? "male" : "female")).then((image) => {
-                    image.png().toFile(`public/userImages/${item.login}.png`);
-                });
+    db.getUsersForAvatars().then((users) => {
+        users.forEach((user) => {
+            avatar.generate(user.login, user.sex).then((image) => {
+                image.png().toFile(`public/userImages/${user.login}.png`);
             });
-        }
+        });
+    }, (err) => {
+        console.error(err);
     })
 })
