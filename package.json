@@ -4,19 +4,17 @@
   "dependencies": {
     "avatar-generator": "^2.0.4",
     "bcrypt": "^5.0.1",
-    "body-parser": "*",
-    "cookie-parser": "^1.4.5",
-    "dotenv": "^8.2.0",
-    "ejs": "^3.1.3",
-    "express": "*",
-    "mysql2": "^2.1.0",
-    "nodemon": "^2.0.4",
-    "socket.io": "*"
+    "body-parser": "^1.19.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^11.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "mysql2": "^2.3.3",
+    "socket.io": "^4.4.1"
   },
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "demon": "nodemon app.js"
+    "start": "node app.js"
   },
   "description": "Chat, friends and communication with danchat and Node.js",
   "repository": {
