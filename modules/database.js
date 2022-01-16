@@ -43,7 +43,7 @@ exports.escape = (s) => {
 setInterval(() => {
     sql.query(`delete
                from tokens
-               where time < (NOW() - INTERVAL ${sql.escape(CONSTANTS.TOKEN_EXPIRATION_INTERVAL)})`, (err) => {
+               where time < (NOW() - INTERVAL ${CONSTANTS.TOKEN_EXPIRATION_INTERVAL})`, (err) => {
         if (err) console.error(err);
     })
 }, CONSTANTS.TOKEN_EXPIRATION_UPDATE_INTERVAL)
