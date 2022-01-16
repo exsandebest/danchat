@@ -1,5 +1,7 @@
 'use strict';
 console.time("Module => standard");
+const CONSTANTS = require("./constants.js");
+
 exports.getCookie = (req, name) => {
     try {
         let matches = req?.headers?.cookie?.match(new RegExp(
@@ -15,8 +17,8 @@ exports.getCookie = (req, name) => {
 
 exports.genToken = () => {
     let text = "";
-    let possible = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890__";
-    for (let i = 0; i < 30; ++i)
+    let possible = CONSTANTS.TOKEN_POSSIBLE_SYMBOLS;
+    for (let i = 0; i < CONSTANTS.TOKEN_SYMBOLS_SIZE; ++i)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }

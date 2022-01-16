@@ -1,9 +1,9 @@
 'use strict';
 console.time("Module => database");
+const CONSTANTS = require("./constants");
 const mysql = require("mysql2");
 const bcrypt = require('bcrypt');
 const queries = require("./queries");
-const saltRounds = 3;
 
 const sql = mysql.createPool({
     host: process.env.DB_HOST,
@@ -14,7 +14,12 @@ const sql = mysql.createPool({
 
 sql.query(queries.getCreateTableUsersQuery(), (err) => {
     if (err) console.error(err);
-    sql.query(queries.getCreateAdminAccountQuery("admin", saltRounds), (err) => {
+    sql.query(queries.getCreateAdminAccountQuery(
+        CONSTANTS.DEFAULT_ADMIN_LOGIN,
+        CONSTANTS.DEFAULT_ADMIN_PASSWORD,
+        CONSTANTS.DEFAULT_ADMIN_NAME,
+        CONSTANTS.DEFAULT_ADMIN_AGE
+    ), (err) => {
         if (err) console.error(err);
         sql.query(queries.getCreateTableFriendsQuery(), (err) => {
             if (err) console.error(err);
@@ -24,7 +29,6 @@ sql.query(queries.getCreateTableUsersQuery(), (err) => {
                     if (err) console.error(err);
                     sql.query(queries.getCreateTableChatQuery(), (err) => {
                         if (err) console.error(err);
-                        console.timeEnd("Module => database");
                     })
                 })
             })
@@ -39,10 +43,10 @@ exports.escape = (s) => {
 setInterval(() => {
     sql.query(`delete
                from tokens
-               where time < (NOW() - INTERVAL 1 DAY)`, (err) => {
+               where time < (NOW() - INTERVAL ${sql.escape(CONSTANTS.TOKEN_EXPIRATION_INTERVAL)})`, (err) => {
         if (err) console.error(err);
     })
-}, 3600000) // 1 hour
+}, CONSTANTS.TOKEN_EXPIRATION_UPDATE_INTERVAL)
 
 exports.authorizeUser = (login, password) => {
     return new Promise((resolve, reject) => {
@@ -263,7 +267,7 @@ exports.getUserColor = (id) => {
                 reject("getUserColor: Data undefined")
                 return;
             }
-            resolve(data[0].color || "#000000");
+            resolve(data[0].color || CONSTANTS.DEFAULT_USER_COLOR);
         })
     });
 }
@@ -455,7 +459,7 @@ exports.checkUserPassword = (id, password) => {
 
 exports.updateUserPassword = (id, password) => {
     return new Promise((resolve, reject) => {
-        password = bcrypt.hashSync(password, saltRounds);
+        password = bcrypt.hashSync(password, CONSTANTS.BCRYPT_SALT_ROUNDS);
         sql.query(queries.getUpdateUserPasswordQuery(id, password), (err) => {
             if (err) {
                 console.error(err);
@@ -669,3 +673,5 @@ exports.getUsersForAvatars = () => {
         })
     });
 }
+
+console.timeEnd("Module => database");

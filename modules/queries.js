@@ -1,7 +1,7 @@
 'use strict';
 console.time("Module => Queries");
+const CONSTANTS = require("./constants");
 const sql = require("mysql2");
-const bcrypt = require("bcrypt");
 
 exports.getOnlineUsersCountQuery = () => {
     return `
@@ -9,7 +9,7 @@ exports.getOnlineUsersCountQuery = () => {
         from tokens
                  left join users
                            on tokens.user_id = users.id
-        where tokens.time >= (NOW() - INTERVAL 5 MINUTE)
+        where tokens.time >= (NOW() - INTERVAL ${CONSTANTS.ONLINE_USERS_UPDATE_INTERVAL})
     `;
 }
 
@@ -224,7 +224,7 @@ exports.getCheckIsUserOnlineQuery = (id) => {
     return `
         select if (count(*) > 0, 'online', 'offline') as status
         from tokens
-        where time >= (NOW() - INTERVAL 5 MINUTE)
+        where time >= (NOW() - INTERVAL ${CONSTANTS.ONLINE_USERS_UPDATE_INTERVAL})
         and user_id = ${sql.escape(id)}
     `;
 }
@@ -418,7 +418,7 @@ exports.getCreateTableUsersQuery = () => {
                 sex        bool         default NULL,
                 firstname  varchar(255)        NOT NULL,
                 lastname   varchar(255) default NULL,
-                color      varchar(8)   default '#000000',
+                color      varchar(8)   default ${sql.escape(CONSTANTS.DEFAULT_USER_COLOR)},
                 admin      bool         default 0,
                 img_status bool         default 0
             )
@@ -426,7 +426,7 @@ exports.getCreateTableUsersQuery = () => {
     `;
 }
 
-exports.getCreateAdminAccountQuery = (adminPassword, saltRounds) => {
+exports.getCreateAdminAccountQuery = (adminLogin, adminPassword, adminName, adminAge) => {
     return `
         insert ignore 
         into users (login, 
@@ -436,11 +436,11 @@ exports.getCreateAdminAccountQuery = (adminPassword, saltRounds) => {
                     firstname, 
                     lastname, 
                     admin)
-        values ("admin", 
-                ${sql.escape(bcrypt.hashSync(adminPassword, saltRounds))}, 
-                NOW() - INTERVAL 18 YEAR, 
+        values (${sql.escape(adminLogin)}, 
+                ${sql.escape(adminPassword)}, 
+                NOW() - INTERVAL ${sql.escape(adminAge)} YEAR, 
                 1,
-                'Администратор', 
+                ${sql.escape(adminName)}, 
                 '', 
                 1)
     `;

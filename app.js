@@ -7,6 +7,7 @@ if (!process.env.USING_SERVER) {
     });
 }
 require("./pre");
+const CONSTANTS = require("./modules/constants");
 const fs = require("fs");
 const cookieParser = require('cookie-parser');
 const pars = require('body-parser');
@@ -28,18 +29,17 @@ const parserURLEncoded = pars.urlencoded({
     extended: false
 });
 const parserJSON = pars.json();
-const saltRounds = 3;
 
 app.use(express.static(__dirname + "/public", {
-    maxAge: "1h"
+    maxAge: CONSTANTS.EXPRESS_STATIC_PUBLIC_TIME
 }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
 
 app.get("/login", (req, res) => {
-    res.clearCookie("danchat.token");
-    res.clearCookie("danchat.user.color");
+    res.clearCookie(CONSTANTS.COOKIE_NAME_TOKEN);
+    res.clearCookie(CONSTANTS.COOKIE_NAME_USER_COLOR);
     res.render("login.ejs", {
         notification: ""
     });
@@ -78,8 +78,8 @@ app.post("/registration", parserURLEncoded, (req, res) => {
         let user = req.body;
         user.birthdate = user.birthdate.split(".").reverse().join("-");
         user.sex = parseInt(user.sex);
-        user.password = bcrypt.hashSync(user.password, saltRounds);
-        user.color = "#000000";
+        user.password = bcrypt.hashSync(user.password, CONSTANTS.BCRYPT_SALT_ROUNDS);
+        user.color = CONSTANTS.DEFAULT_USER_COLOR;
         db.registerUser(user).then((userId) => {
             let msg = {};
             msg.type = "registration";
@@ -113,10 +113,10 @@ app.post("/registration", parserURLEncoded, (req, res) => {
 function enter(res, user) { //user: color, id
     let token = std.genToken();
     db.enter(user.id, token).then(() => {
-        res.cookie("danchat.token", token, {
+        res.cookie(CONSTANTS.COOKIE_NAME_TOKEN, token, {
             path: "/"
         });
-        res.cookie("danchat.user.color", user.color, {
+        res.cookie(CONSTANTS.COOKIE_NAME_USER_COLOR, user.color, {
             path: "/"
         });
         res.redirect("/");
@@ -190,7 +190,7 @@ app.post("/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
             let message = req.body.message.trim();
-            if (message.length > 1000) {
+            if (message.length > CONSTANTS.MESSAGE_SYMBOLS_LIMIT) {
                 res.json(new ResponseObject(false, "Длина сообщения не должна превышать 1000 символов"));
                 return;
             }
@@ -222,9 +222,8 @@ app.post("/message", parserJSON, (req, res) => {
 app.post("/get/message", parserJSON, (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
-            const portion = 50;
             let msgId = parseInt(req.body.id);
-            db.getMessages(msgId, portion).then((messages) => {
+            db.getMessages(msgId, CONSTANTS.MESSAGES_BATCH_SIZE).then((messages) => {
                 res.json(messages);
             }, (err) => {
                 console.error(err);
@@ -359,7 +358,7 @@ app.get("/u/:userLogin", (req, res) => {
                     return;
                 }
                 db.getUserOnlineStatus(user.id).then((userOnlineStatus) => {
-                    db.getFriends(user.id, 6).then((friends) => {
+                    db.getFriends(user.id, CONSTANTS.PROFILE_FRIENDS_DISPLAY_LIMIT).then((friends) => {
                         let renderObject = {
                             login: u.login,
                             imgStatus: user.imgStatus,
@@ -713,8 +712,8 @@ app.get("/logout", (req, res) => {
     wwt.validate(req, res).then((u) => {
         if (u) {
             db.logout(u.id).finally(() => {
-                res.clearCookie("danchat.token");
-                res.clearCookie("danchat.user.color");
+                res.clearCookie(CONSTANTS.COOKIE_NAME_TOKEN);
+                res.clearCookie(CONSTANTS.COOKIE_NAME_USER_COLOR);
                 res.redirect("/login");
                 res.end();
             })
@@ -726,8 +725,8 @@ app.get("/logout", (req, res) => {
 })
 
 
-http.listen(process.env.PORT || 5000, (err) => {
+http.listen(process.env.PORT || CONSTANTS.DEFAULT_PORT, (err) => {
     if (err) console.log(err);
     console.timeEnd("Loading");
-    console.log(`Started on :${process.env.PORT || 5000}`);
+    console.log(`Started on :${process.env.PORT || CONSTANTS.DEFAULT_PORT}`);
 });

@@ -1,12 +1,13 @@
 'use strict';
 console.time("Module => work-with-token");
+const CONSTANTS = require("./constants");
 const db = require("./database");
 const std = require("./standard");
 
 
 exports.validate = (req, res, isAdmin = false) => {
     return new Promise((resolve, reject) => {
-        let token = std.getCookie(req, "danchat.token");
+        let token = std.getCookie(req, CONSTANTS.COOKIE_NAME_TOKEN);
         if (!token) {
             clearCookieAndRedirect(res);
             resolve(false);
@@ -37,8 +38,8 @@ exports.validate = (req, res, isAdmin = false) => {
 }
 
 function clearCookieAndRedirect(res) {
-    res.clearCookie("danchat.token");
-    res.clearCookie("danchat.user.color");
+    res.clearCookie(CONSTANTS.COOKIE_NAME_TOKEN);
+    res.clearCookie(CONSTANTS.COOKIE_NAME_USER_COLOR);
     res.redirect("/login");
 }
 
